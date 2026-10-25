@@ -142,6 +142,21 @@
               class="mg-bottom maxwidth"
               ref="list_domain"
             />
+            <cv-row v-if="listDomainUsedBy">
+              <cv-column>
+                <NsInlineNotification
+                  kind="warning"
+                  :title="$t('settings.list_domain_already_used')"
+                  :description="
+                    $t('settings.list_domain_already_used_description', {
+                      domain: listDomain,
+                      instance: listDomainUsedBy,
+                    })
+                  "
+                  :showCloseButton="false"
+                />
+              </cv-column>
+            </cv-row>
             <cv-text-area
               :label="$t('settings.listmasters')"
               v-model="listmastersText"
@@ -295,6 +310,7 @@ export default {
       mailServers: [],
       userDomains: [],
       smarthostEnabled: true,
+      domainsInUse: {},
       optionsKey: 0,
       invalidEmail: "",
       loading: {
@@ -347,11 +363,19 @@ export default {
     },
     listDomainOptions() {
       const server = this.mailServers.find((s) => s.uuid === this.mailServer);
-      return (server ? server.domains : []).map((domain) => ({
-        name: domain,
-        label: domain,
-        value: domain,
-      }));
+      // Like ns8-piler: the label tells which domains another instance serves
+      return (server ? server.domains : []).map((domain) => {
+        const label = this.domainsInUse[domain]
+          ? this.$t("settings.domain_used_by", {
+              domain,
+              instance: this.domainsInUse[domain],
+            })
+          : domain;
+        return { name: domain, label, value: domain };
+      });
+    },
+    listDomainUsedBy() {
+      return this.domainsInUse[this.listDomain] || "";
     },
     langOptions() {
       return Object.entries(LANGS).map(([value, label]) => ({
@@ -469,6 +493,7 @@ export default {
       this.mailServers = config.mail_servers;
       this.userDomains = config.user_domains;
       this.smarthostEnabled = config.smarthost_enabled;
+      this.domainsInUse = config.domains_in_use || {};
       this.host = config.host;
       this.savedHost = config.host;
       this.hasRoute = config.has_route;
@@ -520,6 +545,14 @@ export default {
           }
           isValidationOk = false;
         }
+      }
+      if (this.listDomainUsedBy) {
+        this.error.list_domain =
+          "settings.list_domain_used_by_another_instance";
+        if (isValidationOk) {
+          this.focusElement("list_domain");
+        }
+        isValidationOk = false;
       }
       const emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
       const badEmail = this.listmasters().find((addr) => !emailRe.test(addr));

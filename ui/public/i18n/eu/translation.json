@@ -53,7 +53,11 @@
     "list_domain_is_mail_internal_domain": "Posta-zerbitzariak bere barne-domeinua eta azpidomeinuak baztertzen ditu, aukeratu beste domeinu bat",
     "user_domain_not_found": "Ez da erabiltzaile-domeinua aurkitu",
     "choose_list_domain": "Aukeratu domeinu bat",
-    "list_domain_not_in_mail_server": "Domeinua ez dago aukeratutako posta-zerbitzarian"
+    "list_domain_not_in_mail_server": "Domeinua ez dago aukeratutako posta-zerbitzarian",
+    "domain_used_by": "{domain} ({instance}-k erabilia)",
+    "list_domain_already_used": "Domeinua beste Sympa instantzia batek erabiltzen du",
+    "list_domain_already_used_description": "{instance}-k {domain} domeinuko zerrendak kudeatzen ditu jada. Sympak robot bat erabiltzen du domeinu bakoitzeko, bere sympa@ eta listmaster@ helbideekin. Aukeratu beste domeinu bat, edo sortu zerrendak {instance}-n.",
+    "list_domain_used_by_another_instance": "Domeinu hau beste Sympa instantzia batek erabiltzen du"
   },
   "common": {
     "required": "Derrigorrezkoa",

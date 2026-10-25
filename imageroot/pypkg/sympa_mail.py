@@ -156,3 +156,20 @@ def remove_addresses(mail_uuid, domain=None, local_parts=None):
         print(agent.SD_WARNING + f"remove-owned-addresses failed on {module_id}", file=sys.stderr)
         return []
     return result['output']['removed']
+
+
+def list_domains_in_use(rdb):
+    """List domains of the other Sympa instances: {domain: module_id}.
+
+    Sympa runs one robot per domain, and the robot addresses (sympa@,
+    listmaster@...) exist once per domain in the mail module.
+    """
+    in_use = {}
+    for module_id in rdb.hkeys('cluster/module_node'):
+        if module_id == os.environ['MODULE_ID']:
+            continue
+        domain, inbound, uuid = rdb.hmget(f'module/{module_id}/environment', 'LIST_DOMAIN', 'INBOUND_DOMAIN', 'MODULE_UUID')
+        # INBOUND_DOMAIN marks a Sympa instance. The source of a move has our UUID.
+        if domain and inbound and uuid != os.environ['MODULE_UUID']:
+            in_use[domain.lower()] = module_id
+    return in_use

@@ -9,7 +9,9 @@
             "lets_encrypt": true,
             "has_route": true,
             "list_domain": "example.org",
-            "listmasters": ["admin@example.org"],
+            "listmasters": [
+                "admin@example.org"
+            ],
             "mail_server": "9b4b1e2c-6f3d-4a8e-8f43-2b2a8d0f8c11",
             "user_domain": "example.org",
             "default_lang": "en-US",
@@ -21,11 +23,18 @@
                     "ui_name": "",
                     "node": "1",
                     "internal_domain": "example.org",
-                    "domains": ["example.org"]
+                    "domains": [
+                        "example.org"
+                    ]
                 }
             ],
-            "user_domains": ["example.org"],
-            "smarthost_enabled": true
+            "user_domains": [
+                "example.org"
+            ],
+            "smarthost_enabled": true,
+            "domains_in_use": {
+                "example.com": "sympa2"
+            }
         }
     ],
     "type": "object",
@@ -42,17 +51,54 @@
         "smarthost_enabled"
     ],
     "properties": {
-        "host": {"type": "string"},
-        "lets_encrypt": {"type": "boolean"},
-        "has_route": {"type": "boolean"},
-        "list_domain": {"type": "string"},
-        "listmasters": {"type": "array", "items": {"type": "string"}},
-        "mail_server": {"type": "string"},
-        "user_domain": {"type": "string"},
-        "default_lang": {"type": "string"},
-        "inbound_domain": {"type": "string"},
-        "mail_servers": {"type": "array"},
-        "user_domains": {"type": "array", "items": {"type": "string"}},
-        "smarthost_enabled": {"type": "boolean"}
+        "host": {
+            "type": "string"
+        },
+        "lets_encrypt": {
+            "type": "boolean"
+        },
+        "has_route": {
+            "type": "boolean"
+        },
+        "list_domain": {
+            "type": "string"
+        },
+        "listmasters": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "mail_server": {
+            "type": "string"
+        },
+        "user_domain": {
+            "type": "string"
+        },
+        "default_lang": {
+            "type": "string"
+        },
+        "inbound_domain": {
+            "type": "string"
+        },
+        "mail_servers": {
+            "type": "array"
+        },
+        "user_domains": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "smarthost_enabled": {
+            "type": "boolean"
+        },
+        "domains_in_use": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "string"
+            },
+            "description": "List domains served by other Sympa instances, with their module ID"
+        }
     }
 }

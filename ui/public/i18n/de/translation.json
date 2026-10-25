@@ -53,7 +53,11 @@
     "list_domain_is_mail_internal_domain": "Der Mailserver lehnt seine interne Domain und deren Subdomains ab, wählen Sie eine andere Domain",
     "user_domain_not_found": "Benutzerdomain nicht gefunden",
     "choose_list_domain": "Domain auswählen",
-    "list_domain_not_in_mail_server": "Die Domain existiert nicht im gewählten Mailserver"
+    "list_domain_not_in_mail_server": "Die Domain existiert nicht im gewählten Mailserver",
+    "domain_used_by": "{domain} (verwendet von {instance})",
+    "list_domain_already_used": "Domain wird bereits von einer anderen Sympa-Instanz verwendet",
+    "list_domain_already_used_description": "{instance} verwaltet bereits die Listen von {domain}. Sympa betreibt einen Robot pro Domain mit eigenen Adressen sympa@ und listmaster@. Wählen Sie eine andere Domain oder erstellen Sie die Listen in {instance}.",
+    "list_domain_used_by_another_instance": "Diese Domain wird von einer anderen Sympa-Instanz verwendet"
   },
   "common": {
     "required": "Erforderlich",
