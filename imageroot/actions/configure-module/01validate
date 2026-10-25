@@ -22,13 +22,23 @@ def fail(field, value, error):
     errors.append({'field': field, 'parameter': field, 'value': value, 'error': error})
 
 
+rdb = agent.redis_connect(use_replica=True)
+
+
+def route_owned_by_us(host):
+    """True if the route belongs to this instance, or to the source of a move (same UUID)"""
+    owners = [os.environ['MODULE_ID']]
+    for module_id, uuid in rdb.hgetall('cluster/module_uuid').items():
+        if uuid == os.environ['MODULE_UUID'] and module_id not in owners:
+            owners.append(module_id)
+    return any((agent.get_route(module_id) or {}).get('host') == host for module_id in owners)
+
+
 host = data["host"].lower()
-# A clone keeps the source host but has no route yet: only skip the check for our own route
-own_route = agent.get_route(os.environ['MODULE_ID']) or {}
-if own_route.get('host') != host and agent.http_route_in_use(domain=host):
+# A copy keeps the source host but has no route: it must not take the source route
+if agent.http_route_in_use(domain=host) and not route_owned_by_us(host):
     fail('host', host, 'domain_already_used_in_traefik')
 
-rdb = agent.redis_connect(use_replica=True)
 providers = agent.list_service_providers(rdb, 'imap', 'tcp', {'module_uuid': data["mail_server"]})
 if not providers:
     fail('mail_server', data["mail_server"], 'mail_server_not_found')
