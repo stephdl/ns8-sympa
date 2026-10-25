@@ -99,7 +99,11 @@
     "list-lists": "Listen anzeigen",
     "create-list": "Liste erstellen",
     "destroy-list": "Liste löschen",
-    "create-list-addresses": "Listenadressen erstellen"
+    "create-list-addresses": "Listenadressen erstellen",
+    "list-addresses": "Adressen anzeigen",
+    "list-domains": "Domains anzeigen",
+    "add-address": "Adresse hinzufügen",
+    "remove-address": "Adresse entfernen"
   },
   "task": {
     "cannot_create_task": "{action} kann nicht erstellt werden"
@@ -124,7 +128,6 @@
     "addresses_ok": "Angelegt",
     "addresses_missing": "Fehlen",
     "create_addresses": "Adressen erstellen",
-    "show_commands": "Befehle anzeigen",
     "open_in_sympa": "In Sympa öffnen",
     "destroy_list": "Liste löschen",
     "destroy_description": "Die Liste {list}, ihre Abonnenten und Archive werden endgültig gelöscht. Ihre E-Mail-Adressen werden vom Mailserver entfernt.",
@@ -158,12 +161,12 @@
     "list_cannot_create_addresses": "Der Mailserver kann die Adressen nicht erstellen",
     "not_configured": "Sympa ist nicht konfiguriert",
     "not_configured_description": "Wählen Sie Mailserver und Listen-Domain in den Einstellungen",
-    "manual_mode": "Der Mailserver kann die Listenadressen nicht verwalten",
-    "manual_mode_description": "Aktualisieren Sie die Mail-Anwendung, damit Sympa die Adressen selbst erstellt. Bis dahin legen Sie sie von Hand an: jede Liste zeigt ihre Befehle.",
-    "manual_create_note": "Die E-Mail-Adressen der neuen Liste müssen von Hand angelegt werden",
     "robot_addresses_missing": "Sympa-Adressen fehlen",
     "robot_addresses_missing_description": "Einige Adressen des Sympa-Robots konnten nicht erstellt werden, z. B. weil ein Benutzer denselben Namen hat. Prüfen Sie die Protokolle und speichern Sie die Einstellungen erneut.",
-    "addresses_of": "Adressen von {list}",
-    "commands_description": "Führen Sie diese Befehle auf dem Cluster-Leader aus oder legen Sie dieselben Adressen in der Mail-Anwendung an. Prüfen Sie zuerst, dass kein Benutzer und keine Gruppe diese Namen trägt."
+    "ui_mode": "Adressen werden auf dieser Seite verwaltet",
+    "ui_mode_description": "Diese Seite erstellt und entfernt die Listenadressen in {mail} mit Ihrem Administratorkonto. In der Sympa-Weboberfläche erstellte oder geschlossene Listen werden nicht synchronisiert: verwenden Sie die Schaltfläche Adressen erstellen oder löschen Sie sie hier.",
+    "mail_not_readable": "Die Adressen von {mail} können nicht gelesen werden",
+    "robot_addresses_missing_ui": "Sympa braucht diese Adressen für Befehle und Unzustellbarkeitsmeldungen: {addresses}.",
+    "create_robot_addresses": "Sympa-Adressen erstellen"
   }
 }

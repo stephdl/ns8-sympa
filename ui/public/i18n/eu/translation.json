@@ -99,7 +99,11 @@
     "list-lists": "Zerrendatu zerrendak",
     "create-list": "Sortu zerrenda",
     "destroy-list": "Suntsitu zerrenda",
-    "create-list-addresses": "Sortu zerrendaren helbideak"
+    "create-list-addresses": "Sortu zerrendaren helbideak",
+    "list-addresses": "Zerrendatu helbideak",
+    "list-domains": "Zerrendatu domeinuak",
+    "add-address": "Gehitu helbidea",
+    "remove-address": "Kendu helbidea"
   },
   "task": {
     "cannot_create_task": "Ezin da zeregina {action} sortu"
@@ -124,7 +128,6 @@
     "addresses_ok": "Adierazita",
     "addresses_missing": "Falta dira",
     "create_addresses": "Sortu helbideak",
-    "show_commands": "Erakutsi komandoak",
     "open_in_sympa": "Ireki Sympan",
     "destroy_list": "Suntsitu zerrenda",
     "destroy_description": "{list} zerrenda, bere harpidedunak eta artxiboak behin betiko ezabatzen dira. Bere helbide elektronikoak posta-zerbitzaritik kentzen dira.",
@@ -158,12 +161,12 @@
     "list_cannot_create_addresses": "Posta-zerbitzariak ezin ditu helbideak sortu",
     "not_configured": "Sympa ez dago konfiguratuta",
     "not_configured_description": "Aukeratu posta-zerbitzaria eta zerrenden domeinua Ezarpenetan",
-    "manual_mode": "Posta-zerbitzariak ezin ditu zerrenden helbideak kudeatu",
-    "manual_mode_description": "Eguneratu Mail aplikazioa Sympak helbideak sor ditzan. Bitartean, adierazi eskuz: zerrenda bakoitzak bere komandoak erakusten ditu.",
-    "manual_create_note": "Zerrenda berriaren helbideak eskuz adierazi behar dira",
     "robot_addresses_missing": "Sympa helbide batzuk falta dira",
     "robot_addresses_missing_description": "Sympa robotaren helbide batzuk ezin izan dira sortu, adibidez erabiltzaile batek izen bera duelako. Begiratu erregistroak eta gorde ezarpenak berriro.",
-    "addresses_of": "{list} zerrendaren helbideak",
-    "commands_description": "Exekutatu komando hauek klusterraren liderrean, edo sortu helbide berak Mail aplikazioan. Egiaztatu lehenik ez dagoela izen hauek dituen erabiltzaile edo talderik."
+    "ui_mode": "Helbideak orri honetatik kudeatzen dira",
+    "ui_mode_description": "Orri honek zerrenden helbideak {mail}-n sortzen eta kentzen ditu zure administratzaile-kontuarekin. Sympa web-interfazean sortutako edo itxitako zerrendak ez dira sinkronizatzen: erabili Sortu helbideak botoia, edo suntsitu hemen.",
+    "mail_not_readable": "Ezin dira {mail}-ren helbideak irakurri",
+    "robot_addresses_missing_ui": "Sympak helbide hauek behar ditu komandoak eta itzulerak jasotzeko: {addresses}.",
+    "create_robot_addresses": "Sortu Sympa helbideak"
   }
 }

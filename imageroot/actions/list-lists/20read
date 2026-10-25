@@ -15,7 +15,8 @@ import sympa_mail
 domain = os.environ.get("LIST_DOMAIN", "")
 mail_server = os.environ.get("MAIL_SERVER", "")
 if not domain or not mail_server:
-    json.dump({"mode": "unconfigured", "lists": [], "robot_addresses_ok": False, "list_types": sympa_lists.LIST_TYPES}, fp=sys.stdout)
+    json.dump({"mode": "unconfigured", "lists": [], "robot_addresses_ok": False, "list_types": sympa_lists.LIST_TYPES,
+               "robot_addresses": [], "list_suffixes": sympa_mail.LIST_SUFFIXES}, fp=sys.stdout)
     sys.exit(0)
 
 owned = sympa_mail.owned_addresses(mail_server)
@@ -32,6 +33,9 @@ for item in lists:
 json.dump({
     "mode": mode,
     "lists": lists,
-    "robot_addresses_ok": mode == "auto" and all(local in present for local in sympa_mail.ROBOT_LOCAL_PARTS),
+    "robot_addresses_ok": mode == "auto" and all(local in present for local in sympa_mail.robot_local_parts()),
+    # The UI declares the addresses itself when the mail server cannot
+    "robot_addresses": sympa_mail.robot_local_parts(),
+    "list_suffixes": sympa_mail.LIST_SUFFIXES,
     "list_types": sympa_lists.LIST_TYPES,
 }, fp=sys.stdout)

@@ -99,7 +99,11 @@
     "list-lists": "Listar listas",
     "create-list": "Criar lista",
     "destroy-list": "Destruir lista",
-    "create-list-addresses": "Criar endereços da lista"
+    "create-list-addresses": "Criar endereços da lista",
+    "list-addresses": "Listar endereços",
+    "list-domains": "Listar domínios",
+    "add-address": "Adicionar endereço",
+    "remove-address": "Remover endereço"
   },
   "task": {
     "cannot_create_task": "Não é possível criar a tarefa {action}"
@@ -124,7 +128,6 @@
     "addresses_ok": "Declarados",
     "addresses_missing": "Em falta",
     "create_addresses": "Criar endereços",
-    "show_commands": "Ver comandos",
     "open_in_sympa": "Abrir no Sympa",
     "destroy_list": "Destruir lista",
     "destroy_description": "A lista {list}, os seus subscritores e arquivos são eliminados definitivamente. Os seus endereços de email são removidos do servidor de correio.",
@@ -158,12 +161,12 @@
     "list_cannot_create_addresses": "O servidor de correio não consegue criar os endereços",
     "not_configured": "O Sympa não está configurado",
     "not_configured_description": "Escolha o servidor de correio e o domínio das listas em Definições",
-    "manual_mode": "O servidor de correio não consegue gerir os endereços das listas",
-    "manual_mode_description": "Atualize a aplicação Mail para que o Sympa crie os endereços. Até lá, declare-os à mão: cada lista mostra os seus comandos.",
-    "manual_create_note": "Os endereços da nova lista têm de ser declarados à mão",
     "robot_addresses_missing": "Faltam endereços do Sympa",
     "robot_addresses_missing_description": "Alguns endereços do robô Sympa não foram criados, por exemplo porque um utilizador tem o mesmo nome. Verifique os registos e guarde as definições de novo.",
-    "addresses_of": "Endereços de {list}",
-    "commands_description": "Execute estes comandos no líder do cluster, ou crie os mesmos endereços na aplicação Mail. Verifique antes que nenhum utilizador ou grupo tem estes nomes."
+    "ui_mode": "Endereços geridos a partir desta página",
+    "ui_mode_description": "Esta página cria e remove os endereços das listas em {mail} com a sua conta de administrador. As listas criadas ou fechadas na interface web do Sympa não são sincronizadas: use o botão Criar endereços, ou destrua-as aqui.",
+    "mail_not_readable": "Não é possível ler os endereços de {mail}",
+    "robot_addresses_missing_ui": "O Sympa precisa destes endereços para receber comandos e devoluções: {addresses}.",
+    "create_robot_addresses": "Criar endereços do Sympa"
   }
 }

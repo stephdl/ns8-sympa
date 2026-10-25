@@ -89,7 +89,11 @@
     "list-lists": "List lists",
     "create-list": "Create list",
     "destroy-list": "Destroy list",
-    "create-list-addresses": "Create list addresses"
+    "create-list-addresses": "Create list addresses",
+    "list-addresses": "List addresses",
+    "list-domains": "List domains",
+    "add-address": "Add address",
+    "remove-address": "Remove address"
   },
   "error": {
     "error": "Error",
@@ -124,7 +128,6 @@
     "addresses_ok": "Declared",
     "addresses_missing": "Missing",
     "create_addresses": "Create addresses",
-    "show_commands": "Show commands",
     "open_in_sympa": "Open in Sympa",
     "destroy_list": "Destroy list",
     "destroy_description": "The list {list}, its subscribers and its archives are deleted for good. Its mail addresses are removed from the mail server.",
@@ -158,12 +161,12 @@
     "list_cannot_create_addresses": "The mail server cannot create the addresses",
     "not_configured": "Sympa is not configured",
     "not_configured_description": "Choose the mail server and the list domain in Settings",
-    "manual_mode": "The mail server cannot manage the list addresses",
-    "manual_mode_description": "Update the Mail application to let Sympa create the addresses itself. Until then, declare them by hand: each list shows its commands.",
-    "manual_create_note": "The mail addresses of the new list must be declared by hand",
     "robot_addresses_missing": "Sympa addresses are missing",
     "robot_addresses_missing_description": "Some addresses of the Sympa robot could not be created, for example because a user has the same name. Check the logs and save the settings again.",
-    "addresses_of": "Addresses of {list}",
-    "commands_description": "Run these commands on the cluster leader, or create the same addresses in the Mail application. Check first that no user or group has these names."
+    "ui_mode": "Addresses managed from this page",
+    "ui_mode_description": "This page creates and removes the list addresses in {mail} with your administrator account. Lists created or closed in the Sympa web interface are not synchronized: use the Create addresses button, or destroy them here.",
+    "mail_not_readable": "Cannot read the addresses of {mail}",
+    "robot_addresses_missing_ui": "Sympa needs these addresses to receive commands and bounces: {addresses}.",
+    "create_robot_addresses": "Create Sympa addresses"
   }
 }

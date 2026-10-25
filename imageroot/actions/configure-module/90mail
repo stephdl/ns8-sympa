@@ -32,7 +32,9 @@ if sympa_mail.owned_addresses(current) is None:
     sys.exit(0)
 
 # Robot addresses, then the addresses of the existing lists
-wanted = list(sympa_mail.ROBOT_LOCAL_PARTS)
+# Robot addresses before the instance prefix are no longer used
+sympa_mail.remove_addresses(current, domain, sympa_mail.LEGACY_ROBOT_LOCAL_PARTS)
+wanted = sympa_mail.robot_local_parts()
 try:
     for item in sympa_lists.get_lists(domain):
         wanted += sympa_mail.list_local_parts(item['name'])

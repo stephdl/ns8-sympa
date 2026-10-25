@@ -39,6 +39,9 @@ write_env("sympa.env", {
     "SYMPA_WWSYMPA_URL": f"https://{host}/sympa",
     "SYMPA_HOSTNAME": host,
     "SYMPA_INBOUND_DOMAIN": env.get("INBOUND_DOMAIN", ""),
+    # Fixed at creation like the inbound domain: robot addresses never collide
+    # with a user or with another instance, and survive restore and move
+    "SYMPA_ROBOT_PREFIX": env.get("INBOUND_DOMAIN", "").removesuffix(".invalid"),
     "SYMPA_LANG": env.get("DEFAULT_LANG", "en-US"),
 })
 

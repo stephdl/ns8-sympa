@@ -29,7 +29,8 @@ def fail(field, error, value):
     sys.exit(2)
 
 
-reserved = set(sympa_mail.ROBOT_LOCAL_PARTS)
+# Legacy robot names stay reserved: the configuration removes them as robot addresses
+reserved = set(sympa_mail.robot_local_parts() + sympa_mail.LEGACY_ROBOT_LOCAL_PARTS)
 if name in reserved or any(name.endswith(suffix) for suffix in sympa_mail.LIST_SUFFIXES if suffix):
     fail('name', 'list_name_reserved', name)
 if sympa_lists.list_exists(name, domain):

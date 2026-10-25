@@ -19,6 +19,21 @@
                     "addresses_ok": true,
                     "missing_addresses": []
                 }
+            ],
+            "robot_addresses": [
+                "sympa1",
+                "sympa1-request",
+                "sympa1-owner",
+                "sympa1-listmaster",
+                "sympa1-bounce",
+                "sympa1-abuse-feedback-report"
+            ],
+            "list_suffixes": [
+                "",
+                "-request",
+                "-editor",
+                "-unsubscribe",
+                "-owner"
             ]
         }
     ],
@@ -27,7 +42,9 @@
         "mode",
         "lists",
         "robot_addresses_ok",
-        "list_types"
+        "list_types",
+        "robot_addresses",
+        "list_suffixes"
     ],
     "properties": {
         "mode": {
@@ -82,6 +99,18 @@
                         }
                     }
                 }
+            }
+        },
+        "robot_addresses": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "list_suffixes": {
+            "type": "array",
+            "items": {
+                "type": "string"
             }
         }
     }

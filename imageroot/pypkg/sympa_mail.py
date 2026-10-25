@@ -91,10 +91,20 @@ def remove_relay_rule(mail_uuid):
 # List addresses in the mail module, through the mailaddressadm role
 #
 
-# Robot addresses, from /etc/sympa/aliases.sympa.postfix of the EPEL package
-ROBOT_LOCAL_PARTS = ["sympa", "sympa-request", "sympa-owner", "listmaster", "bounce", "abuse-feedback-report"]
+# Robot addresses of the EPEL package, before the instance prefix
+LEGACY_ROBOT_LOCAL_PARTS = ["sympa", "sympa-request", "sympa-owner", "listmaster", "bounce", "abuse-feedback-report"]
+ROBOT_SUFFIXES = ["", "-request", "-owner", "-listmaster", "-bounce", "-abuse-feedback-report"]
 # Addresses of one list, from Sympa default/list_aliases.tt2
 LIST_SUFFIXES = ["", "-request", "-editor", "-unsubscribe", "-owner"]
+
+
+def robot_prefix():
+    return os.environ["INBOUND_DOMAIN"].removesuffix(".invalid")
+
+
+def robot_local_parts():
+    """sympa1, sympa1-request, ... set in sympa.conf by the entrypoint"""
+    return [robot_prefix() + suffix for suffix in ROBOT_SUFFIXES]
 
 
 def list_local_parts(name):

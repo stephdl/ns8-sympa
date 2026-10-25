@@ -99,7 +99,11 @@
     "list-lists": "Listar listas",
     "create-list": "Crear lista",
     "destroy-list": "Destruir lista",
-    "create-list-addresses": "Crear direcciones de la lista"
+    "create-list-addresses": "Crear direcciones de la lista",
+    "list-addresses": "Listar direcciones",
+    "list-domains": "Listar dominios",
+    "add-address": "Añadir dirección",
+    "remove-address": "Quitar dirección"
   },
   "task": {
     "cannot_create_task": "No se puede crear la tarea {action}"
@@ -124,7 +128,6 @@
     "addresses_ok": "Declaradas",
     "addresses_missing": "Faltan",
     "create_addresses": "Crear direcciones",
-    "show_commands": "Ver comandos",
     "open_in_sympa": "Abrir en Sympa",
     "destroy_list": "Destruir lista",
     "destroy_description": "La lista {list}, sus suscriptores y sus archivos se eliminan definitivamente. Sus direcciones de correo se quitan del servidor de correo.",
@@ -158,12 +161,12 @@
     "list_cannot_create_addresses": "El servidor de correo no puede crear las direcciones",
     "not_configured": "Sympa no está configurado",
     "not_configured_description": "Elige el servidor de correo y el dominio de las listas en Configuración",
-    "manual_mode": "El servidor de correo no puede gestionar las direcciones de las listas",
-    "manual_mode_description": "Actualiza la aplicación Mail para que Sympa cree las direcciones. Mientras tanto, decláralas a mano: cada lista muestra sus comandos.",
-    "manual_create_note": "Las direcciones de la nueva lista deben declararse a mano",
     "robot_addresses_missing": "Faltan direcciones de Sympa",
     "robot_addresses_missing_description": "Algunas direcciones del robot Sympa no se pudieron crear, por ejemplo porque un usuario tiene el mismo nombre. Revisa los registros y guarda la configuración otra vez.",
-    "addresses_of": "Direcciones de {list}",
-    "commands_description": "Ejecuta estos comandos en el líder del clúster, o crea las mismas direcciones en la aplicación Mail. Comprueba antes que ningún usuario ni grupo tenga estos nombres."
+    "ui_mode": "Direcciones gestionadas desde esta página",
+    "ui_mode_description": "Esta página crea y quita las direcciones de las listas en {mail} con tu cuenta de administrador. Las listas creadas o cerradas en la interfaz web de Sympa no se sincronizan: usa el botón Crear direcciones o destrúyelas aquí.",
+    "mail_not_readable": "No se pueden leer las direcciones de {mail}",
+    "robot_addresses_missing_ui": "Sympa necesita estas direcciones para recibir comandos y rebotes: {addresses}.",
+    "create_robot_addresses": "Crear direcciones de Sympa"
   }
 }
