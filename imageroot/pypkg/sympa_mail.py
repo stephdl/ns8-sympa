@@ -50,12 +50,8 @@ def ensure_relay_rule(mail_uuid):
     if rule and rule['rule_type'] == 'recipient' and rule['host'] == host \
             and int(rule['port']) == port and rule['enabled']:
         return
-    if rule:
-        # After a restore or a move, the rule still points to the old node
-        result = _run(module_id, 'remove-relay-rule', {'rule_subject': subject})
-        agent.assert_exp(result['exit_code'] == 0, f"remove-relay-rule failed on {module_id}")
 
-    result = _run(module_id, 'add-relay-rule', {
+    rule_data = {
         "rule_type": "recipient",
         "rule_subject": subject,
         "host": host,
@@ -64,8 +60,12 @@ def ensure_relay_rule(mail_uuid):
         "username": "",
         "password": "",
         "enabled": True,
-    })
-    agent.assert_exp(result['exit_code'] == 0, f"add-relay-rule failed on {module_id}")
+    }
+    # After a restore or a move the rule still points to the old node: update
+    # it in place, so list mail always has a route
+    action = 'alter-relay-rule' if rule else 'add-relay-rule'
+    result = _run(module_id, action, rule_data)
+    agent.assert_exp(result['exit_code'] == 0, f"{action} failed on {module_id}")
     print(f"Relay rule {subject} -> {host}:{port} set on {module_id}", file=sys.stderr)
 
 
