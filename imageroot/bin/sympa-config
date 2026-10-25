@@ -44,12 +44,20 @@ write_env("sympa.env", {
 
 os.makedirs("secrets", mode=0o700, exist_ok=True)
 
-ldap = {}
+
+def keep_or_empty(path, reason):
+    """On a transient error keep the last good file, so the pod still starts"""
+    print(agent.SD_WARNING + reason, file=sys.stderr)
+    if not os.path.exists(path):
+        write_env(path, {}, secret=True)
+
+
 user_domain = env.get("USER_DOMAIN", "")
-if user_domain:
-    try:
-        lp = Ldapproxy()
-        domain = lp.get_domain(user_domain)
+try:
+    ldap = {}
+    lp = Ldapproxy() if user_domain else None
+    domain = lp.get_domain(user_domain) if lp else None
+    if domain:
         ldap = {
             "SYMPA_LDAP_HOST": "accountprovider",
             "SYMPA_LDAP_PORT": domain["port"],
@@ -59,26 +67,31 @@ if user_domain:
             "SYMPA_LDAP_SCHEMA": domain["schema"],
             "SYMPA_LDAP_USER_CLAUSE": lp.get_ldap_users_search_filter_clause(user_domain),
         }
-    except Exception as ex:
+    elif user_domain:
         # Local Sympa accounts keep working without the user domain
-        print(agent.SD_WARNING + f"User domain {user_domain} is not available, LDAP login disabled: {ex}", file=sys.stderr)
-write_env("secrets/ldap.env", ldap, secret=True)
+        print(agent.SD_WARNING + f"User domain {user_domain} does not exist, LDAP login disabled", file=sys.stderr)
+    write_env("secrets/ldap.env", ldap, secret=True)
+except Exception as ex:
+    keep_or_empty("secrets/ldap.env", f"Cannot read the user domain, keeping the previous LDAP settings: {ex}")
 
-rdb = agent.redis_connect(use_replica=True)
-smtp = agent.get_smarthost_settings(rdb)
-smarthost = {}
-if smtp["enabled"] and smtp["host"]:
-    local_smtp = smtp["host"] in ("127.0.0.1", "localhost", "::1")
-    smarthost = {
-        "SMTP_ENABLED": "1",
-        "SMTP_HOST": NODE_LOOPBACK if local_smtp else smtp["host"],
-        "SMTP_PORT": smtp["port"],
-        "SMTP_USERNAME": smtp["username"],
-        "SMTP_PASSWORD": smtp["password"],
-        "SMTP_ENCRYPTION": smtp["encrypt_smtp"],
-        # The local certificate never matches 10.0.2.2
-        "SMTP_TLSVERIFY": "1" if smtp["tls_verify"] and not local_smtp else "",
-    }
-else:
-    print(agent.SD_WARNING + "The cluster smarthost is not configured, outgoing mail stays in the queue", file=sys.stderr)
-write_env("secrets/smarthost.env", smarthost, secret=True)
+try:
+    rdb = agent.redis_connect(use_replica=True)
+    smtp = agent.get_smarthost_settings(rdb)
+    smarthost = {}
+    if smtp["enabled"] and smtp["host"]:
+        local_smtp = smtp["host"] in ("127.0.0.1", "localhost", "::1")
+        smarthost = {
+            "SMTP_ENABLED": "1",
+            "SMTP_HOST": NODE_LOOPBACK if local_smtp else smtp["host"],
+            "SMTP_PORT": smtp["port"],
+            "SMTP_USERNAME": smtp["username"],
+            "SMTP_PASSWORD": smtp["password"],
+            "SMTP_ENCRYPTION": smtp["encrypt_smtp"],
+            # The local certificate never matches 10.0.2.2
+            "SMTP_TLSVERIFY": "1" if smtp["tls_verify"] and not local_smtp else "",
+        }
+    else:
+        print(agent.SD_WARNING + "The cluster smarthost is not configured, outgoing mail stays in the queue", file=sys.stderr)
+    write_env("secrets/smarthost.env", smarthost, secret=True)
+except Exception as ex:
+    keep_or_empty("secrets/smarthost.env", f"Cannot read the smarthost settings, keeping the previous ones: {ex}")
