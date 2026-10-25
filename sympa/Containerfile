@@ -1,0 +1,20 @@
+FROM docker.io/rockylinux/rockylinux:9.8
+
+ARG SYMPA_VERSION=6.2.80
+
+# CRB provides some Perl modules required by the EPEL sympa package
+RUN dnf -y install epel-release dnf-plugins-core \
+    && dnf config-manager --set-enabled crb \
+    && dnf -y install \
+        "sympa-${SYMPA_VERSION}" \
+        "sympa-nginx-${SYMPA_VERSION}" \
+        postfix \
+        perl-DBD-Pg \
+        perl-LDAP \
+        perl-Mail-DKIM \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf
+
+COPY usr /usr
+
+ENTRYPOINT ["/usr/local/bin/sympa-entrypoint"]
