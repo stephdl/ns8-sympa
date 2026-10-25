@@ -133,7 +133,8 @@ Nothing is automatic outside the UI:
 - when the mail server or the list domain changes in Settings, the UI
   moves the addresses to the new one after saving;
 - when the instance is removed, its addresses stay in the Mail application.
-  The Status page lists them, with the commands to remove them first.
+  Settings has a "Before removing the instance" section to remove them
+  first.
 
 ## Lists
 
@@ -239,8 +240,8 @@ The backup contains a dump of the database, the secrets and the
     remove-module --no-preserve sympa1
 
 The relay rule is removed from the Mail application. The mail addresses
-stay: remove them first from the Lists page, or with the commands of the
-Status page.
+stay: remove them first with the "Before removing the instance" section of
+Settings.
 
 ## Logs
 

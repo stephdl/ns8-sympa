@@ -59,7 +59,11 @@
     "list_domain_already_used_description": "{instance} já gere as listas de {domain}. O Sympa usa um robô por domínio, com os seus próprios endereços de robô. Escolha outro domínio ou crie as listas em {instance}.",
     "list_domain_used_by_another_instance": "Este domínio é usado por outra instância Sympa",
     "addresses_not_moved": "Endereços de email não movidos",
-    "go_to_lists": "Ir para as listas"
+    "go_to_lists": "Ir para as listas",
+    "before_removing": "Antes de remover a instância",
+    "before_removing_description": "Os endereços do Sympa e das listas estão em {mail}. A instância não os consegue remover quando é removida: remova-os aqui primeiro.",
+    "remove_all_addresses": "Remover todos os endereços",
+    "remove_all_addresses_description": "{count} endereços de {mail} reencaminham para esta instância e serão removidos: {addresses}. As listas deixam de receber correio."
   },
   "common": {
     "required": "Obrigatório",
@@ -84,10 +88,7 @@
     "not_configured": "Não configurado",
     "open_webapp": "Abrir o Sympa",
     "configure": "Configurar",
-    "sympa_webapp": "Interface web do Sympa",
-    "addresses_kept_on_removal": "Endereços de email do Sympa",
-    "addresses_kept_on_removal_description": "{count} endereços de {mail} reencaminham para esta instância. Se remover a instância, ficam em {mail}: remova-os antes na página Listas, ou com estes comandos.",
-    "show_addresses": "Ver comandos"
+    "sympa_webapp": "Interface web do Sympa"
   },
   "about": {
     "title": "Sobre"

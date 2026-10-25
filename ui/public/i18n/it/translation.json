@@ -22,10 +22,7 @@
     "not_configured": "Non configurato",
     "open_webapp": "Apri Sympa",
     "configure": "Configura",
-    "sympa_webapp": "Interfaccia web Sympa",
-    "addresses_kept_on_removal": "Indirizzi email di Sympa",
-    "addresses_kept_on_removal_description": "{count} indirizzi di {mail} inoltrano a questa istanza. Se rimuovi l'istanza, restano in {mail}: rimuovili prima dalla pagina Liste, oppure con questi comandi.",
-    "show_addresses": "Mostra comandi"
+    "sympa_webapp": "Interfaccia web Sympa"
   },
   "settings": {
     "save": "Salva",
@@ -74,7 +71,11 @@
     "list_domain_already_used_description": "{instance} gestisce già le liste di {domain}. Sympa usa un robot per dominio, con i propri indirizzi del robot. Scegli un altro dominio, oppure crea le liste in {instance}.",
     "list_domain_used_by_another_instance": "Questo dominio è usato da un'altra istanza Sympa",
     "addresses_not_moved": "Indirizzi email non spostati",
-    "go_to_lists": "Vai alle liste"
+    "go_to_lists": "Vai alle liste",
+    "before_removing": "Prima di rimuovere l'istanza",
+    "before_removing_description": "Gli indirizzi email di Sympa e delle liste si trovano in {mail}. L'istanza non può rimuoverli quando viene rimossa: rimuovili prima qui.",
+    "remove_all_addresses": "Rimuovi tutti gli indirizzi email",
+    "remove_all_addresses_description": "{count} indirizzi di {mail} inoltrano a questa istanza e saranno rimossi: {addresses}. Le liste non riceveranno più posta."
   },
   "error": {
     "error": "Errore",

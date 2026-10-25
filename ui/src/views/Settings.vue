@@ -261,6 +261,57 @@
         </cv-tile>
       </cv-column>
     </cv-row>
+    <cv-row v-if="saved.mailModule && saved.listDomain">
+      <cv-column>
+        <cv-accordion class="mg-bottom">
+          <cv-accordion-item>
+            <template slot="title">{{
+              $t("settings.before_removing")
+            }}</template>
+            <template slot="content">
+              <p class="mg-bottom">
+                {{
+                  $t("settings.before_removing_description", {
+                    mail: saved.mailModule,
+                  })
+                }}
+              </p>
+              <NsInlineNotification
+                v-if="cleanupError"
+                kind="error"
+                :title="$t('settings.remove_all_addresses')"
+                :description="cleanupError"
+                :showCloseButton="false"
+              />
+              <NsButton
+                kind="danger"
+                :icon="TrashCan20"
+                :disabled="stillLoading"
+                @click="showCleanup"
+                >{{ $t("settings.remove_all_addresses") }}</NsButton
+              >
+            </template>
+          </cv-accordion-item>
+        </cv-accordion>
+      </cv-column>
+    </cv-row>
+    <NsDangerDeleteModal
+      :isShown="isCleanupShown"
+      :name="instanceName"
+      :title="$t('settings.remove_all_addresses')"
+      :warning="core.$t('common.please_read_carefully')"
+      :description="
+        $t('settings.remove_all_addresses_description', {
+          count: cleanupAddresses.length,
+          mail: saved.mailModule,
+          addresses: cleanupAddresses.join(', '),
+        })
+      "
+      :typeToConfirm="core.$t('common.type_to_confirm', { name: instanceName })"
+      :loading="loading.cleanup"
+      @hide="isCleanupShown = false"
+      @confirmDelete="removeAllAddresses"
+    />
   </cv-grid>
 </template>
 
@@ -328,12 +379,16 @@ export default {
       // Saved mail server and list domain, to move the addresses after a change
       saved: { mailModule: "", listDomain: "", inbound: "" },
       moveError: "",
+      isCleanupShown: false,
+      cleanupAddresses: [],
+      cleanupError: "",
       optionsKey: 0,
       invalidEmail: "",
       loading: {
         getConfiguration: false,
         configureModule: false,
         getStatus: false,
+        cleanup: false,
       },
       error: {
         getConfiguration: "",
@@ -678,6 +733,38 @@ export default {
       }
       this.loading.configureModule = false;
       this.getConfiguration();
+    },
+    // The module cannot remove its addresses when the instance is removed
+    async showCleanup() {
+      this.cleanupError = "";
+      try {
+        const state = await this.readMailState(
+          this.saved.mailModule,
+          this.saved.listDomain
+        );
+        this.cleanupAddresses = this.sympaAddresses(
+          state,
+          this.saved.inbound
+        ).sort();
+        this.isCleanupShown = true;
+      } catch (err) {
+        this.cleanupError = err.message;
+      }
+    },
+    async removeAllAddresses() {
+      this.loading.cleanup = true;
+      try {
+        await this.withdrawAddresses(
+          this.saved.mailModule,
+          this.saved.listDomain,
+          this.saved.inbound,
+          this.cleanupAddresses
+        );
+        this.isCleanupShown = false;
+      } catch (err) {
+        this.cleanupError = err.message;
+      }
+      this.loading.cleanup = false;
     },
     // The module cannot move its addresses: copy them, then remove the old ones
     async moveAddresses(before, after) {

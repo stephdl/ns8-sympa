@@ -22,10 +22,7 @@
     "not_configured": "Non configuré",
     "open_webapp": "Ouvrir Sympa",
     "configure": "Configurer",
-    "sympa_webapp": "Interface web Sympa",
-    "addresses_kept_on_removal": "Adresses email de Sympa",
-    "addresses_kept_on_removal_description": "{count} adresses de {mail} renvoient vers cette instance. Si vous supprimez l'instance, elles restent dans {mail} : retirez-les d'abord depuis la page Listes, ou avec ces commandes.",
-    "show_addresses": "Voir les commandes"
+    "sympa_webapp": "Interface web Sympa"
   },
   "settings": {
     "title": "Paramètres",
@@ -74,7 +71,11 @@
     "list_domain_already_used_description": "{instance} gère déjà les listes de {domain}. Sympa utilise un robot par domaine, avec ses propres adresses de robot. Choisissez un autre domaine, ou créez les listes dans {instance}.",
     "list_domain_used_by_another_instance": "Ce domaine est utilisé par une autre instance Sympa",
     "addresses_not_moved": "Adresses email non déplacées",
-    "go_to_lists": "Aller aux listes"
+    "go_to_lists": "Aller aux listes",
+    "before_removing": "Avant de supprimer l'instance",
+    "before_removing_description": "Les adresses email de Sympa et des listes sont dans {mail}. L'instance ne peut pas les retirer quand elle est supprimée : retirez-les ici d'abord.",
+    "remove_all_addresses": "Retirer toutes les adresses email",
+    "remove_all_addresses_description": "{count} adresses de {mail} renvoient vers cette instance et seront retirées : {addresses}. Les listes ne recevront plus de courrier."
   },
   "about": {
     "title": "À propos"

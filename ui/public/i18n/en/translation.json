@@ -22,10 +22,7 @@
     "not_configured": "Not configured",
     "open_webapp": "Open Sympa",
     "configure": "Configure",
-    "sympa_webapp": "Sympa web interface",
-    "addresses_kept_on_removal": "Mail addresses of Sympa",
-    "addresses_kept_on_removal_description": "{count} addresses of {mail} forward to this instance. If you remove the instance, they stay in {mail}: remove them first from the Lists page, or with these commands.",
-    "show_addresses": "Show commands"
+    "sympa_webapp": "Sympa web interface"
   },
   "settings": {
     "title": "Settings",
@@ -74,7 +71,11 @@
     "list_domain_already_used_description": "{instance} already serves the lists of {domain}. Sympa runs one robot per domain, with its own robot addresses. Choose another domain, or create the lists in {instance}.",
     "list_domain_used_by_another_instance": "This domain is used by another Sympa instance",
     "addresses_not_moved": "Mail addresses not moved",
-    "go_to_lists": "Go to Lists"
+    "go_to_lists": "Go to Lists",
+    "before_removing": "Before removing the instance",
+    "before_removing_description": "The mail addresses of Sympa and of the lists live in {mail}. The instance cannot remove them when it is removed: remove them here first.",
+    "remove_all_addresses": "Remove all mail addresses",
+    "remove_all_addresses_description": "{count} addresses of {mail} forward to this instance and will be removed: {addresses}. The lists stop receiving mail."
   },
   "about": {
     "title": "About"

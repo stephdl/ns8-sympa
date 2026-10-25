@@ -59,7 +59,11 @@
     "list_domain_already_used_description": "{instance} verwaltet bereits die Listen von {domain}. Sympa betreibt einen Robot pro Domain mit eigenen Robot-Adressen. Wählen Sie eine andere Domain oder erstellen Sie die Listen in {instance}.",
     "list_domain_used_by_another_instance": "Diese Domain wird von einer anderen Sympa-Instanz verwendet",
     "addresses_not_moved": "E-Mail-Adressen nicht verschoben",
-    "go_to_lists": "Zu den Listen"
+    "go_to_lists": "Zu den Listen",
+    "before_removing": "Vor dem Entfernen der Instanz",
+    "before_removing_description": "Die E-Mail-Adressen von Sympa und den Listen liegen in {mail}. Die Instanz kann sie beim Entfernen nicht löschen: entfernen Sie sie zuerst hier.",
+    "remove_all_addresses": "Alle E-Mail-Adressen entfernen",
+    "remove_all_addresses_description": "{count} Adressen von {mail} leiten an diese Instanz weiter und werden entfernt: {addresses}. Die Listen empfangen keine E-Mails mehr."
   },
   "common": {
     "required": "Erforderlich",
@@ -84,10 +88,7 @@
     "not_configured": "Nicht konfiguriert",
     "open_webapp": "Sympa öffnen",
     "configure": "Konfigurieren",
-    "sympa_webapp": "Sympa-Weboberfläche",
-    "addresses_kept_on_removal": "E-Mail-Adressen von Sympa",
-    "addresses_kept_on_removal_description": "{count} Adressen von {mail} leiten an diese Instanz weiter. Wenn Sie die Instanz entfernen, bleiben sie in {mail}: entfernen Sie sie vorher auf der Seite Listen oder mit diesen Befehlen.",
-    "show_addresses": "Befehle anzeigen"
+    "sympa_webapp": "Sympa-Weboberfläche"
   },
   "about": {
     "title": "Über"

@@ -59,7 +59,11 @@
     "list_domain_already_used_description": "{instance}-k {domain} domeinuko zerrendak kudeatzen ditu jada. Sympak robot bat erabiltzen du domeinu bakoitzeko, bere robot helbideekin. Aukeratu beste domeinu bat, edo sortu zerrendak {instance}-n.",
     "list_domain_used_by_another_instance": "Domeinu hau beste Sympa instantzia batek erabiltzen du",
     "addresses_not_moved": "Helbide elektronikoak ez dira mugitu",
-    "go_to_lists": "Joan zerrendetara"
+    "go_to_lists": "Joan zerrendetara",
+    "before_removing": "Instantzia kendu aurretik",
+    "before_removing_description": "Sympa eta zerrenden helbideak {mail}-n daude. Instantziak ezin ditu kendu kentzen denean: kendu hemen lehenago.",
+    "remove_all_addresses": "Kendu helbide elektroniko guztiak",
+    "remove_all_addresses_description": "{mail}-ren {count} helbidek instantzia honetara birbidaltzen dute eta kendu egingo dira: {addresses}. Zerrendek ez dute posta gehiago jasoko."
   },
   "common": {
     "required": "Derrigorrezkoa",
@@ -84,10 +88,7 @@
     "not_configured": "Konfiguratu gabe",
     "open_webapp": "Ireki Sympa",
     "configure": "Konfiguratu",
-    "sympa_webapp": "Sympa web-interfazea",
-    "addresses_kept_on_removal": "Sympa helbide elektronikoak",
-    "addresses_kept_on_removal_description": "{mail}-ren {count} helbidek instantzia honetara birbidaltzen dute. Instantzia kentzen baduzu, {mail}-n geratzen dira: kendu itzazu lehenago Zerrendak orritik, edo komando hauekin.",
-    "show_addresses": "Erakutsi komandoak"
+    "sympa_webapp": "Sympa web-interfazea"
   },
   "about": {
     "title": "Honi buruz"
