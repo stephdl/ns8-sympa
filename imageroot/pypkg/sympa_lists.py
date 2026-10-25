@@ -58,8 +58,10 @@ def _list_config_values(name, keys):
 def get_lists(domain):
     """Lists of the robot, with subject, status and subscribers"""
     lists = []
-    rows = psql("SELECT name_list, status_list, COALESCE(total_list, 0) FROM list_table "
-                f"WHERE robot_list = '{domain}' ORDER BY name_list")
+    # total_list is a cache Sympa fills later: count the subscribers instead
+    rows = psql("SELECT l.name_list, l.status_list, COUNT(s.user_subscriber) FROM list_table l "
+                "LEFT JOIN subscriber_table s ON s.list_subscriber = l.name_list AND s.robot_subscriber = l.robot_list "
+                f"WHERE l.robot_list = '{domain}' GROUP BY l.name_list, l.status_list ORDER BY l.name_list")
     for name, status, total in rows:
         config = _list_config_values(name, ("subject",))
         lists.append({
@@ -85,6 +87,9 @@ def create_list(name, domain, subject, list_type, owners, description):
         f"<subject>{escape(subject)}</subject>"
         f"<description>{escape(description)}</description>"
         "<status>open</status>"
+        # Sympa refuses a list without topic. An unknown topic is accepted and
+        # dropped from the list config: lists stay out of the topic index
+        "<topic>other</topic>"
         f"{owner_xml}"
         "</list>\n"
     )
