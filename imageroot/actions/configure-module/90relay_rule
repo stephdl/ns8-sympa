@@ -8,10 +8,15 @@
 import os
 import sympa_mail
 
-previous = os.environ.get("PREVIOUS_MAIL_SERVER", "")
+import agent
+
+# RELAY_MAIL_SERVER is saved only once the rule exists: a failed run keeps
+# pointing to the old mail server, so a retry still removes its rule
+previous = os.environ.get("RELAY_MAIL_SERVER", "")
 current = os.environ["MAIL_SERVER"]
 
 if previous and previous != current:
     sympa_mail.remove_relay_rule(previous)
 
 sympa_mail.ensure_relay_rule(current)
+agent.set_env("RELAY_MAIL_SERVER", current)

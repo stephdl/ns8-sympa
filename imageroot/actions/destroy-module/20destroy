@@ -10,9 +10,10 @@ import sys
 import agent
 import sympa_mail
 
-if os.environ.get("MAIL_SERVER"):
+mail_server = os.environ.get("RELAY_MAIL_SERVER") or os.environ.get("MAIL_SERVER")
+if mail_server:
     try:
-        sympa_mail.remove_relay_rule(os.environ["MAIL_SERVER"])
+        sympa_mail.remove_relay_rule(mail_server)
     except Exception as ex:
         # The instance must go away even if the mail module is unreachable
         print(agent.SD_WARNING + f"Cannot remove the relay rule: {ex}", file=sys.stderr)
