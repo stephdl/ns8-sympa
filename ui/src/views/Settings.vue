@@ -549,7 +549,10 @@ export default {
       this.savedListDomain = config.list_domain;
       this.listmastersText = config.listmasters.join("\n");
       this.inboundDomain = config.inbound_domain;
-      // New options need a fresh combo box, then the value is set
+      // A combo box shows the raw value if it is created with one: clear it, recreate, then set
+      this.mailServer = "";
+      this.userDomain = "";
+      this.defaultLang = "";
       this.optionsKey++;
       this.$nextTick(() => {
         this.mailServer =
