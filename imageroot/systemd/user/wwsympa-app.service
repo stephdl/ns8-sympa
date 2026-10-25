@@ -1,0 +1,33 @@
+[Unit]
+Description=Podman wwsympa-app.service (web interface)
+BindsTo=sympa.service
+After=sympa.service sympa-app.service
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+EnvironmentFile=%S/state/environment
+WorkingDirectory=%S/state
+Restart=always
+TimeoutStopSec=70
+ExecStartPre=/bin/rm -f %t/wwsympa-app.pid %t/wwsympa-app.ctr-id
+ExecStart=/usr/bin/podman run --conmon-pidfile %t/wwsympa-app.pid \
+    --cidfile %t/wwsympa-app.ctr-id --cgroups=no-conmon \
+    --pod-id-file %t/sympa.pod-id --replace -d --name wwsympa-app \
+    --volume sympa-etc:/etc/sympa:z \
+    --volume sympa-data:/var/lib/sympa:z \
+    --volume sympa-spool:/var/spool/sympa:z \
+    --volume postfix-queue:/var/spool/postfix:z \
+    --env-file=%S/state/sympa.env \
+    --env-file=%S/state/secrets/sympa.env \
+    --env-file=%S/state/secrets/ldap.env \
+    --env-file=%S/state/secrets/smarthost.env \
+    --env TZ=UTC \
+    ${SYMPA_APP_IMAGE} web
+ExecStop=/usr/bin/podman stop --ignore --cidfile %t/wwsympa-app.ctr-id -t 30
+ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/wwsympa-app.ctr-id
+PIDFile=%t/wwsympa-app.pid
+Type=forking
+SyslogIdentifier=%N
+
+[Install]
+WantedBy=default.target

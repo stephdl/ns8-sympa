@@ -1,0 +1,17 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2026 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+import os
+import sympa_mail
+
+previous = os.environ.get("PREVIOUS_MAIL_SERVER", "")
+current = os.environ["MAIL_SERVER"]
+
+if previous and previous != current:
+    sympa_mail.remove_relay_rule(previous)
+
+sympa_mail.ensure_relay_rule(current)

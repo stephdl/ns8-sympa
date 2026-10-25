@@ -1,37 +1,33 @@
 #!/bin/bash
 
 #
-# Copyright (C) 2022 Nethesis S.r.l.
+# Copyright (C) 2026 Nethesis S.r.l.
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
 set -e -o pipefail
-exec 1>&2 # Redirect any output to the journal (stderr)
+exec 1>&2
 
 mkdir -vp restore
-cat - >restore/kickstart_restore.sh <<'EOS'
-# Read dump file from standard input:
-pg_restore --no-owner --no-privileges -U postgres -d kickstart
+mv -v sympa.pg_dump restore/
+cat - >restore/zz_sympa_restore.sh <<'EOS'
+pg_restore --no-owner --no-privileges -U sympa -d sympa /restore/sympa.pg_dump
 ec=$?
 docker_temp_server_stop
 exit $ec
 EOS
 
-# Override the image /docker-entrypoint-initdb.d contents, to restore the
-# DB dump file. The container will be stopped at the end
-
 podman run \
     --rm \
-    --interactive \
     --network=none \
-    --volume=./restore:/docker-entrypoint-initdb.d/:Z \
-    --volume=postgres-data:/var/lib/postgresql/data:Z \
-    --replace --name=restore_db \
-    --env POSTGRES_USER=postgres \
-    --env POSTGRES_PASSWORD=Nethesis,1234 \
-    --env POSTGRES_DB=kickstart \
+    --volume=./restore:/restore:Z \
+    --volume=./restore/zz_sympa_restore.sh:/docker-entrypoint-initdb.d/zz_sympa_restore.sh:Z \
+    --volume=postgres-data:/var/lib/postgresql:Z \
+    --env-file=secrets/postgres.env \
+    --env POSTGRES_USER=sympa \
+    --env POSTGRES_DB=sympa \
     --env TZ=UTC \
-    "${POSTGRES_IMAGE}" < kickstart.pg_dump
+    --replace --name=restore_db \
+    "${POSTGRES_IMAGE}"
 
-# If the restore is successful, clean up:
-rm -rfv restore/ kickstart.pg_dump
+rm -rf restore

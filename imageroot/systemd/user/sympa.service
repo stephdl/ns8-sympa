@@ -1,0 +1,30 @@
+[Unit]
+Description=Podman sympa.service
+Requires=postgresql-app.service sympa-app.service postfix-app.service wwsympa-app.service
+Before=postgresql-app.service sympa-app.service postfix-app.service wwsympa-app.service
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+EnvironmentFile=%S/state/environment
+WorkingDirectory=%S/state
+Restart=always
+TimeoutStopSec=70
+ExecStartPre=/bin/rm -f %t/sympa.pid %t/sympa.pod-id
+ExecStartPre=runagent sympa-config
+ExecStartPre=/usr/bin/podman pod create --infra-conmon-pidfile %t/sympa.pid \
+    --pod-id-file %t/sympa.pod-id \
+    --name sympa \
+    --network=slirp4netns:allow_host_loopback=true \
+    --add-host=accountprovider:10.0.2.2 \
+    --hostname=${TRAEFIK_HOST} \
+    --publish 127.0.0.1:${TCP_PORT}:8080 \
+    --publish ${SMTP_BIND_ADDRESS}:${SMTP_PORT}:25 \
+    --replace
+ExecStart=/usr/bin/podman pod start --pod-id-file %t/sympa.pod-id
+ExecStop=/usr/bin/podman pod stop --ignore --pod-id-file %t/sympa.pod-id -t 10
+ExecStopPost=/usr/bin/podman pod rm --ignore -f --pod-id-file %t/sympa.pod-id
+PIDFile=%t/sympa.pid
+Type=forking
+
+[Install]
+WantedBy=default.target

@@ -1,26 +1,44 @@
 #!/usr/bin/env python3
 
 #
-# Copyright (C) 2022 Nethesis S.r.l.
+# Copyright (C) 2026 Nethesis S.r.l.
 # SPDX-License-Identifier: GPL-3.0-or-later
-#
-
-#
-# Read configuration
 #
 
 import os
 import sys
 import json
 import agent
+from agent.ldapproxy import Ldapproxy
 
-# Prepare return variable
-config = {}
+rdb = agent.redis_connect(use_replica=True)
 
-# Read current configuration from the environment file
-config["host"] = os.getenv("TRAEFIK_HOST","")
-config["http2https"] = os.getenv("TRAEFIK_HTTP2HTTPS") == "True"
-config["lets_encrypt"] = agent.get_route(os.environ['MODULE_ID']).get('lets_encrypt', False)
+mail_servers = []
+for provider in agent.list_service_providers(rdb, 'imap', 'tcp'):
+    mail_servers.append({
+        "uuid": provider["module_uuid"],
+        "module_id": provider["module_id"],
+        "ui_name": provider.get("ui_name") or "",
+        "node": provider["node"],
+        "internal_domain": provider.get("user_domain", ""),
+    })
 
-# Dump the configuration to stdout
+route = agent.get_route(os.environ['MODULE_ID']) or {}
+smarthost = agent.get_smarthost_settings(rdb)
+inbound = os.environ.get("INBOUND_DOMAIN", "")
+
+config = {
+    "host": os.getenv("TRAEFIK_HOST", ""),
+    "lets_encrypt": route.get('lets_encrypt', False),
+    "has_route": bool(route),
+    "list_domain": os.getenv("LIST_DOMAIN", ""),
+    "listmasters": [addr for addr in os.getenv("LISTMASTERS", "").split(",") if addr],
+    "mail_server": os.getenv("MAIL_SERVER", ""),
+    "user_domain": os.getenv("USER_DOMAIN", ""),
+    "default_lang": os.getenv("DEFAULT_LANG", "en-US"),
+    "inbound_domain": inbound,
+    "mail_servers": mail_servers,
+    "user_domains": Ldapproxy().get_domains_list(),
+    "smarthost_enabled": bool(smarthost["enabled"] and smarthost["host"]),
+}
 json.dump(config, fp=sys.stdout)

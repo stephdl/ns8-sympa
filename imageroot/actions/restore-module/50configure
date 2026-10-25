@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2026 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+import os
+import sys
+import json
+import agent
+from agent.ldapproxy import Ldapproxy
+
+request = json.load(sys.stdin)
+renv = request['environment']
+
+user_domain = renv.get("USER_DOMAIN", "")
+if user_domain and user_domain not in Ldapproxy().get_domains_list():
+    print(agent.SD_WARNING + f"User domain {user_domain} does not exist on this cluster, LDAP login is disabled", file=sys.stderr)
+    user_domain = ""
+
+configure_data = {
+    "host": renv["TRAEFIK_HOST"],
+    "lets_encrypt": False,
+    "list_domain": renv["LIST_DOMAIN"],
+    "listmasters": [addr for addr in renv["LISTMASTERS"].split(",") if addr],
+    "mail_server": renv["MAIL_SERVER"],
+    "user_domain": user_domain,
+    "default_lang": renv.get("DEFAULT_LANG", "en-US"),
+}
+
+if agent.http_route_in_use(domain=renv["TRAEFIK_HOST"]):
+    print(agent.SD_WARNING + f"Host {renv['TRAEFIK_HOST']} is used by another application, set a new host name in Settings", file=sys.stderr)
+    sys.exit(0)
+
+configure_retval = agent.tasks.run(agent_id=os.environ['AGENT_ID'], action='configure-module', data=configure_data)
+agent.assert_exp(configure_retval['exit_code'] == 0, "The configure-module subtask failed!")

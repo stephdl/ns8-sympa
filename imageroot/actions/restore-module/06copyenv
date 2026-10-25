@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-# Copyright (C) 2022 Nethesis S.r.l.
+# Copyright (C) 2026 Nethesis S.r.l.
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
@@ -10,13 +10,17 @@ import json
 import agent
 
 request = json.load(sys.stdin)
-
 original_environment = request['environment']
 
 for evar in [
         "TRAEFIK_HOST",
-        "TRAEFIK_HTTP2HTTPS",
+        "LIST_DOMAIN",
+        "LISTMASTERS",
+        "MAIL_SERVER",
+        "USER_DOMAIN",
+        "DEFAULT_LANG",
+        # Keep the inbound domain: the addresses in the mail module point to it
+        "INBOUND_DOMAIN",
     ]:
-    agent.set_env(evar, original_environment[evar])
-
-agent.dump_env()
+    if evar in original_environment:
+        agent.set_env(evar, original_environment[evar])

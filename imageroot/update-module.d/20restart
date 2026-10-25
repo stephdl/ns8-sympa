@@ -1,15 +1,11 @@
 #!/bin/bash
 
 #
-# Copyright (C) 2023 Nethesis S.r.l.
+# Copyright (C) 2026 Nethesis S.r.l.
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
-# If the control reaches this step, the service can be enabled and started
-
 set -e
-
-# Redirect any output to the journal (stderr)
 exec 1>&2
 
-systemctl --user try-restart kickstart.service
+systemctl --user try-restart sympa.service postgresql-app.service sympa-app.service postfix-app.service wwsympa-app.service

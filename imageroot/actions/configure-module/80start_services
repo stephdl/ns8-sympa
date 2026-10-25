@@ -1,17 +1,24 @@
 #!/bin/bash
 
 #
-# Copyright (C) 2023 Nethesis S.r.l.
+# Copyright (C) 2026 Nethesis S.r.l.
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-set -e
 
-# Redirect any output to the journal (stderr)
+set -e
 exec 1>&2
 
-# If the control reaches this step, the service can be enabled and started
+systemctl --user enable sympa.service
+# Restart the pod: sympa-config runs again before it starts
+systemctl --user restart sympa.service
+systemctl --user start postgresql-app.service sympa-app.service postfix-app.service wwsympa-app.service
 
-touch smarthost.env
-
-systemctl --user enable kickstart.service
-systemctl --user restart kickstart.service
+# add-relay-rule probes our SMTP port: wait for Postfix to answer
+for (( i = 0; i < 60; i++ )); do
+    if (exec 3<>"/dev/tcp/${SMTP_BIND_ADDRESS}/${SMTP_PORT}") 2>/dev/null; then
+        exit 0
+    fi
+    sleep 2
+done
+echo "Postfix is not listening on ${SMTP_BIND_ADDRESS}:${SMTP_PORT}" >&2
+exit 1
