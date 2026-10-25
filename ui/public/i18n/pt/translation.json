@@ -61,12 +61,12 @@
     "addresses_not_moved": "Endereços de email não movidos",
     "go_to_lists": "Ir para as listas",
     "before_removing": "Antes de remover a instância",
-    "before_removing_description": "Os endereços do Sympa e das listas estão em {mail}. A instância não os consegue remover quando é removida: remova-os aqui primeiro.",
+    "before_removing_description": "{count} endereços de {mail} reencaminham para esta instância. Remova-os antes de remover a instância: ela não os consegue remover.",
     "remove_all_addresses": "Remover todos os endereços",
     "remove_all_addresses_description": "{count} endereços de {mail} reencaminham para esta instância e serão removidos: {addresses}. As listas deixam de receber correio.",
     "addresses_removed": "Endereços de email removidos",
     "addresses_removed_description": "Foram removidos {count} endereços de {mail}.",
-    "no_address_to_remove": "Nenhum endereço de email reencaminha para esta instância."
+    "no_address_to_remove": "Nenhum endereço de {mail} reencaminha para esta instância. Pode remover a instância."
   },
   "common": {
     "required": "Obrigatório",

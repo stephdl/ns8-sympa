@@ -61,12 +61,12 @@
     "addresses_not_moved": "E-Mail-Adressen nicht verschoben",
     "go_to_lists": "Zu den Listen",
     "before_removing": "Vor dem Entfernen der Instanz",
-    "before_removing_description": "Die E-Mail-Adressen von Sympa und den Listen liegen in {mail}. Die Instanz kann sie beim Entfernen nicht löschen: entfernen Sie sie zuerst hier.",
+    "before_removing_description": "{count} Adressen von {mail} leiten an diese Instanz weiter. Entfernen Sie sie, bevor Sie die Instanz entfernen: sie kann es nicht selbst.",
     "remove_all_addresses": "Alle E-Mail-Adressen entfernen",
     "remove_all_addresses_description": "{count} Adressen von {mail} leiten an diese Instanz weiter und werden entfernt: {addresses}. Die Listen empfangen keine E-Mails mehr.",
     "addresses_removed": "E-Mail-Adressen entfernt",
     "addresses_removed_description": "{count} Adressen wurden aus {mail} entfernt.",
-    "no_address_to_remove": "Keine E-Mail-Adresse leitet an diese Instanz weiter."
+    "no_address_to_remove": "Keine Adresse von {mail} leitet an diese Instanz weiter. Sie können die Instanz entfernen."
   },
   "common": {
     "required": "Erforderlich",

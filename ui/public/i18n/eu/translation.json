@@ -61,12 +61,12 @@
     "addresses_not_moved": "Helbide elektronikoak ez dira mugitu",
     "go_to_lists": "Joan zerrendetara",
     "before_removing": "Instantzia kendu aurretik",
-    "before_removing_description": "Sympa eta zerrenden helbideak {mail}-n daude. Instantziak ezin ditu kendu kentzen denean: kendu hemen lehenago.",
+    "before_removing_description": "{mail}-ren {count} helbidek instantzia honetara birbidaltzen dute. Kendu itzazu instantzia kendu aurretik: berak ezin ditu kendu.",
     "remove_all_addresses": "Kendu helbide elektroniko guztiak",
     "remove_all_addresses_description": "{mail}-ren {count} helbidek instantzia honetara birbidaltzen dute eta kendu egingo dira: {addresses}. Zerrendek ez dute posta gehiago jasoko.",
     "addresses_removed": "Helbide elektronikoak kenduta",
     "addresses_removed_description": "{count} helbide kendu dira {mail}-tik.",
-    "no_address_to_remove": "Ez dago instantzia honetara birbidaltzen duen helbiderik."
+    "no_address_to_remove": "Ez dago {mail}-ren helbiderik instantzia honetara birbidaltzen duenik. Instantzia kendu dezakezu."
   },
   "common": {
     "required": "Derrigorrezkoa",

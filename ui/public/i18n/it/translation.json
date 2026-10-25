@@ -73,12 +73,12 @@
     "addresses_not_moved": "Indirizzi email non spostati",
     "go_to_lists": "Vai alle liste",
     "before_removing": "Prima di rimuovere l'istanza",
-    "before_removing_description": "Gli indirizzi email di Sympa e delle liste si trovano in {mail}. L'istanza non può rimuoverli quando viene rimossa: rimuovili prima qui.",
+    "before_removing_description": "{count} indirizzi di {mail} inoltrano a questa istanza. Rimuovili prima di rimuovere l'istanza: non può rimuoverli da sola.",
     "remove_all_addresses": "Rimuovi tutti gli indirizzi email",
     "remove_all_addresses_description": "{count} indirizzi di {mail} inoltrano a questa istanza e saranno rimossi: {addresses}. Le liste non riceveranno più posta.",
     "addresses_removed": "Indirizzi email rimossi",
     "addresses_removed_description": "{count} indirizzi sono stati rimossi da {mail}.",
-    "no_address_to_remove": "Nessun indirizzo email inoltra a questa istanza."
+    "no_address_to_remove": "Nessun indirizzo di {mail} inoltra a questa istanza. Puoi rimuovere l'istanza."
   },
   "error": {
     "error": "Errore",

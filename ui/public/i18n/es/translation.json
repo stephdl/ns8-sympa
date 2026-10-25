@@ -61,12 +61,12 @@
     "addresses_not_moved": "Direcciones de correo no movidas",
     "go_to_lists": "Ir a las listas",
     "before_removing": "Antes de quitar la instancia",
-    "before_removing_description": "Las direcciones de Sympa y de las listas están en {mail}. La instancia no puede quitarlas al eliminarse: quítalas aquí antes.",
+    "before_removing_description": "{count} direcciones de {mail} reenvían a esta instancia. Quítalas antes de quitar la instancia: no puede quitarlas ella misma.",
     "remove_all_addresses": "Quitar todas las direcciones",
     "remove_all_addresses_description": "{count} direcciones de {mail} reenvían a esta instancia y se quitarán: {addresses}. Las listas dejarán de recibir correo.",
     "addresses_removed": "Direcciones de correo quitadas",
     "addresses_removed_description": "Se quitaron {count} direcciones de {mail}.",
-    "no_address_to_remove": "Ninguna dirección de correo reenvía a esta instancia."
+    "no_address_to_remove": "Ninguna dirección de {mail} reenvía a esta instancia. Puedes quitar la instancia."
   },
   "common": {
     "required": "Obligatorio",

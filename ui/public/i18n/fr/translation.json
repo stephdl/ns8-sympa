@@ -73,12 +73,12 @@
     "addresses_not_moved": "Adresses email non déplacées",
     "go_to_lists": "Aller aux listes",
     "before_removing": "Avant de supprimer l'instance",
-    "before_removing_description": "Les adresses email de Sympa et des listes sont dans {mail}. L'instance ne peut pas les retirer quand elle est supprimée : retirez-les ici d'abord.",
+    "before_removing_description": "{count} adresses de {mail} renvoient vers cette instance. Retirez-les avant de supprimer l'instance : elle ne peut pas les retirer elle-même.",
     "remove_all_addresses": "Retirer toutes les adresses email",
     "remove_all_addresses_description": "{count} adresses de {mail} renvoient vers cette instance et seront retirées : {addresses}. Les listes ne recevront plus de courrier.",
     "addresses_removed": "Adresses email retirées",
     "addresses_removed_description": "{count} adresses ont été retirées de {mail}.",
-    "no_address_to_remove": "Aucune adresse email ne renvoie vers cette instance."
+    "no_address_to_remove": "Aucune adresse de {mail} ne renvoie vers cette instance. Vous pouvez supprimer l'instance."
   },
   "about": {
     "title": "À propos"

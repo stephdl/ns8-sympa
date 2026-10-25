@@ -271,9 +271,14 @@
             <template slot="content">
               <p class="mg-bottom">
                 {{
-                  $t("settings.before_removing_description", {
-                    mail: saved.mailModule,
-                  })
+                  cleanupAddresses.length
+                    ? $t("settings.before_removing_description", {
+                        count: cleanupAddresses.length,
+                        mail: saved.mailModule,
+                      })
+                    : $t("settings.no_address_to_remove", {
+                        mail: saved.mailModule,
+                      })
                 }}
               </p>
               <NsInlineNotification
@@ -298,15 +303,11 @@
               <NsButton
                 kind="danger"
                 :icon="TrashCan20"
-                :disabled="stillLoading || !cleanupAddresses.length"
+                :disabled="
+                  stillLoading || !cleanupLoaded || !cleanupAddresses.length
+                "
                 @click="showCleanup"
                 >{{ $t("settings.remove_all_addresses") }}</NsButton
-              <p
-                v-if="cleanupLoaded && !cleanupAddresses.length"
-                class="mg-top"
-              >
-                {{ $t("settings.no_address_to_remove") }}
-              </p>
               >
             </template>
           </cv-accordion-item>
@@ -831,10 +832,6 @@ export default {
 @import "../styles/carbon-utils";
 .mg-bottom {
   margin-bottom: $spacing-06;
-}
-
-.mg-top {
-  margin-top: $spacing-05;
 }
 
 .maxwidth {
