@@ -1,0 +1,46 @@
+name: "Test module on QEMU"
+
+# Boots a throwaway NS8 node on the runner and runs tests/ against it, so the
+# module is tested without any external infrastructure. Chained on the build:
+# a broken image never reaches the test.
+
+run-name: "Test ${{ github.event.workflow_run.head_branch || github.ref_name }} on QEMU"
+
+on:
+  workflow_run:
+    workflows: ["Publish images"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      debug_shell:
+        description: "Open a tmate shell when the suite fails"
+        required: false
+        default: false
+        type: boolean
+      ui_tests:
+        description: "Run the cases tagged ui and publish their screenshots"
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  run:
+    name: "Run tests"
+    # A commit status per leg and the screenshots comment, and a called
+    # workflow cannot hold more than its caller. Granted here rather than by
+    # raising the repository default, so the write token stops at this job.
+    permissions:
+      contents: read
+      pull-requests: write
+      statuses: write
+    uses: NethServer/ns8-github-actions/.github/workflows/test-module-qemu.yml@v1
+    with:
+      # optional: build-images.sh's reponame is a template placeholder
+      # (kickstart), shared with ns8-kickstart-mariadb. Sed it together with
+      # this value if this repo is cloned into a differently named module.
+      image_name: kickstart
+      # update tested separately later, independent of this drop-in
+      # scenarios: '["install","update"]'
+      ui_tests_strategy: ${{ github.event.inputs.ui_tests == 'true' && 'always' || 'on_renovate_ui_change' }}
+      debug_shell: ${{ github.event.inputs.debug_shell == 'true' }}
+      # vm_mem: 12288                 # guest memory, MiB
