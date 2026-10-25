@@ -9,6 +9,13 @@ module.exports = {
     },
   },
   publicPath: "./",
+  // The core launcher loads the logo by file name: never inline it
+  chainWebpack: (config) => {
+    config.module
+      .rule("images")
+      .use("url-loader")
+      .tap((options) => Object.assign(options, { limit: -1 }));
+  },
   configureWebpack: {
     optimization: {
       splitChunks: {

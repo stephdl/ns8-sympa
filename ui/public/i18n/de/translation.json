@@ -1,57 +1,104 @@
 {
-    "error": {
-        "403": "Operation nicht zugelassen",
-        "cannot_retrieve_installed_modules": "installierte Module nicht abrufbar",
-        "401": "fehlerhafte Anmeldung",
-        "cannot_retrieve_module_info": "Modulinfo nicht abrufbar",
-        "generic_error": "Etwas ist schief gegangen",
-        "error": "Fehler",
-        "network_timeout": "Netzwerk Timeout",
-        "404": "Ressource nicht gefunden",
-        "network_error": "Netzwerkfehler",
-        "validation_error": "Fehlerhafte Prüfung"
-    },
-    "settings": {
-        "test_field": "Testfeld",
-        "configure_instance": "{instance} konfigurieren",
-        "save": "Speichern",
-        "title": "Einstellungen"
-    },
-    "common": {
-        "required": "erforderlich",
-        "work_in_progress": "In Arbeit",
-        "processing": "Ausführung..."
-    },
-    "status": {
-        "created": "erstellt",
-        "size": "Größe",
-        "name": "Name",
-        "no_images": "Keine Abbilder",
-        "app_volumes": "App Volumen | App Volumen",
-        "services": "Dienst | Dienste",
-        "app_images": "App-Abbild | App-Abbilder",
-        "no_services": "Keine Dienste",
-        "app_instance": "App-Instanz",
-        "mount": "Einbindepunkt",
-        "title": "Status",
-        "installation_node": "Knoten der Installation",
-        "node": "Knoten",
-        "no_volumes": "keine Volumen"
-    },
-    "about": {
-        "title": "Über"
-    },
-    "action": {
-        "list-backup-repositories": "Liste der Datensicherungs-Speicherort",
-        "get-module-info": "Informationen zum Modul abrufen",
-        "list-installed-modules": "installierte Module auflisten",
-        "list-backups": "Datensicherungen auflisten",
-        "get-status": "Status abfragen",
-        "configure-module": "Modul konfigurieren",
-        "get-configuration": "Konfiguration abrufen",
-        "get-name": "Name abrufen"
-    },
-    "task": {
-        "cannot_create_task": "{task} kann nicht erstellt werden"
-    }
+  "error": {
+    "403": "Operation nicht zugelassen",
+    "cannot_retrieve_installed_modules": "installierte Module nicht abrufbar",
+    "401": "fehlerhafte Anmeldung",
+    "cannot_retrieve_module_info": "Modulinfo nicht abrufbar",
+    "generic_error": "Etwas ist schief gegangen",
+    "error": "Fehler",
+    "network_timeout": "Netzwerk Timeout",
+    "404": "Ressource nicht gefunden",
+    "network_error": "Netzwerkfehler",
+    "validation_error": "Fehlerhafte Prüfung",
+    "cannot_retrieve_configuration": "Cannot retrieve configuration"
+  },
+  "settings": {
+    "configure_instance": "{instance} konfigurieren",
+    "save": "Speichern",
+    "title": "Einstellungen",
+    "enabled": "Aktiviert",
+    "disabled": "Deaktiviert",
+    "configuring": "Wird konfiguriert",
+    "instance_configuration": "{instance} konfigurieren",
+    "domain_already_used_in_traefik": "Hostname wird bereits von einer anderen Anwendung verwendet",
+    "host": "Hostname der Weboberfläche (FQDN)",
+    "host_helper": "Die Weboberfläche ist unter https://<Hostname>/sympa erreichbar",
+    "mail_server": "Mailserver",
+    "choose_mail_server": "Mailserver auswählen",
+    "mail_server_helper": "Er empfängt die Listen-E-Mails aus dem Internet und leitet sie an Sympa weiter",
+    "list_domain": "Mail-Domain der Listen",
+    "list_domain_helper": "Listen verwenden Adressen wie meineliste@<Domain>. Die Domain muss im Mailserver existieren",
+    "listmasters": "Listmaster",
+    "listmasters_placeholder": "admin@example.org",
+    "listmasters_helper": "E-Mail-Adressen der Sympa-Administratoren, eine pro Zeile",
+    "invalid_email": "Ungültige E-Mail-Adresse: {email}",
+    "user_domain": "Benutzerdomain",
+    "choose_user_domain": "Benutzerdomain auswählen",
+    "user_domain_helper": "Benutzer dieser Domain melden sich mit ihren LDAP-Zugangsdaten an. Andere behalten ein Sympa-Konto",
+    "no_ldap_login": "Keine, nur Sympa-Konten",
+    "default_lang": "Standardsprache",
+    "choose_language": "Sprache auswählen",
+    "smarthost_missing": "Smarthost nicht konfiguriert",
+    "smarthost_missing_description": "Sympa versendet E-Mails nur über den Smarthost des Clusters. Bis er konfiguriert ist, bleiben ausgehende E-Mails in der Warteschlange",
+    "go_to_smarthost": "Zu den Smarthost-Einstellungen",
+    "mail_missing": "Kein Mailserver",
+    "mail_missing_description": "Installieren Sie die Mail-Anwendung: Sie empfängt die Listen-E-Mails und leitet sie an Sympa weiter",
+    "go_to_software_center": "Zum Software-Center",
+    "no_user_domain": "Keine Benutzerdomain",
+    "no_user_domain_description": "Erstellen Sie eine Benutzerdomain, damit sich deren Benutzer per LDAP anmelden. Sympa-Konten funktionieren auch ohne",
+    "go_to_domains": "Zu Domains und Benutzer",
+    "no_route": "Die Weboberfläche ist nicht veröffentlicht",
+    "no_route_description": "Diese Instanz wurde geklont oder wiederhergestellt. Setzen Sie einen Hostnamen und speichern Sie",
+    "mail_server_not_found": "Mailserver nicht gefunden",
+    "list_domain_is_mail_internal_domain": "Der Mailserver lehnt seine interne Domain und deren Subdomains ab, wählen Sie eine andere Domain",
+    "user_domain_not_found": "Benutzerdomain nicht gefunden",
+    "addresses_title": "E-Mail-Adressen",
+    "addresses_info": "Adressen im Mailserver anlegen",
+    "addresses_description": "Jede von Sympa genutzte Adresse von {domain} muss an denselben lokalen Teil bei {inbound} weiterleiten. Legen Sie sie einmal für Sympa an, dann für jede neue Liste. Führen Sie die Befehle auf dem Cluster-Leader aus oder legen Sie dieselben Adressen in der Mail-Anwendung an. Prüfen Sie zuerst, dass kein Benutzer und keine Gruppe diese Namen trägt.",
+    "robot_addresses": "Sympa-Adressen, einmalig",
+    "list_name": "Listenname",
+    "list_name_helper": "Geben Sie einen Listennamen ein, um dessen Adressen zu erhalten",
+    "list_addresses": "Adressen der Liste {list}"
+  },
+  "common": {
+    "required": "Erforderlich",
+    "work_in_progress": "In Arbeit",
+    "processing": "Ausführung..."
+  },
+  "status": {
+    "created": "erstellt",
+    "size": "Größe",
+    "name": "Name",
+    "no_images": "Keine Abbilder",
+    "app_volumes": "App Volumen | App Volumen",
+    "services": "Dienst | Dienste",
+    "app_images": "App-Abbild | App-Abbilder",
+    "no_services": "Keine Dienste",
+    "app_instance": "App-Instanz",
+    "mount": "Einbindepunkt",
+    "title": "Status",
+    "installation_node": "Knoten der Installation",
+    "node": "Knoten",
+    "no_volumes": "keine Volumen",
+    "not_configured": "Nicht konfiguriert",
+    "open_webapp": "Sympa öffnen",
+    "configure": "Konfigurieren",
+    "sympa_webapp": "Sympa-Weboberfläche"
+  },
+  "about": {
+    "title": "Über"
+  },
+  "action": {
+    "list-backup-repositories": "Liste der Datensicherungs-Speicherort",
+    "get-module-info": "Informationen zum Modul abrufen",
+    "list-installed-modules": "installierte Module auflisten",
+    "list-backups": "Datensicherungen auflisten",
+    "get-status": "Status abfragen",
+    "configure-module": "Modul konfigurieren",
+    "get-configuration": "Konfiguration abrufen",
+    "get-name": "Name abrufen"
+  },
+  "task": {
+    "cannot_create_task": "{action} kann nicht erstellt werden"
+  }
 }

@@ -1,57 +1,104 @@
 {
-    "error": {
-        "403": "Operação não autorizada",
-        "cannot_retrieve_installed_modules": "Não é possível recuperar módulos instalados",
-        "401": "Autenticação inválida",
-        "cannot_retrieve_module_info": "Não é possível recuperar informações do módulo",
-        "generic_error": "Algo deu errado",
-        "error": "Erro",
-        "network_timeout": "Tempo limite da rede",
-        "404": "Recurso não encontrado",
-        "network_error": "Erro de rede",
-        "validation_error": "Erros de validação"
-    },
-    "settings": {
-        "test_field": "Campo de teste",
-        "configure_instance": "Configurar {instância}",
-        "save": "Gravar",
-        "title": "Configurações"
-    },
-    "common": {
-        "required": "Obrigatório",
-        "work_in_progress": "Trabalho em progresso",
-        "processing": "Processando..."
-    },
-    "status": {
-        "created": "Criado",
-        "size": "Tamanho",
-        "name": "Nome",
-        "no_images": "Sem imagens",
-        "app_volumes": "Volume do aplicativo | Volumes dos aplicativos",
-        "services": "Serviço | Serviços",
-        "app_images": "Imagem do aplicativo | Imagens dos aplicativos",
-        "no_services": "Nenhum serviço",
-        "app_instance": "Instância do aplicativo",
-        "mount": "Montar",
-        "title": "Estado",
-        "installation_node": "Nó de instalação",
-        "node": "Node",
-        "no_volumes": "Sem volumes"
-    },
-    "about": {
-        "title": "Sobre"
-    },
-    "action": {
-        "list-backup-repositories": "Listar repositórios de backup",
-        "get-module-info": "Obtenha informações do módulo",
-        "list-installed-modules": "Listar módulos instalados",
-        "list-backups": "Listar backups",
-        "get-status": "Obter status",
-        "configure-module": "Configurar módulo",
-        "get-configuration": "Obter configuração",
-        "get-name": "Obter nome"
-    },
-    "task": {
-        "cannot_create_task": "Não é possível criar a tarefa {action}"
-    }
+  "error": {
+    "403": "Operação não autorizada",
+    "cannot_retrieve_installed_modules": "Não é possível recuperar módulos instalados",
+    "401": "Autenticação inválida",
+    "cannot_retrieve_module_info": "Não é possível recuperar informações do módulo",
+    "generic_error": "Algo deu errado",
+    "error": "Erro",
+    "network_timeout": "Tempo limite da rede",
+    "404": "Recurso não encontrado",
+    "network_error": "Erro de rede",
+    "validation_error": "Erros de validação",
+    "cannot_retrieve_configuration": "Cannot retrieve configuration"
+  },
+  "settings": {
+    "configure_instance": "Configurar {instance}",
+    "save": "Guardar",
+    "title": "Definições",
+    "enabled": "Ativado",
+    "disabled": "Desativado",
+    "configuring": "A configurar",
+    "instance_configuration": "Configurar {instance}",
+    "domain_already_used_in_traefik": "Nome de host já usado por outra aplicação",
+    "host": "Nome do host da interface web (FQDN)",
+    "host_helper": "A interface web está disponível em https://<nome do host>/sympa",
+    "mail_server": "Servidor de correio",
+    "choose_mail_server": "Escolha um servidor de correio",
+    "mail_server_helper": "Recebe o correio das listas da Internet e encaminha-o para o Sympa",
+    "list_domain": "Domínio de correio das listas",
+    "list_domain_helper": "As listas usam endereços como minhalista@<domínio>. O domínio tem de existir no servidor de correio",
+    "listmasters": "Listmasters",
+    "listmasters_placeholder": "admin@example.org",
+    "listmasters_helper": "Endereços de email dos administradores do Sympa, um por linha",
+    "invalid_email": "Endereço de email inválido: {email}",
+    "user_domain": "Domínio de utilizadores",
+    "choose_user_domain": "Escolha um domínio de utilizadores",
+    "user_domain_helper": "Os utilizadores deste domínio entram com as credenciais LDAP. Os outros mantêm uma conta Sympa",
+    "no_ldap_login": "Nenhum, só contas Sympa",
+    "default_lang": "Idioma predefinido",
+    "choose_language": "Escolha um idioma",
+    "smarthost_missing": "Smarthost não configurado",
+    "smarthost_missing_description": "O Sympa envia correio só através do smarthost do cluster. Até ser configurado, o correio de saída fica na fila",
+    "go_to_smarthost": "Ir para as definições do smarthost",
+    "mail_missing": "Nenhum servidor de correio",
+    "mail_missing_description": "Instale a aplicação Mail: recebe o correio das listas e encaminha-o para o Sympa",
+    "go_to_software_center": "Ir para o centro de software",
+    "no_user_domain": "Nenhum domínio de utilizadores",
+    "no_user_domain_description": "Crie um domínio de utilizadores para que entrem com LDAP. As contas Sympa funcionam sem ele",
+    "go_to_domains": "Ir para Domínios e utilizadores",
+    "no_route": "A interface web não está publicada",
+    "no_route_description": "Esta instância foi clonada ou restaurada. Defina um nome de host e guarde",
+    "mail_server_not_found": "Servidor de correio não encontrado",
+    "list_domain_is_mail_internal_domain": "O servidor de correio rejeita o seu domínio interno e subdomínios, escolha outro domínio",
+    "user_domain_not_found": "Domínio de utilizadores não encontrado",
+    "addresses_title": "Endereços de email",
+    "addresses_info": "Declare os endereços no servidor de correio",
+    "addresses_description": "Cada endereço de {domain} usado pelo Sympa tem de reencaminhar para a mesma parte local em {inbound}. Crie-os uma vez para o Sympa e depois para cada nova lista. Execute os comandos no líder do cluster, ou crie os mesmos endereços na aplicação Mail. Verifique antes que nenhum utilizador ou grupo tem estes nomes.",
+    "robot_addresses": "Endereços do Sympa, uma só vez",
+    "list_name": "Nome da lista",
+    "list_name_helper": "Escreva o nome de uma lista para obter os seus endereços",
+    "list_addresses": "Endereços da lista {list}"
+  },
+  "common": {
+    "required": "Obrigatório",
+    "work_in_progress": "Trabalho em progresso",
+    "processing": "Processando..."
+  },
+  "status": {
+    "created": "Criado",
+    "size": "Tamanho",
+    "name": "Nome",
+    "no_images": "Sem imagens",
+    "app_volumes": "Volume do aplicativo | Volumes dos aplicativos",
+    "services": "Serviço | Serviços",
+    "app_images": "Imagem do aplicativo | Imagens dos aplicativos",
+    "no_services": "Nenhum serviço",
+    "app_instance": "Instância do aplicativo",
+    "mount": "Montar",
+    "title": "Estado",
+    "installation_node": "Nó de instalação",
+    "node": "Node",
+    "no_volumes": "Sem volumes",
+    "not_configured": "Não configurado",
+    "open_webapp": "Abrir o Sympa",
+    "configure": "Configurar",
+    "sympa_webapp": "Interface web do Sympa"
+  },
+  "about": {
+    "title": "Sobre"
+  },
+  "action": {
+    "list-backup-repositories": "Listar repositórios de backup",
+    "get-module-info": "Obtenha informações do módulo",
+    "list-installed-modules": "Listar módulos instalados",
+    "list-backups": "Listar backups",
+    "get-status": "Obter status",
+    "configure-module": "Configurar módulo",
+    "get-configuration": "Obter configuração",
+    "get-name": "Obter nome"
+  },
+  "task": {
+    "cannot_create_task": "Não é possível criar a tarefa {action}"
+  }
 }
