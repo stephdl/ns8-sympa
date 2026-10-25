@@ -6,45 +6,17 @@
 #
 
 import os
-import sys
 import agent
-import sympa_lists
 import sympa_mail
 
-# RELAY_* values are saved only once the mail module is updated: a failed
-# run keeps pointing to the old values, so a retry still cleans them up
+# RELAY_MAIL_SERVER is saved only once the rule exists: a failed run keeps
+# pointing to the old mail server, so a retry still removes its rule.
+# The addresses are declared by the UI, not here.
 previous = os.environ.get("RELAY_MAIL_SERVER", "")
-previous_domain = os.environ.get("RELAY_LIST_DOMAIN", "")
 current = os.environ["MAIL_SERVER"]
-domain = os.environ["LIST_DOMAIN"]
 
 if previous and previous != current:
     sympa_mail.remove_relay_rule(previous)
-if previous and (previous != current or previous_domain != domain):
-    # The addresses follow the mail server and the list domain
-    sympa_mail.remove_addresses(previous)
 
 sympa_mail.ensure_relay_rule(current)
 agent.set_env("RELAY_MAIL_SERVER", current)
-
-if sympa_mail.owned_addresses(current) is None:
-    print(agent.SD_NOTICE + "The mail server cannot manage our addresses, declare them in the Mail application", file=sys.stderr)
-    sys.exit(0)
-
-# Robot addresses, then the addresses of the existing lists
-# Robot addresses before the instance prefix are no longer used
-sympa_mail.remove_addresses(current, domain, sympa_mail.LEGACY_ROBOT_LOCAL_PARTS)
-wanted = sympa_mail.robot_local_parts()
-try:
-    for item in sympa_lists.get_lists(domain):
-        wanted += sympa_mail.list_local_parts(item['name'])
-except Exception as ex:
-    # On the first start Sympa may not have created its tables yet
-    print(agent.SD_NOTICE + f"Cannot read the lists yet: {ex}", file=sys.stderr)
-for local in wanted:
-    try:
-        sympa_mail.add_addresses(current, domain, [local])
-    except sympa_mail.AddressError as ex:
-        # A collision on one address must not block the configuration
-        print(agent.SD_WARNING + f"Address {local}@{domain} not created: {ex.details}", file=sys.stderr)
-agent.set_env("RELAY_LIST_DOMAIN", domain)

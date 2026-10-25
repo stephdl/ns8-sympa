@@ -6,8 +6,7 @@
 #
 
 #
-# Create the mail addresses first: when the mail module refuses one, for
-# example a user with the same name, nothing is created in Sympa.
+# The UI declares the mail addresses of the list before calling this action
 #
 
 import os
@@ -20,7 +19,6 @@ import sympa_mail
 request = json.load(sys.stdin)
 name = request['name'].lower()
 domain = os.environ["LIST_DOMAIN"]
-mail_server = os.environ["MAIL_SERVER"]
 
 
 def fail(field, error, value):
@@ -29,30 +27,17 @@ def fail(field, error, value):
     sys.exit(2)
 
 
-# Legacy robot names stay reserved: the configuration removes them as robot addresses
+# Legacy robot names stay reserved: an older instance may still use them
 reserved = set(sympa_mail.robot_local_parts() + sympa_mail.LEGACY_ROBOT_LOCAL_PARTS)
 if name in reserved or any(name.endswith(suffix) for suffix in sympa_mail.LIST_SUFFIXES if suffix):
     fail('name', 'list_name_reserved', name)
 if sympa_lists.list_exists(name, domain):
     fail('name', 'list_already_exists', name)
 
-auto = sympa_mail.owned_addresses(mail_server) is not None
-created = []
-if auto:
-    try:
-        created = sympa_mail.add_addresses(mail_server, domain, sympa_mail.list_local_parts(name))
-    except sympa_mail.AddressError as ex:
-        detail = ex.details[0] if ex.details else {}
-        fail('name', 'list_' + detail.get('error', 'cannot_create_addresses'), detail.get('value', name))
-
-agent.set_progress(50)
 ok, message = sympa_lists.create_list(name, domain, request['subject'], request['type'],
                                       [owner.lower() for owner in request['owners']], request.get('description', ''))
 if not ok:
     print(agent.SD_ERR + f"sympa create failed: {message}", file=sys.stderr)
-    if created:
-        # Leave the mail module as it was before
-        sympa_mail.remove_addresses(mail_server, domain, created)
     sys.exit(1)
 
-json.dump({"name": name, "addresses_created": auto}, fp=sys.stdout)
+json.dump({"name": name}, fp=sys.stdout)

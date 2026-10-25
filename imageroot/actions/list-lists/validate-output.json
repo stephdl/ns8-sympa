@@ -2,23 +2,12 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$id": "http://nethserver.org/json-schema/task/output/sympa/list-lists",
     "title": "list-lists output",
-    "description": "Sympa lists and the state of their mail addresses",
+    "description": "Sympa lists and the mail addresses the UI must declare",
     "examples": [
         {
-            "mode": "auto",
-            "robot_addresses_ok": true,
+            "configured": true,
             "list_types": [
                 "discussion_list"
-            ],
-            "lists": [
-                {
-                    "name": "news",
-                    "subject": "Company news",
-                    "status": "open",
-                    "subscribers": 12,
-                    "addresses_ok": true,
-                    "missing_addresses": []
-                }
             ],
             "robot_addresses": [
                 "sympa1",
@@ -34,31 +23,42 @@
                 "-editor",
                 "-unsubscribe",
                 "-owner"
+            ],
+            "lists": [
+                {
+                    "name": "news",
+                    "subject": "Company news",
+                    "status": "open",
+                    "subscribers": 12
+                }
             ]
         }
     ],
     "type": "object",
     "required": [
-        "mode",
+        "configured",
         "lists",
-        "robot_addresses_ok",
         "list_types",
         "robot_addresses",
         "list_suffixes"
     ],
     "properties": {
-        "mode": {
-            "type": "string",
-            "enum": [
-                "auto",
-                "manual",
-                "unconfigured"
-            ]
-        },
-        "robot_addresses_ok": {
+        "configured": {
             "type": "boolean"
         },
         "list_types": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "robot_addresses": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "list_suffixes": {
             "type": "array",
             "items": {
                 "type": "string"
@@ -72,9 +72,7 @@
                     "name",
                     "subject",
                     "status",
-                    "subscribers",
-                    "addresses_ok",
-                    "missing_addresses"
+                    "subscribers"
                 ],
                 "properties": {
                     "name": {
@@ -88,29 +86,8 @@
                     },
                     "subscribers": {
                         "type": "integer"
-                    },
-                    "addresses_ok": {
-                        "type": "boolean"
-                    },
-                    "missing_addresses": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
                     }
                 }
-            }
-        },
-        "robot_addresses": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
-        },
-        "list_suffixes": {
-            "type": "array",
-            "items": {
-                "type": "string"
             }
         }
     }

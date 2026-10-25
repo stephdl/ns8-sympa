@@ -5,12 +5,15 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
+#
+# The UI removes the mail addresses of the list after this action
+#
+
 import os
 import sys
 import json
 import agent
 import sympa_lists
-import sympa_mail
 
 request = json.load(sys.stdin)
 name = request['name'].lower()
@@ -26,6 +29,4 @@ if not ok:
     print(agent.SD_ERR + f"sympa close failed: {message}", file=sys.stderr)
     sys.exit(1)
 
-# Only addresses owned by this instance are removed, others stay untouched
-removed = sympa_mail.remove_addresses(os.environ["MAIL_SERVER"], domain, sympa_mail.list_local_parts(name))
-json.dump({"name": name, "removed_addresses": len(removed)}, fp=sys.stdout)
+json.dump({"name": name}, fp=sys.stdout)

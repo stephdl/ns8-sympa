@@ -5,37 +5,24 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
+#
+# The module cannot read the addresses of the mail module: the UI checks
+# them with the token of the logged admin
+#
+
 import os
 import sys
 import json
-import agent
 import sympa_lists
 import sympa_mail
 
 domain = os.environ.get("LIST_DOMAIN", "")
-mail_server = os.environ.get("MAIL_SERVER", "")
-if not domain or not mail_server:
-    json.dump({"mode": "unconfigured", "lists": [], "robot_addresses_ok": False, "list_types": sympa_lists.LIST_TYPES,
-               "robot_addresses": [], "list_suffixes": sympa_mail.LIST_SUFFIXES}, fp=sys.stdout)
-    sys.exit(0)
-
-owned = sympa_mail.owned_addresses(mail_server)
-mode = "manual" if owned is None else "auto"
-present = {addr['local'].lower() for addr in owned or [] if addr['domain'].lower() == domain}
-
-lists = sympa_lists.get_lists(domain)
-for item in lists:
-    missing = [local for local in sympa_mail.list_local_parts(item['name']) if local not in present]
-    # In manual mode the module cannot see the addresses: never claim they exist
-    item['addresses_ok'] = mode == "auto" and not missing
-    item['missing_addresses'] = missing if mode == "auto" else sympa_mail.list_local_parts(item['name'])
+configured = bool(domain and os.environ.get("MAIL_SERVER"))
 
 json.dump({
-    "mode": mode,
-    "lists": lists,
-    "robot_addresses_ok": mode == "auto" and all(local in present for local in sympa_mail.robot_local_parts()),
-    # The UI declares the addresses itself when the mail server cannot
-    "robot_addresses": sympa_mail.robot_local_parts(),
-    "list_suffixes": sympa_mail.LIST_SUFFIXES,
+    "configured": configured,
+    "lists": sympa_lists.get_lists(domain) if configured else [],
     "list_types": sympa_lists.LIST_TYPES,
+    "robot_addresses": sympa_mail.robot_local_parts() if configured else [],
+    "list_suffixes": sympa_mail.LIST_SUFFIXES,
 }, fp=sys.stdout)

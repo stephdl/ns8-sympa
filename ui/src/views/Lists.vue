@@ -19,7 +19,7 @@
         />
       </cv-column>
     </cv-row>
-    <cv-row v-if="loaded && mode === 'unconfigured'">
+    <cv-row v-if="loaded && !configured">
       <cv-column>
         <NsInlineNotification
           kind="info"
@@ -31,7 +31,7 @@
         />
       </cv-column>
     </cv-row>
-    <cv-row v-if="loaded && uiManaged">
+    <cv-row v-if="loaded && configured">
       <cv-column>
         <NsInlineNotification
           kind="info"
@@ -51,28 +51,34 @@
         />
       </cv-column>
     </cv-row>
-    <cv-row v-if="stateReady && !robotOk">
+    <cv-row v-if="stateReady && missingRobot.length">
       <cv-column>
         <NsInlineNotification
           kind="warning"
           :title="$t('lists.robot_addresses_missing')"
           :description="
-            uiManaged
-              ? $t('lists.robot_addresses_missing_ui', {
-                  addresses: robotAddresses.join(', '),
-                })
-              : $t('lists.robot_addresses_missing_description')
+            $t('lists.robot_addresses_missing_ui', {
+              addresses: missingRobot.join(', '),
+            })
           "
-          :actionLabel="
-            uiManaged
-              ? $t('lists.create_robot_addresses')
-              : $t('status.configure')
+          :actionLabel="$t('lists.create_robot_addresses')"
+          @action="createRobotAddresses"
+          :showCloseButton="false"
+        />
+      </cv-column>
+    </cv-row>
+    <cv-row v-if="stateReady && orphans.length">
+      <cv-column>
+        <NsInlineNotification
+          kind="warning"
+          :title="$t('lists.orphan_addresses')"
+          :description="
+            $t('lists.orphan_addresses_description', {
+              addresses: orphans.join(', '),
+            })
           "
-          @action="
-            uiManaged
-              ? createRobotAddresses()
-              : goToAppPage(instanceName, 'settings')
-          "
+          :actionLabel="$t('lists.remove_orphan_addresses')"
+          @action="removeOrphans"
           :showCloseButton="false"
         />
       </cv-column>
@@ -87,7 +93,7 @@
         />
       </cv-column>
     </cv-row>
-    <cv-row v-if="mode !== 'unconfigured'">
+    <cv-row v-if="configured">
       <cv-column>
         <NsButton
           kind="secondary"
@@ -99,7 +105,7 @@
         >
       </cv-column>
     </cv-row>
-    <cv-row v-if="mode !== 'unconfigured'">
+    <cv-row v-if="configured">
       <cv-column>
         <cv-tile light>
           <NsEmptyState
@@ -306,15 +312,7 @@ import {
   IconService,
   PageTitleService,
 } from "@nethserver/ns8-ui-lib";
-
-// Raised when an address cannot be declared in the mail module
-class AddressConflict extends Error {
-  constructor(local, reason) {
-    super(reason);
-    this.local = local;
-    this.reason = reason;
-  }
-}
+import MailAddresses, { AddressConflict } from "@/mixins/mailAddresses";
 
 export default {
   name: "Lists",
@@ -324,6 +322,7 @@ export default {
     UtilService,
     QueryParamService,
     PageTitleService,
+    MailAddresses,
   ],
   pageTitle() {
     return this.$t("lists.title") + " - " + this.appName;
@@ -335,10 +334,9 @@ export default {
       },
       urlCheckInterval: null,
       loaded: false,
-      mode: "auto",
+      configured: false,
       lists: [],
       listTypes: [],
-      backendRobotOk: true,
       robotAddresses: [],
       listSuffixes: [],
       listDomain: "",
@@ -346,7 +344,6 @@ export default {
       inboundDomain: "",
       mailModule: "",
       listmasters: [],
-      // Addresses of the list domain as the mail module sees them (UI mode)
       mailState: null,
       tablePage: [],
       columns: ["name", "subject", "status", "subscribers", "addresses"],
@@ -384,23 +381,26 @@ export default {
   },
   computed: {
     ...mapState(["instanceName", "core", "appName"]),
-    // Without the mailaddressadm role, this page declares the addresses
-    uiManaged() {
-      return this.mode === "manual";
-    },
     stateReady() {
-      return this.loaded && (!this.uiManaged || !!this.mailState);
+      return this.loaded && this.configured && !!this.mailState;
     },
-    robotOk() {
-      if (!this.uiManaged) {
-        return this.backendRobotOk;
+    missingRobot() {
+      return this.robotAddresses.filter((local) => !this.isOurs(local));
+    },
+    // Addresses forwarding to this instance that no list or robot uses
+    orphans() {
+      if (!this.mailState) {
+        return [];
       }
-      return this.robotAddresses.every((local) => this.isOurs(local));
+      const used = new Set(this.robotAddresses);
+      for (const item of this.lists) {
+        this.listLocalParts(item.name).forEach((local) => used.add(local));
+      }
+      return this.sympaAddresses(this.mailState, this.inboundDomain)
+        .filter((local) => !used.has(local))
+        .sort();
     },
     rows() {
-      if (!this.uiManaged) {
-        return this.lists;
-      }
       return this.lists.map((item) => ({
         ...item,
         addresses_ok:
@@ -457,39 +457,16 @@ export default {
     listLocalParts(name) {
       return this.listSuffixes.map((suffix) => name + suffix);
     },
-    // Run an action of any module with the token of the logged admin
-    task(moduleId, action, data = {}, title = "") {
-      return new Promise((resolve, reject) => {
-        const eventId = this.getUuid();
-        this.core.$root.$once(`${action}-completed-${eventId}`, (ctx, result) =>
-          resolve(result.output)
-        );
-        this.core.$root.$once(`${action}-aborted-${eventId}`, () =>
-          reject(new Error(this.$t("error.generic_error")))
-        );
-        this.core.$root.$once(
-          `${action}-validation-failed-${eventId}`,
-          (errors) =>
-            reject(Object.assign(new Error(action), { validation: errors }))
-        );
-        this.createModuleTaskForApp(moduleId, {
-          action,
-          data,
-          extra: {
-            title: title || this.$t("action." + action),
-            isNotificationHidden: !title,
-            eventId,
-          },
-        }).catch((err) => reject(new Error(this.getErrorMessage(err))));
-      });
+    isOurs(local) {
+      return this.forwardsTo(this.mailState, local, this.inboundDomain);
     },
     async refresh() {
       this.loading.listLists = true;
       this.error.listLists = "";
       try {
         const [config, output] = await Promise.all([
-          this.task(this.instanceName, "get-configuration"),
-          this.task(this.instanceName, "list-lists"),
+          this.moduleTask(this.instanceName, "get-configuration"),
+          this.moduleTask(this.instanceName, "list-lists"),
         ]);
         this.listDomain = config.list_domain;
         this.host = config.host;
@@ -499,10 +476,9 @@ export default {
           (s) => s.uuid === config.mail_server
         );
         this.mailModule = server ? server.module_id : "";
-        this.mode = output.mode;
+        this.configured = output.configured && !!this.mailModule;
         this.lists = output.lists;
         this.listTypes = output.list_types;
-        this.backendRobotOk = output.robot_addresses_ok;
         this.robotAddresses = output.robot_addresses;
         this.listSuffixes = output.list_suffixes;
         this.loaded = true;
@@ -510,159 +486,72 @@ export default {
         this.error.listLists = err.message;
       }
       this.loading.listLists = false;
-      if (this.uiManaged && this.mailModule) {
+      if (this.configured) {
         await this.loadMailState();
       }
     },
-    // Read the addresses of the mail module, to check names before using them
     async loadMailState() {
       this.error.mail = "";
       try {
-        const [addresses, domains] = await Promise.all([
-          this.task(this.mailModule, "list-addresses"),
-          this.task(this.mailModule, "list-domains"),
-        ]);
-        const domain = domains.find((d) => d.domain === this.listDomain) || {};
-        const state = { destinations: {}, taken: {} };
-        for (const addr of addresses.addresses) {
-          const local = addr.local.toLowerCase();
-          if (addr.atype === "wildcard") {
-            state.taken[local] = "address_reserved";
-          } else if (addr.atype === "adduser" && domain.addusers) {
-            state.taken[local] = "address_is_user";
-          } else if (addr.atype === "addgroup" && domain.addgroups) {
-            state.taken[local] = "address_is_group";
-          } else if (
-            addr.atype === "domain" &&
-            addr.domain.toLowerCase() === this.listDomain
-          ) {
-            state.destinations[local] = addr.destinations;
-          }
-        }
-        this.mailState = state;
+        this.mailState = await this.readMailState(
+          this.mailModule,
+          this.listDomain
+        );
       } catch (err) {
         this.mailState = null;
         this.error.mail = err.message;
       }
     },
-    // An address is ours when its only destination is <local>@<inbound domain>
-    isOurs(local) {
-      const dests = this.mailState
-        ? this.mailState.destinations[local.toLowerCase()]
-        : null;
-      return (
-        !!dests &&
-        dests.length === 1 &&
-        dests[0].dtype === "external" &&
-        dests[0].name.toLowerCase() ===
-          `${local}@${this.inboundDomain}`.toLowerCase()
+    async runAddressAction(key, title, action) {
+      this.busy = key;
+      this.error.action = "";
+      try {
+        await action();
+      } catch (err) {
+        this.error.actionTitle = title;
+        this.error.action = this.addressErrorMessage(err, this.listDomain);
+      }
+      this.busy = "";
+      await this.loadMailState();
+    },
+    createRobotAddresses() {
+      return this.runAddressAction(
+        "robot",
+        this.$t("lists.create_robot_addresses"),
+        () =>
+          this.declareAddresses(
+            this.mailModule,
+            this.listDomain,
+            this.inboundDomain,
+            this.robotAddresses
+          )
       );
     },
-    // Declare the addresses in the mail module. All of them, or none.
-    async addAddresses(locals) {
-      await this.loadMailState();
-      if (!this.mailState) {
-        throw new Error(this.error.mail);
-      }
-      const missing = [];
-      for (const local of locals) {
-        if (this.isOurs(local)) {
-          continue;
-        }
-        if (this.mailState.taken[local]) {
-          throw new AddressConflict(local, this.mailState.taken[local]);
-        }
-        if (this.mailState.destinations[local]) {
-          throw new AddressConflict(local, "address_already_exists");
-        }
-        missing.push(local);
-      }
-      const created = [];
-      try {
-        for (const local of missing) {
-          await this.task(this.mailModule, "add-address", {
-            atype: "domain",
-            domain: this.listDomain,
-            local,
-            destinations: [
-              { dtype: "external", name: `${local}@${this.inboundDomain}` },
-            ],
-          });
-          created.push(local);
-        }
-      } catch (err) {
-        await this.removeAddresses(created, false);
-        throw err;
-      }
-      return created;
+    removeOrphans() {
+      return this.runAddressAction(
+        "orphans",
+        this.$t("lists.remove_orphan_addresses"),
+        () =>
+          this.withdrawAddresses(
+            this.mailModule,
+            this.listDomain,
+            this.inboundDomain,
+            this.orphans
+          )
+      );
     },
-    // Remove only addresses that still forward to this instance
-    async removeAddresses(locals, check = true) {
-      if (check) {
-        await this.loadMailState();
-        if (!this.mailState) {
-          return;
-        }
-      }
-      for (const local of locals) {
-        if (check && !this.isOurs(local)) {
-          continue;
-        }
-        try {
-          await this.task(this.mailModule, "remove-address", {
-            atype: "domain",
-            domain: this.listDomain,
-            local,
-          });
-        } catch (err) {
-          console.error(`cannot remove ${local}@${this.listDomain}`, err);
-        }
-      }
-    },
-    conflictMessage(err) {
-      if (err instanceof AddressConflict) {
-        return this.$t("lists.list_" + err.reason, {
-          value: `${err.local}@${this.listDomain}`,
-        });
-      }
-      return err.message;
-    },
-    async createRobotAddresses() {
-      this.busy = "robot";
-      this.error.action = "";
-      try {
-        await this.addAddresses(this.robotAddresses);
-      } catch (err) {
-        this.error.actionTitle = this.$t("lists.create_robot_addresses");
-        this.error.action = this.conflictMessage(err);
-      }
-      this.busy = "";
-      await this.loadMailState();
-    },
-    async createListAddresses(row) {
-      this.busy = row.name;
-      this.error.action = "";
-      try {
-        if (this.uiManaged) {
-          await this.addAddresses(this.listLocalParts(row.name));
-        } else {
-          await this.task(
-            this.instanceName,
-            "create-list-addresses",
-            { name: row.name },
-            this.$t("lists.creating_addresses", { list: row.name })
-          );
-        }
-      } catch (err) {
-        this.error.actionTitle = this.$t("action.create-list-addresses");
-        this.error.action = err.validation
-          ? err.validation
-              .map((e) => this.$t("lists." + e.error, { value: e.value }))
-              .join(" ")
-          : this.conflictMessage(err);
-      }
-      this.busy = "";
-      await this.refresh();
+    createListAddresses(row) {
+      return this.runAddressAction(
+        row.name,
+        this.$t("lists.create_addresses"),
+        () =>
+          this.declareAddresses(
+            this.mailModule,
+            this.listDomain,
+            this.inboundDomain,
+            this.listLocalParts(row.name)
+          )
+      );
     },
     showDestroy(row) {
       this.selected = row;
@@ -737,11 +626,14 @@ export default {
       const name = this.form.name;
       let created = [];
       try {
-        if (this.uiManaged) {
-          // Addresses first: a refused name leaves nothing behind in Sympa
-          created = await this.addAddresses(this.listLocalParts(name));
-        }
-        await this.task(
+        // Addresses first: a refused name leaves nothing behind in Sympa
+        created = await this.declareAddresses(
+          this.mailModule,
+          this.listDomain,
+          this.inboundDomain,
+          this.listLocalParts(name)
+        );
+        await this.moduleTask(
           this.instanceName,
           "create-list",
           {
@@ -755,9 +647,7 @@ export default {
         );
         this.isCreateShown = false;
       } catch (err) {
-        if (created.length) {
-          await this.removeAddresses(created, false);
-        }
+        await this.dropAddresses(this.mailModule, this.listDomain, created);
         if (err instanceof AddressConflict) {
           this.error.name = "lists.list_" + err.reason;
           this.errorValue = `${err.local}@${this.listDomain}`;
@@ -780,15 +670,18 @@ export default {
       this.error.destroyList = "";
       const name = this.selected.name;
       try {
-        await this.task(
+        await this.moduleTask(
           this.instanceName,
           "destroy-list",
           { name },
           this.$t("lists.destroying_list", { list: name })
         );
-        if (this.uiManaged) {
-          await this.removeAddresses(this.listLocalParts(name));
-        }
+        await this.withdrawAddresses(
+          this.mailModule,
+          this.listDomain,
+          this.inboundDomain,
+          this.listLocalParts(name)
+        );
         this.isDestroyShown = false;
       } catch (err) {
         this.error.destroyList = err.message;
