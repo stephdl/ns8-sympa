@@ -11,9 +11,6 @@ the cluster smarthost.
 ## Requirements
 
 - A Mail application instance in the cluster. It can run on another node.
-  A version with the `mailaddressadm` role lets the module manage the list
-  addresses itself. With an older version the administrator declares them
-  by hand.
 - The cluster smarthost, configured in Settings > Smarthost. Without it,
   outgoing mail stays in the queue.
 - Optional: a user domain, for LDAP login to the web interface.
@@ -47,9 +44,8 @@ Configure the instance from the UI, or with:
   already holds mailboxes. It must be a domain of the Mail application, and
   it cannot be the internal LDAP domain of the mail server or one of its
   subdomains: the Mail application rejects them. One domain is served by
-  one Sympa instance only: Sympa runs one robot per domain, with its own
-  `sympa@` and `listmaster@` addresses. The UI marks the domains used by
-  another instance.
+  one Sympa instance only: Sympa runs one robot per domain. The UI marks
+  the domains used by another instance.
 - `listmasters`: email addresses of the Sympa administrators.
 - `mail_server`: UUID of the Mail application instance. `get-configuration`
   lists the available ones in `mail_servers`.
@@ -105,54 +101,54 @@ forwards the message.
 Each address of the list domain used by Sympa forwards to an external
 destination: the same local part at the inbound domain.
 
-Sympa addresses, once per instance:
+Sympa addresses, once per instance. They start with a prefix taken from
+the inbound domain, for example `sympa1` for `sympa1.invalid`, so they
+never collide with a user and survive restore and move:
 
-    sympa  sympa-request  sympa-owner  listmaster  bounce  abuse-feedback-report
+    sympa1  sympa1-request  sympa1-owner  sympa1-listmaster  sympa1-bounce  sympa1-abuse-feedback-report
 
-Addresses of each list, for example `mylist`:
+`sympa1@` receives the mail commands, like `subscribe` or `help`, and
+`sympa1-bounce@` the bounces with VERP. Lists keep plain addresses, for
+example `mylist`:
 
     mylist  mylist-request  mylist-editor  mylist-unsubscribe  mylist-owner
 
 An address that is not declared is rejected during the SMTP session.
 
-When the Mail application grants the `mailaddressadm` role, the module
-manages these addresses itself with `add-owned-addresses` and
-`remove-owned-addresses`. The Mail application records the module as their
-owner, and the module changes only its own addresses:
+The `mailadm` role of the module does not allow creating addresses. The
+module UI creates and removes them instead, with the actions of the Mail
+application and the token of the logged administrator. The administrator
+needs the right to run `add-address` and `remove-address` on the mail
+server. Before creating an address, the UI checks that no user, group or
+other address has the same name, and creates the five addresses of a list
+or none. It removes only the addresses that forward to this instance.
 
-- `configure-module` creates the Sympa addresses and the addresses of the
-  existing lists. An address with the same destination created earlier by
-  hand is taken over. An address that cannot be created, for example
-  because a user has the same name, is skipped with a warning, and the
-  Lists page reports it.
-- Creating a list creates its five addresses first. If the Mail application
-  refuses one, for example the name of a user or a group, the list is not
-  created.
-- Destroying a list removes its five addresses.
-- When the mail server or the list domain changes, the addresses are
-  removed from the previous mail server and created again.
-- Removing the instance removes all its addresses.
+Nothing is automatic outside the UI:
 
-With an older Mail application the administrator declares the addresses by
-hand. The Lists page shows the `add-address` commands for each list.
-Before you create an address by hand, check that no user or group has the
-same name: an address of the Mail application takes priority over users
-and groups, so their mail would go to Sympa without any error.
+- `create-list` and `destroy-list` called with `api-cli` do not change
+  the addresses;
+- a list created or closed in the Sympa web interface has no addresses, or
+  keeps them. The Lists page flags missing and unused addresses, with a
+  button to create or remove them;
+- when the mail server or the list domain changes in Settings, the UI
+  moves the addresses to the new one after saving;
+- when the instance is removed, its addresses stay in the Mail application.
+  The Status page lists them, with the commands to remove them first.
 
 ## Lists
 
 The Lists page shows the lists of the instance with their subject, status,
-number of subscribers and the state of their mail addresses. Actions:
+number of subscribers and the state of their mail addresses, read from the
+mail server selected in Settings. Actions:
 
 - `list-lists`: lists, subscribers and missing addresses.
 - `create-list`: name, subject, type (a Sympa list template), owners and
   description. The name accepts lowercase letters, digits, dot, dash and
   underscore. Names of Sympa addresses and names ending with a list suffix,
-  like `-owner`, are refused.
-- `destroy-list`: purge the list, its subscribers and its archives, then
-  remove its addresses. The UI asks to type the list name.
-- `create-list-addresses`: create the missing addresses of a list created
-  in the Sympa web interface. The Lists page flags such lists.
+  like `-owner`, are refused. The UI declares the addresses first: if one
+  is refused, the list is not created.
+- `destroy-list`: purge the list, its subscribers and its archives. The UI
+  asks to type the list name, then removes the addresses.
 
 Subscribers, moderation and archives are managed in the Sympa web
 interface.
@@ -224,14 +220,16 @@ The backup contains a dump of the database, the secrets and the
   Mail application stay valid, and the relay rule is updated in place with
   the new node address and port. Let's Encrypt is disabled: enable it again
   in Settings. A user domain that does not exist on the cluster is dropped
-  with a warning.
+  with a warning. If another instance of the cluster already uses the
+  inbound domain, the restored instance takes a new one with a warning,
+  and its addresses must be declared again from the Lists page.
 - Restore that cannot be configured: when the host name is used by another
   application, when the mail server of the backup does not exist on the
   cluster, or when it lacks the list domain, the instance starts without
   web route and without relay rule, and logs a warning. Complete the
   configuration in Settings.
 - Clone: the copy gets its own inbound domain and port, no web route and
-  no relay rule. The source keeps working. Set a new host name in
+  no relay rule. Its Sympa addresses must be created from the Lists page. The source keeps working. Set a new host name in
   Settings to use the copy.
 - Move: the new instance takes over the web route with its Let's Encrypt
   setting, the inbound domain and the relay rule of the source.
@@ -240,8 +238,9 @@ The backup contains a dump of the database, the secrets and the
 
     remove-module --no-preserve sympa1
 
-The relay rule is removed from the Mail application. The addresses
-declared by the administrator are not removed.
+The relay rule is removed from the Mail application. The mail addresses
+stay: remove them first from the Lists page, or with the commands of the
+Status page.
 
 ## Logs
 
