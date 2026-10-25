@@ -1,19 +1,28 @@
 {
-  "name": "kickstart",
+  "name": "sympa",
   "description": {
-    "en": "My kickstart module"
+    "en": "Sympa mailing list manager",
+    "fr": "Gestionnaire de listes de diffusion Sympa",
+    "it": "Gestore di mailing list Sympa",
+    "de": "Sympa Mailinglisten-Verwaltung",
+    "es": "Gestor de listas de correo Sympa",
+    "pt": "Gestor de listas de correio Sympa",
+    "pt_BR": "Gerenciador de listas de e-mail Sympa",
+    "eu": "Sympa posta-zerrenden kudeatzailea"
   },
-  "categories": [],
+  "categories": [
+    "collaboration"
+  ],
   "authors": [
     {
-      "name": "Name Surname",
-      "email": "author@yourmail.org"
+      "name": "Stephane de Labrusse",
+      "email": "stephane.delabrusse@nethesis.it"
     }
   ],
   "docs": {
-    "documentation_url": "https://docs.kickstart.com/",
+    "documentation_url": "https://www.sympa.community/manual/",
     "bug_url": "https://github.com/NethServer/dev",
-    "code_url": "https://github.com/author/ns8-kickstart"
+    "code_url": "https://github.com/stephdl/ns8-sympa"
   },
-  "source": "ghcr.io/nethserver/kickstart"
+  "source": "ghcr.io/stephdl/sympa"
 }
