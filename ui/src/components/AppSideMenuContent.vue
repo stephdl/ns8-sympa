@@ -22,6 +22,13 @@
         <span>{{ $t("status.title") }}</span>
       </cv-side-nav-link>
       <cv-side-nav-link
+        @click="goToAppPage(instanceName, 'lists')"
+        :class="{ 'current-page': isLinkActive('lists') }"
+      >
+        <template v-slot:nav-icon><Email20 /></template>
+        <span>{{ $t("lists.title") }}</span>
+      </cv-side-nav-link>
+      <cv-side-nav-link
         @click="goToAppPage(instanceName, 'settings')"
         :class="{ 'current-page': isLinkActive('settings') }"
       >
@@ -41,6 +48,7 @@
 
 <script>
 import Settings20 from "@carbon/icons-vue/es/settings/20";
+import Email20 from "@carbon/icons-vue/es/email/20";
 import Information20 from "@carbon/icons-vue/es/information/20";
 import Activity20 from "@carbon/icons-vue/es/activity/20";
 import { mapState } from "vuex";
@@ -50,6 +58,7 @@ export default {
   name: "AppSideMenuContent",
   components: {
     Settings20,
+    Email20,
     Information20,
     Activity20,
   },

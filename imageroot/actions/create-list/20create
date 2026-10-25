@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2026 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+#
+# Create the mail addresses first: when the mail module refuses one, for
+# example a user with the same name, nothing is created in Sympa.
+#
+
+import os
+import sys
+import json
+import agent
+import sympa_lists
+import sympa_mail
+
+request = json.load(sys.stdin)
+name = request['name'].lower()
+domain = os.environ["LIST_DOMAIN"]
+mail_server = os.environ["MAIL_SERVER"]
+
+
+def fail(field, error, value):
+    agent.set_status('validation-failed')
+    json.dump([{'field': field, 'parameter': field, 'value': value, 'error': error}], fp=sys.stdout)
+    sys.exit(2)
+
+
+reserved = set(sympa_mail.ROBOT_LOCAL_PARTS)
+if name in reserved or any(name.endswith(suffix) for suffix in sympa_mail.LIST_SUFFIXES if suffix):
+    fail('name', 'list_name_reserved', name)
+if sympa_lists.list_exists(name, domain):
+    fail('name', 'list_already_exists', name)
+
+auto = sympa_mail.owned_addresses(mail_server) is not None
+created = []
+if auto:
+    try:
+        created = sympa_mail.add_addresses(mail_server, domain, sympa_mail.list_local_parts(name))
+    except sympa_mail.AddressError as ex:
+        detail = ex.details[0] if ex.details else {}
+        fail('name', 'list_' + detail.get('error', 'cannot_create_addresses'), detail.get('value', name))
+
+agent.set_progress(50)
+ok, message = sympa_lists.create_list(name, domain, request['subject'], request['type'],
+                                      [owner.lower() for owner in request['owners']], request.get('description', ''))
+if not ok:
+    print(agent.SD_ERR + f"sympa create failed: {message}", file=sys.stderr)
+    if created:
+        # Leave the mail module as it was before
+        sympa_mail.remove_addresses(mail_server, domain, created)
+    sys.exit(1)
+
+json.dump({"name": name, "addresses_created": auto}, fp=sys.stdout)

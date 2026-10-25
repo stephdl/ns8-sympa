@@ -85,3 +85,74 @@ def remove_relay_rule(mail_uuid):
     result = _run(module_id, 'remove-relay-rule', {'rule_subject': subject})
     if result['exit_code'] != 0:
         print(agent.SD_WARNING + f"remove-relay-rule failed on {module_id}", file=sys.stderr)
+
+
+#
+# List addresses in the mail module, through the mailaddressadm role
+#
+
+# Robot addresses, from /etc/sympa/aliases.sympa.postfix of the EPEL package
+ROBOT_LOCAL_PARTS = ["sympa", "sympa-request", "sympa-owner", "listmaster", "bounce", "abuse-feedback-report"]
+# Addresses of one list, from Sympa default/list_aliases.tt2
+LIST_SUFFIXES = ["", "-request", "-editor", "-unsubscribe", "-owner"]
+
+
+def list_local_parts(name):
+    return [name + suffix for suffix in LIST_SUFFIXES]
+
+
+class AddressError(Exception):
+    """The mail module refused the addresses: field, value and error code for the UI"""
+    def __init__(self, details):
+        super().__init__(details)
+        self.details = details
+
+
+def owned_addresses(mail_uuid):
+    """Our addresses in the mail module, or None if it lacks the mailaddressadm actions"""
+    rdb = agent.redis_connect(use_replica=True)
+    module_id = _mail_module_id(rdb, mail_uuid)
+    if module_id is None:
+        return None
+    try:
+        result = _run(module_id, 'list-owned-addresses', {})
+    except Exception as ex:
+        print(agent.SD_NOTICE + f"list-owned-addresses not available on {module_id}: {ex}", file=sys.stderr)
+        return None
+    if result['exit_code'] != 0:
+        # Older mail module: the action does not exist or the role is missing
+        return None
+    return result['output']['addresses']
+
+
+def add_addresses(mail_uuid, domain, local_parts):
+    rdb = agent.redis_connect(use_replica=True)
+    module_id = _mail_module_id(rdb, mail_uuid)
+    agent.assert_exp(module_id is not None, f"Mail server {mail_uuid} not found")
+    inbound = os.environ["INBOUND_DOMAIN"]
+    result = _run(module_id, 'add-owned-addresses', {
+        "domain": domain,
+        "addresses": [{"local": local, "destination": f"{local}@{inbound}"} for local in local_parts],
+        "description": "Sympa " + os.environ["MODULE_ID"],
+    })
+    if result['exit_code'] != 0:
+        raise AddressError(result.get('output') or [{"field": "addresses", "error": "cannot_create_addresses"}])
+    return result['output']['created']
+
+
+def remove_addresses(mail_uuid, domain=None, local_parts=None):
+    rdb = agent.redis_connect(use_replica=True)
+    module_id = _mail_module_id(rdb, mail_uuid)
+    if module_id is None:
+        print(agent.SD_WARNING + f"Mail server {mail_uuid} not found, addresses not removed", file=sys.stderr)
+        return []
+    data = {}
+    if domain:
+        data["domain"] = domain
+    if local_parts is not None:
+        data["locals"] = local_parts
+    result = _run(module_id, 'remove-owned-addresses', data)
+    if result['exit_code'] != 0:
+        print(agent.SD_WARNING + f"remove-owned-addresses failed on {module_id}", file=sys.stderr)
+        return []
+    return result['output']['removed']

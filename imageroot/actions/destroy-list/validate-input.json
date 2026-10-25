@@ -1,0 +1,25 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://nethserver.org/json-schema/task/input/sympa/destroy-list",
+    "title": "destroy-list input",
+    "description": "Purge a Sympa list and remove its mail addresses",
+    "examples": [
+        {
+            "name": "news"
+        }
+    ],
+    "type": "object",
+    "required": [
+        "name"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "name": {
+            "type": "string",
+            "title": "List name",
+            "minLength": 1,
+            "maxLength": 50,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+        }
+    }
+}

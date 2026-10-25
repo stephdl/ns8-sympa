@@ -1,0 +1,88 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://nethserver.org/json-schema/task/output/sympa/list-lists",
+    "title": "list-lists output",
+    "description": "Sympa lists and the state of their mail addresses",
+    "examples": [
+        {
+            "mode": "auto",
+            "robot_addresses_ok": true,
+            "list_types": [
+                "discussion_list"
+            ],
+            "lists": [
+                {
+                    "name": "news",
+                    "subject": "Company news",
+                    "status": "open",
+                    "subscribers": 12,
+                    "addresses_ok": true,
+                    "missing_addresses": []
+                }
+            ]
+        }
+    ],
+    "type": "object",
+    "required": [
+        "mode",
+        "lists",
+        "robot_addresses_ok",
+        "list_types"
+    ],
+    "properties": {
+        "mode": {
+            "type": "string",
+            "enum": [
+                "auto",
+                "manual",
+                "unconfigured"
+            ]
+        },
+        "robot_addresses_ok": {
+            "type": "boolean"
+        },
+        "list_types": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "lists": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "subject",
+                    "status",
+                    "subscribers",
+                    "addresses_ok",
+                    "missing_addresses"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "subject": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "subscribers": {
+                        "type": "integer"
+                    },
+                    "addresses_ok": {
+                        "type": "boolean"
+                    },
+                    "missing_addresses": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

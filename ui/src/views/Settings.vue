@@ -234,54 +234,6 @@
         </cv-tile>
       </cv-column>
     </cv-row>
-    <cv-row v-if="savedListDomain && inboundDomain">
-      <cv-column>
-        <cv-tile light>
-          <h4 class="mg-bottom-md">{{ $t("settings.addresses_title") }}</h4>
-          <NsInlineNotification
-            kind="info"
-            :title="$t('settings.addresses_info')"
-            :description="
-              $t('settings.addresses_description', {
-                domain: savedListDomain,
-                inbound: inboundDomain,
-              })
-            "
-            :showCloseButton="false"
-          />
-          <h6 class="mg-bottom-sm">{{ $t("settings.robot_addresses") }}</h6>
-          <NsCodeSnippet
-            class="mg-bottom"
-            :copyTooltip="core.$t('common.copy_to_clipboard')"
-            :copyFeedback="core.$t('common.copied_to_clipboard')"
-            :moreText="core.$t('common.show_more')"
-            :lessText="core.$t('common.show_less')"
-            light
-            >{{ addressCommands(robotLocalParts) }}</NsCodeSnippet
-          >
-          <NsTextInput
-            :label="$t('settings.list_name')"
-            placeholder="mylist"
-            v-model.trim="listName"
-            :helper-text="$t('settings.list_name_helper')"
-            class="mg-bottom maxwidth"
-          />
-          <template v-if="validListName">
-            <h6 class="mg-bottom-sm">
-              {{ $t("settings.list_addresses", { list: listName }) }}
-            </h6>
-            <NsCodeSnippet
-              :copyTooltip="core.$t('common.copy_to_clipboard')"
-              :copyFeedback="core.$t('common.copied_to_clipboard')"
-              :moreText="core.$t('common.show_more')"
-              :lessText="core.$t('common.show_less')"
-              light
-              >{{ addressCommands(listLocalParts) }}</NsCodeSnippet
-            >
-          </template>
-        </cv-tile>
-      </cv-column>
-    </cv-row>
   </cv-grid>
 </template>
 
@@ -307,19 +259,6 @@ const LANGS = {
   "pt-BR": "Português (Brasil)",
   eu: "Euskara",
 };
-
-// Robot addresses, from /etc/sympa/aliases.sympa.postfix of the EPEL package
-const ROBOT_LOCAL_PARTS = [
-  "sympa",
-  "sympa-request",
-  "sympa-owner",
-  "listmaster",
-  "bounce",
-  "abuse-feedback-report",
-];
-
-// Addresses of one list, from Sympa default/list_aliases.tt2
-const LIST_SUFFIXES = ["", "-request", "-editor", "-unsubscribe", "-owner"];
 
 export default {
   name: "Settings",
@@ -348,18 +287,15 @@ export default {
       isLetsEncryptEnabled: false,
       isLetsEncryptCurrentlyEnabled: false,
       listDomain: "",
-      savedListDomain: "",
       listmastersText: "",
       // Empty until the configuration loads, or the combo box shows the raw value
       mailServer: "",
       userDomain: "",
       defaultLang: "",
-      inboundDomain: "",
       mailServers: [],
       userDomains: [],
       smarthostEnabled: true,
       optionsKey: 0,
-      listName: "",
       invalidEmail: "",
       loading: {
         getConfiguration: false,
@@ -424,19 +360,6 @@ export default {
         value,
       }));
     },
-    selectedMailModule() {
-      const server = this.mailServers.find((s) => s.uuid === this.mailServer);
-      return server ? server.module_id : "mail1";
-    },
-    validListName() {
-      return /^[a-z0-9][a-z0-9._-]*$/.test(this.listName);
-    },
-    robotLocalParts() {
-      return ROBOT_LOCAL_PARTS;
-    },
-    listLocalParts() {
-      return LIST_SUFFIXES.map((suffix) => this.listName + suffix);
-    },
   },
   watch: {
     mailServer() {
@@ -466,23 +389,6 @@ export default {
   methods: {
     goTo(path) {
       this.core.$router.push(path);
-    },
-    addressCommands(localParts) {
-      return localParts
-        .map((local) => {
-          const data = {
-            atype: "domain",
-            domain: this.savedListDomain,
-            local,
-            destinations: [
-              { dtype: "external", name: `${local}@${this.inboundDomain}` },
-            ],
-          };
-          return `api-cli run module/${
-            this.selectedMailModule
-          }/add-address --data '${JSON.stringify(data)}'`;
-        })
-        .join("\n");
     },
     async getStatus() {
       this.loading.getStatus = true;
@@ -568,9 +474,7 @@ export default {
       this.hasRoute = config.has_route;
       this.isLetsEncryptEnabled = config.lets_encrypt;
       this.isLetsEncryptCurrentlyEnabled = config.lets_encrypt;
-      this.savedListDomain = config.list_domain;
       this.listmastersText = config.listmasters.join("\n");
-      this.inboundDomain = config.inbound_domain;
       // A combo box shows the raw value if it is created with one: clear it, recreate, then set
       this.mailServer = "";
       this.listDomain = "";

@@ -45,7 +45,7 @@ buildah add "${container}" imageroot /imageroot
 buildah add "${container}" ui/dist /ui
 # Two TCP ports: web (Traefik backend) and SMTP (inbound from the mail module)
 buildah config --entrypoint=/ \
-    --label="org.nethserver.authorizations=traefik@node:routeadm cluster:accountconsumer mail@any:mailadm" \
+    --label="org.nethserver.authorizations=traefik@node:routeadm cluster:accountconsumer mail@any:mailadm,mailaddressadm" \
     --label="org.nethserver.tcp-ports-demand=2" \
     --label="org.nethserver.rootfull=0" \
     --label="org.nethserver.min-core=3.20.1" \
