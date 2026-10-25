@@ -13,12 +13,13 @@ systemctl --user enable sympa.service
 systemctl --user restart sympa.service
 systemctl --user start postgresql-app.service sympa-app.service postfix-app.service wwsympa-app.service
 
-# add-relay-rule probes our SMTP port: wait for Postfix to answer
+# add-relay-rule probes our SMTP port. The port forwarder accepts TCP
+# before Postfix listens, so wait for the SMTP greeting itself.
 for (( i = 0; i < 60; i++ )); do
-    if (exec 3<>"/dev/tcp/${SMTP_BIND_ADDRESS}/${SMTP_PORT}") 2>/dev/null; then
+    if timeout 5 bash -c 'exec 3<>"/dev/tcp/$1/$2" && read -r -t 4 line <&3 && [[ $line == 220* ]] && printf "QUIT\r\n" >&3' _ "${SMTP_BIND_ADDRESS}" "${SMTP_PORT}" 2>/dev/null; then
         exit 0
     fi
     sleep 2
 done
-echo "Postfix is not listening on ${SMTP_BIND_ADDRESS}:${SMTP_PORT}" >&2
+echo "Postfix does not answer on ${SMTP_BIND_ADDRESS}:${SMTP_PORT}" >&2
 exit 1
