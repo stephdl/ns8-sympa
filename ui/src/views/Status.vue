@@ -39,6 +39,33 @@
         />
       </cv-column>
     </cv-row>
+    <cv-row v-if="sympaAddressList.length">
+      <cv-column>
+        <NsInlineNotification
+          kind="info"
+          :title="$t('status.addresses_kept_on_removal')"
+          :description="
+            $t('status.addresses_kept_on_removal_description', {
+              count: sympaAddressList.length,
+              mail: mailModule,
+            })
+          "
+          :actionLabel="$t('status.show_addresses')"
+          @action="isAddressListShown = !isAddressListShown"
+          :showCloseButton="false"
+        />
+        <NsCodeSnippet
+          v-if="isAddressListShown"
+          :copyTooltip="core.$t('common.copy_to_clipboard')"
+          :copyFeedback="core.$t('common.copied_to_clipboard')"
+          :moreText="core.$t('common.show_more')"
+          :lessText="core.$t('common.show_less')"
+          light
+          class="mg-bottom"
+          >{{ removalCommands }}</NsCodeSnippet
+        >
+      </cv-column>
+    </cv-row>
     <cv-row>
       <cv-column :md="4" :max="4">
         <NsInfoCard
@@ -295,6 +322,7 @@ import {
   UtilService,
   PageTitleService,
 } from "@nethserver/ns8-ui-lib";
+import MailAddresses from "@/mixins/mailAddresses";
 
 export default {
   name: "Status",
@@ -304,6 +332,7 @@ export default {
     IconService,
     UtilService,
     PageTitleService,
+    MailAddresses,
   ],
   pageTitle() {
     return this.$t("status.title") + " - " + this.appName;
@@ -317,6 +346,10 @@ export default {
       isRedirectChecked: false,
       redirectTimeout: 0,
       host: "",
+      mailModule: "",
+      listDomain: "",
+      sympaAddressList: [],
+      isAddressListShown: false,
       status: {
         instance: "",
         services: [],
@@ -339,6 +372,20 @@ export default {
     };
   },
   computed: {
+    removalCommands() {
+      return this.sympaAddressList
+        .map(
+          (local) =>
+            `api-cli run module/${
+              this.mailModule
+            }/remove-address --data '${JSON.stringify({
+              atype: "domain",
+              domain: this.listDomain,
+              local,
+            })}'`
+        )
+        .join("\n");
+    },
     ...mapState(["instanceName", "instanceLabel", "core", "appName"]),
     installationNodeTitle() {
       if (this.status && this.status.node) {
@@ -384,6 +431,29 @@ export default {
     this.listBackupRepositories();
   },
   methods: {
+    // Addresses the module cannot remove: listed so the admin knows what stays
+    async loadSympaAddresses(config) {
+      const server = config.mail_servers.find(
+        (srv) => srv.uuid === config.mail_server
+      );
+      if (!server || !config.list_domain) {
+        return;
+      }
+      this.mailModule = server.module_id;
+      this.listDomain = config.list_domain;
+      try {
+        const state = await this.readMailState(
+          server.module_id,
+          config.list_domain
+        );
+        this.sympaAddressList = this.sympaAddresses(
+          state,
+          config.inbound_domain
+        ).sort();
+      } catch (err) {
+        console.error("cannot read the mail addresses", err);
+      }
+    },
     goToWebapp() {
       window.open(`https://${this.host}/sympa`, "_blank");
     },
@@ -432,6 +502,7 @@ export default {
     getConfigurationCompleted(taskContext, taskResult) {
       const config = taskResult.output;
       this.host = config.host;
+      this.loadSympaAddresses(config);
       this.loading.getConfiguration = false;
     },
     async getStatus() {

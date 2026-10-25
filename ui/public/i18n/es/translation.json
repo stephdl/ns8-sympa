@@ -56,8 +56,10 @@
     "list_domain_not_in_mail_server": "El dominio no existe en el servidor de correo elegido",
     "domain_used_by": "{domain} (usado por {instance})",
     "list_domain_already_used": "Dominio ya usado por otra instancia de Sympa",
-    "list_domain_already_used_description": "{instance} ya gestiona las listas de {domain}. Sympa usa un robot por dominio, con sus propias direcciones sympa@ y listmaster@. Elige otro dominio o crea las listas en {instance}.",
-    "list_domain_used_by_another_instance": "Este dominio lo usa otra instancia de Sympa"
+    "list_domain_already_used_description": "{instance} ya gestiona las listas de {domain}. Sympa usa un robot por dominio, con sus propias direcciones de robot. Elige otro dominio o crea las listas en {instance}.",
+    "list_domain_used_by_another_instance": "Este dominio lo usa otra instancia de Sympa",
+    "addresses_not_moved": "Direcciones de correo no movidas",
+    "go_to_lists": "Ir a las listas"
   },
   "common": {
     "required": "Obligatorio",
@@ -82,7 +84,10 @@
     "not_configured": "No configurado",
     "open_webapp": "Abrir Sympa",
     "configure": "Configurar",
-    "sympa_webapp": "Interfaz web de Sympa"
+    "sympa_webapp": "Interfaz web de Sympa",
+    "addresses_kept_on_removal": "Direcciones de correo de Sympa",
+    "addresses_kept_on_removal_description": "{count} direcciones de {mail} reenvían a esta instancia. Si quitas la instancia, se quedan en {mail}: quítalas antes desde la página Listas, o con estos comandos.",
+    "show_addresses": "Ver comandos"
   },
   "about": {
     "title": "Acerca de"
@@ -99,7 +104,6 @@
     "list-lists": "Listar listas",
     "create-list": "Crear lista",
     "destroy-list": "Destruir lista",
-    "create-list-addresses": "Crear direcciones de la lista",
     "list-addresses": "Listar direcciones",
     "list-domains": "Listar dominios",
     "add-address": "Añadir dirección",
@@ -157,16 +161,16 @@
     "list_address_is_group": "La dirección {value} pertenece a un grupo",
     "list_address_reserved": "La dirección {value} está reservada por el servidor de correo",
     "list_address_already_exists": "La dirección {value} ya existe en el servidor de correo",
-    "list_mail_domain_not_found": "El dominio de las listas no existe en el servidor de correo",
-    "list_cannot_create_addresses": "El servidor de correo no puede crear las direcciones",
     "not_configured": "Sympa no está configurado",
     "not_configured_description": "Elige el servidor de correo y el dominio de las listas en Configuración",
     "robot_addresses_missing": "Faltan direcciones de Sympa",
-    "robot_addresses_missing_description": "Algunas direcciones del robot Sympa no se pudieron crear, por ejemplo porque un usuario tiene el mismo nombre. Revisa los registros y guarda la configuración otra vez.",
     "ui_mode": "Direcciones gestionadas desde esta página",
     "ui_mode_description": "Esta página crea y quita las direcciones de las listas en {mail} con tu cuenta de administrador. Las listas creadas o cerradas en la interfaz web de Sympa no se sincronizan: usa el botón Crear direcciones o destrúyelas aquí.",
     "mail_not_readable": "No se pueden leer las direcciones de {mail}",
     "robot_addresses_missing_ui": "Sympa necesita estas direcciones para recibir comandos y rebotes: {addresses}.",
-    "create_robot_addresses": "Crear direcciones de Sympa"
+    "create_robot_addresses": "Crear direcciones de Sympa",
+    "orphan_addresses": "Direcciones de Sympa sin uso",
+    "orphan_addresses_description": "Estas direcciones reenvían a esta instancia pero ninguna lista ni el robot Sympa las usa, por ejemplo tras cerrar una lista en la interfaz web de Sympa: {addresses}.",
+    "remove_orphan_addresses": "Quitar direcciones sin uso"
   }
 }

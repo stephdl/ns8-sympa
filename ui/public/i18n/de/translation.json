@@ -56,8 +56,10 @@
     "list_domain_not_in_mail_server": "Die Domain existiert nicht im gewählten Mailserver",
     "domain_used_by": "{domain} (verwendet von {instance})",
     "list_domain_already_used": "Domain wird bereits von einer anderen Sympa-Instanz verwendet",
-    "list_domain_already_used_description": "{instance} verwaltet bereits die Listen von {domain}. Sympa betreibt einen Robot pro Domain mit eigenen Adressen sympa@ und listmaster@. Wählen Sie eine andere Domain oder erstellen Sie die Listen in {instance}.",
-    "list_domain_used_by_another_instance": "Diese Domain wird von einer anderen Sympa-Instanz verwendet"
+    "list_domain_already_used_description": "{instance} verwaltet bereits die Listen von {domain}. Sympa betreibt einen Robot pro Domain mit eigenen Robot-Adressen. Wählen Sie eine andere Domain oder erstellen Sie die Listen in {instance}.",
+    "list_domain_used_by_another_instance": "Diese Domain wird von einer anderen Sympa-Instanz verwendet",
+    "addresses_not_moved": "E-Mail-Adressen nicht verschoben",
+    "go_to_lists": "Zu den Listen"
   },
   "common": {
     "required": "Erforderlich",
@@ -82,7 +84,10 @@
     "not_configured": "Nicht konfiguriert",
     "open_webapp": "Sympa öffnen",
     "configure": "Konfigurieren",
-    "sympa_webapp": "Sympa-Weboberfläche"
+    "sympa_webapp": "Sympa-Weboberfläche",
+    "addresses_kept_on_removal": "E-Mail-Adressen von Sympa",
+    "addresses_kept_on_removal_description": "{count} Adressen von {mail} leiten an diese Instanz weiter. Wenn Sie die Instanz entfernen, bleiben sie in {mail}: entfernen Sie sie vorher auf der Seite Listen oder mit diesen Befehlen.",
+    "show_addresses": "Befehle anzeigen"
   },
   "about": {
     "title": "Über"
@@ -99,7 +104,6 @@
     "list-lists": "Listen anzeigen",
     "create-list": "Liste erstellen",
     "destroy-list": "Liste löschen",
-    "create-list-addresses": "Listenadressen erstellen",
     "list-addresses": "Adressen anzeigen",
     "list-domains": "Domains anzeigen",
     "add-address": "Adresse hinzufügen",
@@ -157,16 +161,16 @@
     "list_address_is_group": "Die Adresse {value} gehört einer Gruppe",
     "list_address_reserved": "Die Adresse {value} ist vom Mailserver reserviert",
     "list_address_already_exists": "Die Adresse {value} existiert bereits im Mailserver",
-    "list_mail_domain_not_found": "Die Listen-Domain existiert nicht im Mailserver",
-    "list_cannot_create_addresses": "Der Mailserver kann die Adressen nicht erstellen",
     "not_configured": "Sympa ist nicht konfiguriert",
     "not_configured_description": "Wählen Sie Mailserver und Listen-Domain in den Einstellungen",
     "robot_addresses_missing": "Sympa-Adressen fehlen",
-    "robot_addresses_missing_description": "Einige Adressen des Sympa-Robots konnten nicht erstellt werden, z. B. weil ein Benutzer denselben Namen hat. Prüfen Sie die Protokolle und speichern Sie die Einstellungen erneut.",
     "ui_mode": "Adressen werden auf dieser Seite verwaltet",
     "ui_mode_description": "Diese Seite erstellt und entfernt die Listenadressen in {mail} mit Ihrem Administratorkonto. In der Sympa-Weboberfläche erstellte oder geschlossene Listen werden nicht synchronisiert: verwenden Sie die Schaltfläche Adressen erstellen oder löschen Sie sie hier.",
     "mail_not_readable": "Die Adressen von {mail} können nicht gelesen werden",
     "robot_addresses_missing_ui": "Sympa braucht diese Adressen für Befehle und Unzustellbarkeitsmeldungen: {addresses}.",
-    "create_robot_addresses": "Sympa-Adressen erstellen"
+    "create_robot_addresses": "Sympa-Adressen erstellen",
+    "orphan_addresses": "Ungenutzte Sympa-Adressen",
+    "orphan_addresses_description": "Diese Adressen leiten an diese Instanz weiter, aber keine Liste und kein Sympa-Robot verwendet sie, z. B. nach dem Schließen einer Liste in der Sympa-Weboberfläche: {addresses}.",
+    "remove_orphan_addresses": "Ungenutzte Adressen entfernen"
   }
 }

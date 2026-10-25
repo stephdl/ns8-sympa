@@ -22,7 +22,10 @@
     "not_configured": "Not configured",
     "open_webapp": "Open Sympa",
     "configure": "Configure",
-    "sympa_webapp": "Sympa web interface"
+    "sympa_webapp": "Sympa web interface",
+    "addresses_kept_on_removal": "Mail addresses of Sympa",
+    "addresses_kept_on_removal_description": "{count} addresses of {mail} forward to this instance. If you remove the instance, they stay in {mail}: remove them first from the Lists page, or with these commands.",
+    "show_addresses": "Show commands"
   },
   "settings": {
     "title": "Settings",
@@ -68,8 +71,10 @@
     "list_domain_not_in_mail_server": "The domain does not exist in the selected mail server",
     "domain_used_by": "{domain} (used by {instance})",
     "list_domain_already_used": "Domain already used by another Sympa instance",
-    "list_domain_already_used_description": "{instance} already serves the lists of {domain}. Sympa runs one robot per domain, with its own sympa@ and listmaster@ addresses. Choose another domain, or create the lists in {instance}.",
-    "list_domain_used_by_another_instance": "This domain is used by another Sympa instance"
+    "list_domain_already_used_description": "{instance} already serves the lists of {domain}. Sympa runs one robot per domain, with its own robot addresses. Choose another domain, or create the lists in {instance}.",
+    "list_domain_used_by_another_instance": "This domain is used by another Sympa instance",
+    "addresses_not_moved": "Mail addresses not moved",
+    "go_to_lists": "Go to Lists"
   },
   "about": {
     "title": "About"
@@ -89,7 +94,6 @@
     "list-lists": "List lists",
     "create-list": "Create list",
     "destroy-list": "Destroy list",
-    "create-list-addresses": "Create list addresses",
     "list-addresses": "List addresses",
     "list-domains": "List domains",
     "add-address": "Add address",
@@ -157,16 +161,16 @@
     "list_address_is_group": "The address {value} belongs to a group",
     "list_address_reserved": "The address {value} is reserved by the mail server",
     "list_address_already_exists": "The address {value} already exists in the mail server",
-    "list_mail_domain_not_found": "The list domain does not exist in the mail server",
-    "list_cannot_create_addresses": "The mail server cannot create the addresses",
     "not_configured": "Sympa is not configured",
     "not_configured_description": "Choose the mail server and the list domain in Settings",
     "robot_addresses_missing": "Sympa addresses are missing",
-    "robot_addresses_missing_description": "Some addresses of the Sympa robot could not be created, for example because a user has the same name. Check the logs and save the settings again.",
     "ui_mode": "Addresses managed from this page",
     "ui_mode_description": "This page creates and removes the list addresses in {mail} with your administrator account. Lists created or closed in the Sympa web interface are not synchronized: use the Create addresses button, or destroy them here.",
     "mail_not_readable": "Cannot read the addresses of {mail}",
     "robot_addresses_missing_ui": "Sympa needs these addresses to receive commands and bounces: {addresses}.",
-    "create_robot_addresses": "Create Sympa addresses"
+    "create_robot_addresses": "Create Sympa addresses",
+    "orphan_addresses": "Unused Sympa addresses",
+    "orphan_addresses_description": "These addresses forward to this instance but no list or Sympa robot uses them, for example after a list was closed in the Sympa web interface: {addresses}.",
+    "remove_orphan_addresses": "Remove unused addresses"
   }
 }

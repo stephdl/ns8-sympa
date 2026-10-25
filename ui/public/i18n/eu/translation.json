@@ -56,8 +56,10 @@
     "list_domain_not_in_mail_server": "Domeinua ez dago aukeratutako posta-zerbitzarian",
     "domain_used_by": "{domain} ({instance}-k erabilia)",
     "list_domain_already_used": "Domeinua beste Sympa instantzia batek erabiltzen du",
-    "list_domain_already_used_description": "{instance}-k {domain} domeinuko zerrendak kudeatzen ditu jada. Sympak robot bat erabiltzen du domeinu bakoitzeko, bere sympa@ eta listmaster@ helbideekin. Aukeratu beste domeinu bat, edo sortu zerrendak {instance}-n.",
-    "list_domain_used_by_another_instance": "Domeinu hau beste Sympa instantzia batek erabiltzen du"
+    "list_domain_already_used_description": "{instance}-k {domain} domeinuko zerrendak kudeatzen ditu jada. Sympak robot bat erabiltzen du domeinu bakoitzeko, bere robot helbideekin. Aukeratu beste domeinu bat, edo sortu zerrendak {instance}-n.",
+    "list_domain_used_by_another_instance": "Domeinu hau beste Sympa instantzia batek erabiltzen du",
+    "addresses_not_moved": "Helbide elektronikoak ez dira mugitu",
+    "go_to_lists": "Joan zerrendetara"
   },
   "common": {
     "required": "Derrigorrezkoa",
@@ -82,7 +84,10 @@
     "not_configured": "Konfiguratu gabe",
     "open_webapp": "Ireki Sympa",
     "configure": "Konfiguratu",
-    "sympa_webapp": "Sympa web-interfazea"
+    "sympa_webapp": "Sympa web-interfazea",
+    "addresses_kept_on_removal": "Sympa helbide elektronikoak",
+    "addresses_kept_on_removal_description": "{mail}-ren {count} helbidek instantzia honetara birbidaltzen dute. Instantzia kentzen baduzu, {mail}-n geratzen dira: kendu itzazu lehenago Zerrendak orritik, edo komando hauekin.",
+    "show_addresses": "Erakutsi komandoak"
   },
   "about": {
     "title": "Honi buruz"
@@ -99,7 +104,6 @@
     "list-lists": "Zerrendatu zerrendak",
     "create-list": "Sortu zerrenda",
     "destroy-list": "Suntsitu zerrenda",
-    "create-list-addresses": "Sortu zerrendaren helbideak",
     "list-addresses": "Zerrendatu helbideak",
     "list-domains": "Zerrendatu domeinuak",
     "add-address": "Gehitu helbidea",
@@ -157,16 +161,16 @@
     "list_address_is_group": "{value} helbidea talde batena da",
     "list_address_reserved": "{value} helbidea posta-zerbitzariak erreserbatuta du",
     "list_address_already_exists": "{value} helbidea badago posta-zerbitzarian",
-    "list_mail_domain_not_found": "Zerrenden domeinua ez dago posta-zerbitzarian",
-    "list_cannot_create_addresses": "Posta-zerbitzariak ezin ditu helbideak sortu",
     "not_configured": "Sympa ez dago konfiguratuta",
     "not_configured_description": "Aukeratu posta-zerbitzaria eta zerrenden domeinua Ezarpenetan",
     "robot_addresses_missing": "Sympa helbide batzuk falta dira",
-    "robot_addresses_missing_description": "Sympa robotaren helbide batzuk ezin izan dira sortu, adibidez erabiltzaile batek izen bera duelako. Begiratu erregistroak eta gorde ezarpenak berriro.",
     "ui_mode": "Helbideak orri honetatik kudeatzen dira",
     "ui_mode_description": "Orri honek zerrenden helbideak {mail}-n sortzen eta kentzen ditu zure administratzaile-kontuarekin. Sympa web-interfazean sortutako edo itxitako zerrendak ez dira sinkronizatzen: erabili Sortu helbideak botoia, edo suntsitu hemen.",
     "mail_not_readable": "Ezin dira {mail}-ren helbideak irakurri",
     "robot_addresses_missing_ui": "Sympak helbide hauek behar ditu komandoak eta itzulerak jasotzeko: {addresses}.",
-    "create_robot_addresses": "Sortu Sympa helbideak"
+    "create_robot_addresses": "Sortu Sympa helbideak",
+    "orphan_addresses": "Erabili gabeko Sympa helbideak",
+    "orphan_addresses_description": "Helbide hauek instantzia honetara birbidaltzen dute, baina ez dute zerrendek ez Sympa robotak erabiltzen, adibidez Sympa web-interfazean zerrenda bat itxi ondoren: {addresses}.",
+    "remove_orphan_addresses": "Kendu erabili gabeko helbideak"
   }
 }

@@ -206,6 +206,18 @@
               class="mg-bottom maxwidth"
               ref="default_lang"
             />
+            <cv-row v-if="moveError">
+              <cv-column>
+                <NsInlineNotification
+                  kind="warning"
+                  :title="$t('settings.addresses_not_moved')"
+                  :description="moveError"
+                  :actionLabel="$t('settings.go_to_lists')"
+                  @action="goToAppPage(instanceName, 'lists')"
+                  :showCloseButton="false"
+                />
+              </cv-column>
+            </cv-row>
             <cv-row v-if="error.configureModule">
               <cv-column>
                 <NsInlineNotification
@@ -262,6 +274,7 @@ import {
   IconService,
   PageTitleService,
 } from "@nethserver/ns8-ui-lib";
+import MailAddresses from "@/mixins/mailAddresses";
 
 // Languages shipped with Sympa 6.2
 const LANGS = {
@@ -283,6 +296,7 @@ export default {
     UtilService,
     QueryParamService,
     PageTitleService,
+    MailAddresses,
   ],
   pageTitle() {
     return this.$t("settings.title") + " - " + this.appName;
@@ -311,6 +325,9 @@ export default {
       userDomains: [],
       smarthostEnabled: true,
       domainsInUse: {},
+      // Saved mail server and list domain, to move the addresses after a change
+      saved: { mailModule: "", listDomain: "", inbound: "" },
+      moveError: "",
       optionsKey: 0,
       invalidEmail: "",
       loading: {
@@ -494,6 +511,14 @@ export default {
       this.userDomains = config.user_domains;
       this.smarthostEnabled = config.smarthost_enabled;
       this.domainsInUse = config.domains_in_use || {};
+      const savedServer = config.mail_servers.find(
+        (s) => s.uuid === config.mail_server
+      );
+      this.saved = {
+        mailModule: savedServer ? savedServer.module_id : "",
+        listDomain: config.list_domain,
+        inbound: config.inbound_domain,
+      };
       this.host = config.host;
       this.savedHost = config.host;
       this.hasRoute = config.has_route;
@@ -636,9 +661,43 @@ export default {
       this.error.configureModule = this.$t("error.generic_error");
       this.loading.configureModule = false;
     },
-    configureModuleCompleted() {
+    async configureModuleCompleted() {
+      const before = this.saved;
+      const server = this.mailServers.find((s) => s.uuid === this.mailServer);
+      const after = {
+        mailModule: server ? server.module_id : "",
+        listDomain: this.listDomain,
+      };
+      if (
+        before.mailModule &&
+        before.listDomain &&
+        (before.mailModule !== after.mailModule ||
+          before.listDomain !== after.listDomain)
+      ) {
+        await this.moveAddresses(before, after);
+      }
       this.loading.configureModule = false;
       this.getConfiguration();
+    },
+    // The module cannot move its addresses: copy them, then remove the old ones
+    async moveAddresses(before, after) {
+      this.moveError = "";
+      try {
+        const state = await this.readMailState(
+          before.mailModule,
+          before.listDomain
+        );
+        const locals = this.sympaAddresses(state, before.inbound);
+        await this.declareAddresses(
+          after.mailModule,
+          after.listDomain,
+          before.inbound,
+          locals
+        );
+        await this.dropAddresses(before.mailModule, before.listDomain, locals);
+      } catch (err) {
+        this.moveError = this.addressErrorMessage(err, after.listDomain);
+      }
     },
   },
 };
