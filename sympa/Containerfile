@@ -9,6 +9,7 @@ RUN dnf -y install epel-release dnf-plugins-core \
         "sympa-${SYMPA_VERSION}" \
         "sympa-nginx-${SYMPA_VERSION}" \
         postfix \
+        cyrus-sasl-plain \
         perl-DBD-Pg \
         perl-LDAP \
         perl-Mail-DKIM \
