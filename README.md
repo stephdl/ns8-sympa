@@ -52,7 +52,8 @@ Configure the instance from the UI, or with:
 - `default_lang`: default language of Sympa.
 
 `configure-module` validates the input first: the host must not be used by
-another application, the mail server and the user domain must exist.
+another application, the mail server and the user domain must exist, and
+the list domain must be a domain of the mail server.
 
 ## How mail flows
 
@@ -64,6 +65,9 @@ Internet -> Mail application :25 (antispam)
 Sympa -> module Postfix -> cluster smarthost -> Internet
 ```
 
+The module Postfix accepts mail only for the inbound domain: it cannot be
+used as an open relay.
+
 Each instance has an inbound domain, `<module_id>.invalid`, saved in the
 `INBOUND_DOMAIN` variable. The `.invalid` top level domain never resolves,
 so this mail cannot leave the cluster by mistake.
@@ -71,8 +75,11 @@ so this mail cannot leave the cluster by mistake.
 When the instance is configured, it creates a `recipient` relay rule on
 the selected Mail application: `<INBOUND_DOMAIN>` goes to the module
 Postfix, published on the node VPN address. The rule appears in the Mail
-application relay rules. When the instance is removed, it removes the rule,
-only if the rule still points to this instance.
+application relay rules. When the rule already exists, for example after a restore or a move, the
+module updates it in place with `alter-relay-rule`. When the mail server
+changes, the rule is removed from the previous one. When the instance is
+removed, it removes the rule, only if the rule still points to this
+instance.
 
 The module Postfix rewrites `<local>@<INBOUND_DOMAIN>` to
 `<local>@<list_domain>` and hands the message to Sympa:
@@ -124,8 +131,10 @@ a user without `mail` cannot log in. Hidden users of the user domain are
 excluded. Other people, for example external subscribers, use a Sympa
 account with a password.
 
-When the user domain is not available, the module starts with LDAP login
-disabled and logs a warning.
+When the user domain does not exist, the module starts with LDAP login
+disabled and logs a warning. When Redis or the user domain cannot be read,
+for example at boot, the pod starts with the previous LDAP and smarthost
+settings.
 
 ## Containers and data
 
@@ -176,16 +185,20 @@ The backup contains a dump of the database, the secrets and the
 
 - Restore: the database is restored, then `configure-module` runs with
   the saved settings. The inbound domain is kept, so the addresses in the
-  Mail application stay valid, and the relay rule is updated with the new
-  node address and port. A user domain that does not exist on the cluster
-  is dropped with a warning. If the host name is used by another
-  application, the instance is not configured: set a new host name in
-  Settings.
+  Mail application stay valid, and the relay rule is updated in place with
+  the new node address and port. Let's Encrypt is disabled: enable it again
+  in Settings. A user domain that does not exist on the cluster is dropped
+  with a warning.
+- Restore that cannot be configured: when the host name is used by another
+  application, when the mail server of the backup does not exist on the
+  cluster, or when it lacks the list domain, the instance starts without
+  web route and without relay rule, and logs a warning. Complete the
+  configuration in Settings.
 - Clone: the copy gets its own inbound domain and port, no web route and
   no relay rule. The source keeps working. Set a new host name in
   Settings to use the copy.
-- Move: the new instance takes over the web route, the inbound domain and
-  the relay rule of the source.
+- Move: the new instance takes over the web route with its Let's Encrypt
+  setting, the inbound domain and the relay rule of the source.
 
 ## Uninstall
 
