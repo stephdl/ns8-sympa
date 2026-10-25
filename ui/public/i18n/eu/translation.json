@@ -63,7 +63,10 @@
     "before_removing": "Instantzia kendu aurretik",
     "before_removing_description": "Sympa eta zerrenden helbideak {mail}-n daude. Instantziak ezin ditu kendu kentzen denean: kendu hemen lehenago.",
     "remove_all_addresses": "Kendu helbide elektroniko guztiak",
-    "remove_all_addresses_description": "{mail}-ren {count} helbidek instantzia honetara birbidaltzen dute eta kendu egingo dira: {addresses}. Zerrendek ez dute posta gehiago jasoko."
+    "remove_all_addresses_description": "{mail}-ren {count} helbidek instantzia honetara birbidaltzen dute eta kendu egingo dira: {addresses}. Zerrendek ez dute posta gehiago jasoko.",
+    "addresses_removed": "Helbide elektronikoak kenduta",
+    "addresses_removed_description": "{count} helbide kendu dira {mail}-tik.",
+    "no_address_to_remove": "Ez dago instantzia honetara birbidaltzen duen helbiderik."
   },
   "common": {
     "required": "Derrigorrezkoa",
@@ -172,6 +175,8 @@
     "create_robot_addresses": "Sortu Sympa helbideak",
     "orphan_addresses": "Erabili gabeko Sympa helbideak",
     "orphan_addresses_description": "Helbide hauek instantzia honetara birbidaltzen dute, baina ez dute zerrendek ez Sympa robotak erabiltzen, adibidez Sympa web-interfazean zerrenda bat itxi ondoren: {addresses}.",
-    "remove_orphan_addresses": "Kendu erabili gabeko helbideak"
+    "remove_orphan_addresses": "Kendu erabili gabeko helbideak",
+    "adding_address": "{address} helbidea gehitzen",
+    "removing_address": "{address} helbidea kentzen"
   }
 }

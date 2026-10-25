@@ -75,7 +75,10 @@
     "before_removing": "Avant de supprimer l'instance",
     "before_removing_description": "Les adresses email de Sympa et des listes sont dans {mail}. L'instance ne peut pas les retirer quand elle est supprimée : retirez-les ici d'abord.",
     "remove_all_addresses": "Retirer toutes les adresses email",
-    "remove_all_addresses_description": "{count} adresses de {mail} renvoient vers cette instance et seront retirées : {addresses}. Les listes ne recevront plus de courrier."
+    "remove_all_addresses_description": "{count} adresses de {mail} renvoient vers cette instance et seront retirées : {addresses}. Les listes ne recevront plus de courrier.",
+    "addresses_removed": "Adresses email retirées",
+    "addresses_removed_description": "{count} adresses ont été retirées de {mail}.",
+    "no_address_to_remove": "Aucune adresse email ne renvoie vers cette instance."
   },
   "about": {
     "title": "À propos"
@@ -172,6 +175,8 @@
     "create_robot_addresses": "Créer les adresses de Sympa",
     "orphan_addresses": "Adresses Sympa inutilisées",
     "orphan_addresses_description": "Ces adresses renvoient vers cette instance mais aucune liste ni le robot Sympa ne les utilise, par exemple après la fermeture d'une liste dans l'interface web de Sympa : {addresses}.",
-    "remove_orphan_addresses": "Retirer les adresses inutilisées"
+    "remove_orphan_addresses": "Retirer les adresses inutilisées",
+    "adding_address": "Ajout de l'adresse {address}",
+    "removing_address": "Retrait de l'adresse {address}"
   }
 }

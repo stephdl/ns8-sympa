@@ -63,7 +63,10 @@
     "before_removing": "Antes de quitar la instancia",
     "before_removing_description": "Las direcciones de Sympa y de las listas están en {mail}. La instancia no puede quitarlas al eliminarse: quítalas aquí antes.",
     "remove_all_addresses": "Quitar todas las direcciones",
-    "remove_all_addresses_description": "{count} direcciones de {mail} reenvían a esta instancia y se quitarán: {addresses}. Las listas dejarán de recibir correo."
+    "remove_all_addresses_description": "{count} direcciones de {mail} reenvían a esta instancia y se quitarán: {addresses}. Las listas dejarán de recibir correo.",
+    "addresses_removed": "Direcciones de correo quitadas",
+    "addresses_removed_description": "Se quitaron {count} direcciones de {mail}.",
+    "no_address_to_remove": "Ninguna dirección de correo reenvía a esta instancia."
   },
   "common": {
     "required": "Obligatorio",
@@ -172,6 +175,8 @@
     "create_robot_addresses": "Crear direcciones de Sympa",
     "orphan_addresses": "Direcciones de Sympa sin uso",
     "orphan_addresses_description": "Estas direcciones reenvían a esta instancia pero ninguna lista ni el robot Sympa las usa, por ejemplo tras cerrar una lista en la interfaz web de Sympa: {addresses}.",
-    "remove_orphan_addresses": "Quitar direcciones sin uso"
+    "remove_orphan_addresses": "Quitar direcciones sin uso",
+    "adding_address": "Añadir la dirección {address}",
+    "removing_address": "Quitar la dirección {address}"
   }
 }

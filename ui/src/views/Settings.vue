@@ -277,6 +277,18 @@
                 }}
               </p>
               <NsInlineNotification
+                v-if="cleanupDone"
+                kind="success"
+                :title="$t('settings.addresses_removed')"
+                :description="
+                  $t('settings.addresses_removed_description', {
+                    count: cleanupDone,
+                    mail: saved.mailModule,
+                  })
+                "
+                @close="cleanupDone = 0"
+              />
+              <NsInlineNotification
                 v-if="cleanupError"
                 kind="error"
                 :title="$t('settings.remove_all_addresses')"
@@ -286,9 +298,15 @@
               <NsButton
                 kind="danger"
                 :icon="TrashCan20"
-                :disabled="stillLoading"
+                :disabled="stillLoading || !cleanupAddresses.length"
                 @click="showCleanup"
                 >{{ $t("settings.remove_all_addresses") }}</NsButton
+              <p
+                v-if="cleanupLoaded && !cleanupAddresses.length"
+                class="mg-top"
+              >
+                {{ $t("settings.no_address_to_remove") }}
+              </p>
               >
             </template>
           </cv-accordion-item>
@@ -382,6 +400,8 @@ export default {
       isCleanupShown: false,
       cleanupAddresses: [],
       cleanupError: "",
+      cleanupDone: 0,
+      cleanupLoaded: false,
       optionsKey: 0,
       invalidEmail: "",
       loading: {
@@ -574,6 +594,7 @@ export default {
         listDomain: config.list_domain,
         inbound: config.inbound_domain,
       };
+      this.loadCleanupAddresses();
       this.host = config.host;
       this.savedHost = config.host;
       this.hasRoute = config.has_route;
@@ -735,8 +756,12 @@ export default {
       this.getConfiguration();
     },
     // The module cannot remove its addresses when the instance is removed
-    async showCleanup() {
-      this.cleanupError = "";
+    async loadCleanupAddresses() {
+      this.cleanupLoaded = false;
+      if (!this.saved.mailModule || !this.saved.listDomain) {
+        this.cleanupAddresses = [];
+        return;
+      }
       try {
         const state = await this.readMailState(
           this.saved.mailModule,
@@ -746,9 +771,19 @@ export default {
           state,
           this.saved.inbound
         ).sort();
-        this.isCleanupShown = true;
+        this.cleanupLoaded = true;
       } catch (err) {
+        this.cleanupAddresses = [];
         this.cleanupError = err.message;
+      }
+    },
+    async showCleanup() {
+      this.cleanupError = "";
+      this.cleanupDone = 0;
+      // Read again: the Lists page may have changed the addresses
+      await this.loadCleanupAddresses();
+      if (this.cleanupAddresses.length) {
+        this.isCleanupShown = true;
       }
     },
     async removeAllAddresses() {
@@ -760,7 +795,9 @@ export default {
           this.saved.inbound,
           this.cleanupAddresses
         );
+        this.cleanupDone = this.cleanupAddresses.length;
         this.isCleanupShown = false;
+        await this.loadCleanupAddresses();
       } catch (err) {
         this.cleanupError = err.message;
       }
@@ -794,6 +831,10 @@ export default {
 @import "../styles/carbon-utils";
 .mg-bottom {
   margin-bottom: $spacing-06;
+}
+
+.mg-top {
+  margin-top: $spacing-05;
 }
 
 .maxwidth {

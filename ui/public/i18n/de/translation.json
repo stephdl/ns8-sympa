@@ -63,7 +63,10 @@
     "before_removing": "Vor dem Entfernen der Instanz",
     "before_removing_description": "Die E-Mail-Adressen von Sympa und den Listen liegen in {mail}. Die Instanz kann sie beim Entfernen nicht löschen: entfernen Sie sie zuerst hier.",
     "remove_all_addresses": "Alle E-Mail-Adressen entfernen",
-    "remove_all_addresses_description": "{count} Adressen von {mail} leiten an diese Instanz weiter und werden entfernt: {addresses}. Die Listen empfangen keine E-Mails mehr."
+    "remove_all_addresses_description": "{count} Adressen von {mail} leiten an diese Instanz weiter und werden entfernt: {addresses}. Die Listen empfangen keine E-Mails mehr.",
+    "addresses_removed": "E-Mail-Adressen entfernt",
+    "addresses_removed_description": "{count} Adressen wurden aus {mail} entfernt.",
+    "no_address_to_remove": "Keine E-Mail-Adresse leitet an diese Instanz weiter."
   },
   "common": {
     "required": "Erforderlich",
@@ -172,6 +175,8 @@
     "create_robot_addresses": "Sympa-Adressen erstellen",
     "orphan_addresses": "Ungenutzte Sympa-Adressen",
     "orphan_addresses_description": "Diese Adressen leiten an diese Instanz weiter, aber keine Liste und kein Sympa-Robot verwendet sie, z. B. nach dem Schließen einer Liste in der Sympa-Weboberfläche: {addresses}.",
-    "remove_orphan_addresses": "Ungenutzte Adressen entfernen"
+    "remove_orphan_addresses": "Ungenutzte Adressen entfernen",
+    "adding_address": "Adresse {address} hinzufügen",
+    "removing_address": "Adresse {address} entfernen"
   }
 }

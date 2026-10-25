@@ -75,7 +75,10 @@
     "before_removing": "Before removing the instance",
     "before_removing_description": "The mail addresses of Sympa and of the lists live in {mail}. The instance cannot remove them when it is removed: remove them here first.",
     "remove_all_addresses": "Remove all mail addresses",
-    "remove_all_addresses_description": "{count} addresses of {mail} forward to this instance and will be removed: {addresses}. The lists stop receiving mail."
+    "remove_all_addresses_description": "{count} addresses of {mail} forward to this instance and will be removed: {addresses}. The lists stop receiving mail.",
+    "addresses_removed": "Mail addresses removed",
+    "addresses_removed_description": "{count} addresses were removed from {mail}.",
+    "no_address_to_remove": "No mail address forwards to this instance."
   },
   "about": {
     "title": "About"
@@ -172,6 +175,8 @@
     "create_robot_addresses": "Create Sympa addresses",
     "orphan_addresses": "Unused Sympa addresses",
     "orphan_addresses_description": "These addresses forward to this instance but no list or Sympa robot uses them, for example after a list was closed in the Sympa web interface: {addresses}.",
-    "remove_orphan_addresses": "Remove unused addresses"
+    "remove_orphan_addresses": "Remove unused addresses",
+    "adding_address": "Add address {address}",
+    "removing_address": "Remove address {address}"
   }
 }

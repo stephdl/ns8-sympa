@@ -103,12 +103,19 @@ export default {
       const created = [];
       try {
         for (const local of missing) {
-          await this.moduleTask(mailModule, "add-address", {
-            atype: "domain",
-            domain,
-            local,
-            destinations: [{ dtype: "external", name: `${local}@${inbound}` }],
-          });
+          await this.moduleTask(
+            mailModule,
+            "add-address",
+            {
+              atype: "domain",
+              domain,
+              local,
+              destinations: [
+                { dtype: "external", name: `${local}@${inbound}` },
+              ],
+            },
+            this.$t("lists.adding_address", { address: `${local}@${domain}` })
+          );
           created.push(local);
         }
       } catch (err) {
@@ -121,11 +128,12 @@ export default {
     async dropAddresses(mailModule, domain, locals) {
       for (const local of locals) {
         try {
-          await this.moduleTask(mailModule, "remove-address", {
-            atype: "domain",
-            domain,
-            local,
-          });
+          await this.moduleTask(
+            mailModule,
+            "remove-address",
+            { atype: "domain", domain, local },
+            this.$t("lists.removing_address", { address: `${local}@${domain}` })
+          );
         } catch (err) {
           console.error(`cannot remove ${local}@${domain}`, err);
         }

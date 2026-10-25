@@ -75,7 +75,10 @@
     "before_removing": "Prima di rimuovere l'istanza",
     "before_removing_description": "Gli indirizzi email di Sympa e delle liste si trovano in {mail}. L'istanza non può rimuoverli quando viene rimossa: rimuovili prima qui.",
     "remove_all_addresses": "Rimuovi tutti gli indirizzi email",
-    "remove_all_addresses_description": "{count} indirizzi di {mail} inoltrano a questa istanza e saranno rimossi: {addresses}. Le liste non riceveranno più posta."
+    "remove_all_addresses_description": "{count} indirizzi di {mail} inoltrano a questa istanza e saranno rimossi: {addresses}. Le liste non riceveranno più posta.",
+    "addresses_removed": "Indirizzi email rimossi",
+    "addresses_removed_description": "{count} indirizzi sono stati rimossi da {mail}.",
+    "no_address_to_remove": "Nessun indirizzo email inoltra a questa istanza."
   },
   "error": {
     "error": "Errore",
@@ -172,6 +175,8 @@
     "create_robot_addresses": "Crea indirizzi di Sympa",
     "orphan_addresses": "Indirizzi Sympa inutilizzati",
     "orphan_addresses_description": "Questi indirizzi inoltrano a questa istanza ma nessuna lista né il robot Sympa li usa, ad esempio dopo la chiusura di una lista nell'interfaccia web di Sympa: {addresses}.",
-    "remove_orphan_addresses": "Rimuovi indirizzi inutilizzati"
+    "remove_orphan_addresses": "Rimuovi indirizzi inutilizzati",
+    "adding_address": "Aggiunta dell'indirizzo {address}",
+    "removing_address": "Rimozione dell'indirizzo {address}"
   }
 }
