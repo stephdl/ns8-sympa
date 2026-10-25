@@ -8,30 +8,53 @@
 import os
 import sys
 import json
+import subprocess
 import agent
+import sympa_mail
 from agent.ldapproxy import Ldapproxy
 
 request = json.load(sys.stdin)
 renv = request['environment']
 
+
+def warn(message):
+    print(agent.SD_WARNING + message, file=sys.stderr)
+
+
+def start_without_configuration(reason):
+    """Start the lists without web route and relay rule: the admin finishes in Settings"""
+    warn(reason + ", open Settings to complete the configuration")
+    sympa_mail.set_smtp_endpoint(agent.redis_connect(use_replica=True))
+    subprocess.run(["systemctl", "--user", "enable", "--now", "sympa.service"], check=True)
+    sys.exit(0)
+
+
 user_domain = renv.get("USER_DOMAIN", "")
 if user_domain and user_domain not in Ldapproxy().get_domains_list():
-    print(agent.SD_WARNING + f"User domain {user_domain} does not exist on this cluster, LDAP login is disabled", file=sys.stderr)
+    warn(f"User domain {user_domain} does not exist on this cluster, LDAP login is disabled")
     user_domain = ""
+    agent.set_env("USER_DOMAIN", "")
 
-configure_data = {
+if agent.http_route_in_use(domain=renv["TRAEFIK_HOST"]):
+    start_without_configuration(f"Host {renv['TRAEFIK_HOST']} is used by another application")
+
+# On another cluster the mail module has another UUID, or lacks the list domain
+rdb = agent.redis_connect(use_replica=True)
+providers = agent.list_service_providers(rdb, 'imap', 'tcp', {'module_uuid': renv["MAIL_SERVER"]})
+if not providers:
+    start_without_configuration("The mail server of the backup does not exist on this cluster")
+result = agent.tasks.run(f"module/{providers[0]['module_id']}", action='list-domains', data={})
+if result['exit_code'] != 0 or renv["LIST_DOMAIN"] not in [record['domain'].lower() for record in result['output']]:
+    start_without_configuration(f"Domain {renv['LIST_DOMAIN']} does not exist in the mail server")
+
+configure_retval = agent.tasks.run(agent_id=os.environ['AGENT_ID'], action='configure-module', data={
     "host": renv["TRAEFIK_HOST"],
+    # The certificate is requested again only when the admin enables it
     "lets_encrypt": False,
     "list_domain": renv["LIST_DOMAIN"],
     "listmasters": [addr for addr in renv["LISTMASTERS"].split(",") if addr],
     "mail_server": renv["MAIL_SERVER"],
     "user_domain": user_domain,
     "default_lang": renv.get("DEFAULT_LANG", "en-US"),
-}
-
-if agent.http_route_in_use(domain=renv["TRAEFIK_HOST"]):
-    print(agent.SD_WARNING + f"Host {renv['TRAEFIK_HOST']} is used by another application, set a new host name in Settings", file=sys.stderr)
-    sys.exit(0)
-
-configure_retval = agent.tasks.run(agent_id=os.environ['AGENT_ID'], action='configure-module', data=configure_data)
+})
 agent.assert_exp(configure_retval['exit_code'] == 0, "The configure-module subtask failed!")
