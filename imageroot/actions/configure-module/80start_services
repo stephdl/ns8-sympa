@@ -1,17 +1,25 @@
 #!/bin/bash
 
 #
-# Copyright (C) 2023 Nethesis S.r.l.
+# Copyright (C) 2026 Nethesis S.r.l.
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-set -e
 
-# Redirect any output to the journal (stderr)
+set -e
 exec 1>&2
 
-# If the control reaches this step, the service can be enabled and started
+systemctl --user enable sympa.service
+# Restart the pod: sympa-config runs again before it starts, and the
+# containers follow the pod through Requires= and BindsTo=
+systemctl --user restart sympa.service
 
-touch smarthost.env
-
-systemctl --user enable kickstart.service
-systemctl --user restart kickstart.service
+# add-relay-rule probes our SMTP port. The port forwarder accepts TCP
+# before Postfix listens, so wait for the SMTP greeting itself.
+for (( i = 0; i < 60; i++ )); do
+    if timeout 5 bash -c 'exec 3<>"/dev/tcp/$1/$2" && read -r -t 4 line <&3 && [[ $line == 220* ]] && printf "QUIT\r\n" >&3' _ "${SMTP_BIND_ADDRESS}" "${SMTP_PORT}" 2>/dev/null; then
+        exit 0
+    fi
+    sleep 2
+done
+echo "Postfix does not answer on ${SMTP_BIND_ADDRESS}:${SMTP_PORT}" >&2
+exit 1

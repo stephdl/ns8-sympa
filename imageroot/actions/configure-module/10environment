@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2026 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+import os
+import sys
+import json
+import agent
+import sympa_mail
+
+data = json.load(sys.stdin)
+
+user_domain = data.get("user_domain", "")
+
+agent.set_env("TRAEFIK_HOST", data["host"].lower())
+agent.set_env("LIST_DOMAIN", data["list_domain"].lower())
+agent.set_env("LISTMASTERS", ",".join(addr.lower() for addr in data["listmasters"]))
+agent.set_env("MAIL_SERVER", data["mail_server"])
+agent.set_env("USER_DOMAIN", user_domain)
+agent.set_env("DEFAULT_LANG", data.get("default_lang", os.environ.get("DEFAULT_LANG", "en-US")))
+agent.bind_user_domains([user_domain] if user_domain else [])
+
+sympa_mail.set_smtp_endpoint(agent.redis_connect(use_replica=True))
+
+if not os.environ.get("INBOUND_DOMAIN"):
+    agent.set_env("INBOUND_DOMAIN", os.environ["MODULE_ID"] + ".invalid")

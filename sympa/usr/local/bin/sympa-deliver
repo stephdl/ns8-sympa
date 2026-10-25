@@ -1,0 +1,35 @@
+#!/bin/bash
+
+#
+# Copyright (C) 2026 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+#
+# Postfix pipe target. The mail module forwards <local>@<module_id>, and
+# this script hands the message to the Sympa queue for <local>@<list domain>.
+# It replaces the sympa_transport map: the addresses live in the mail module.
+#
+
+local_part="${1,,}"
+domain=$(sed -n 's/^domain[[:space:]]\+//p' /etc/sympa/sympa.conf)
+# EX_TEMPFAIL: Postfix keeps the message and retries
+[[ -n "${local_part}" && -n "${domain}" ]] || exit 75
+
+case "${local_part}" in
+bounce|abuse-feedback-report)
+    exec /usr/libexec/sympa/bouncequeue "sympa@${domain}"
+    ;;
+sympa|listmaster)
+    exec /usr/libexec/sympa/queue "${local_part}@${domain}"
+    ;;
+sympa-request|sympa-owner)
+    exec /usr/libexec/sympa/queue "listmaster@${domain}"
+    ;;
+*-owner)
+    exec /usr/libexec/sympa/bouncequeue "${local_part%-owner}@${domain}"
+    ;;
+*)
+    exec /usr/libexec/sympa/queue "${local_part}@${domain}"
+    ;;
+esac

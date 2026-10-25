@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2022 Nethesis S.r.l.
+  Copyright (C) 2026 Nethesis S.r.l.
   SPDX-License-Identifier: GPL-3.0-or-later
 -->
 <template>
@@ -19,20 +19,54 @@
         />
       </cv-column>
     </cv-row>
+    <cv-row v-if="configLoaded && !smarthostEnabled">
+      <cv-column>
+        <NsInlineNotification
+          kind="warning"
+          :title="$t('settings.smarthost_missing')"
+          :description="$t('settings.smarthost_missing_description')"
+          :actionLabel="$t('settings.go_to_smarthost')"
+          @action="goTo('/settings/smarthost')"
+          :showCloseButton="false"
+        />
+      </cv-column>
+    </cv-row>
+    <cv-row v-if="configLoaded && !mailServers.length">
+      <cv-column>
+        <NsInlineNotification
+          kind="warning"
+          :title="$t('settings.mail_missing')"
+          :description="$t('settings.mail_missing_description')"
+          :actionLabel="$t('settings.go_to_software_center')"
+          @action="goTo('/software-center')"
+          :showCloseButton="false"
+        />
+      </cv-column>
+    </cv-row>
+    <cv-row v-if="savedHost && !hasRoute">
+      <cv-column>
+        <NsInlineNotification
+          kind="warning"
+          :title="$t('settings.no_route')"
+          :description="$t('settings.no_route_description')"
+          :showCloseButton="false"
+        />
+      </cv-column>
+    </cv-row>
     <cv-row>
       <cv-column>
         <cv-tile light>
           <cv-form @submit.prevent="configureModule">
-            <cv-text-input
-              :label="$t('settings.kickstart_fqdn')"
-              placeholder="kickstart.example.org"
+            <NsTextInput
+              :label="$t('settings.host')"
+              placeholder="sympa.example.org"
               v-model.trim="host"
               class="mg-bottom"
               :invalid-message="$t(error.host)"
-              :disabled="loading.getConfiguration || loading.configureModule"
+              :helper-text="$t('settings.host_helper')"
+              :disabled="stillLoading"
               ref="host"
-            >
-            </cv-text-input>
+            />
             <NsToggle
               value="letsEncrypt"
               :label="core.$t('apps_lets_encrypt.request_https_certificate')"
@@ -45,7 +79,7 @@
                   {{ core.$t("apps_lets_encrypt.lets_encrypt_tips") }}
                 </div>
                 <div class="mg-bottom-sm">
-                  <cv-link @click="goToCertificates">
+                  <cv-link @click="goTo('/settings/tls-certificates')">
                     {{ core.$t("apps_lets_encrypt.go_to_tls_certificates") }}
                   </cv-link>
                 </div>
@@ -70,9 +104,9 @@
                     core.$t(
                       'apps_lets_encrypt.lets_encrypt_disabled_warning_description',
                       {
-                        node: this.status.node_ui_name
-                          ? this.status.node_ui_name
-                          : this.status.node,
+                        node: status.node_ui_name
+                          ? status.node_ui_name
+                          : status.node,
                       }
                     )
                   "
@@ -80,43 +114,89 @@
                 />
               </cv-column>
             </cv-row>
-            <cv-toggle
-              value="httpToHttps"
-              :label="$t('settings.http_to_https')"
-              v-model="isHttpToHttpsEnabled"
-              :disabled="loading.getConfiguration || loading.configureModule"
-              class="mg-bottom"
-            >
-              <template slot="text-left">{{
-                $t("settings.disabled")
-              }}</template>
-              <template slot="text-right">{{
-                $t("settings.enabled")
-              }}</template>
-            </cv-toggle>
-            <!-- advanced options -->
-            <cv-accordion ref="accordion" class="maxwidth mg-bottom">
-              <cv-accordion-item :open="toggleAccordion[0]">
-                <template slot="title">{{ $t("settings.advanced") }}</template>
-                <template slot="content"> </template>
-              </cv-accordion-item>
-            </cv-accordion>
+            <NsComboBox
+              :key="'mail-' + optionsKey"
+              v-model="mailServer"
+              :title="$t('settings.mail_server')"
+              :label="$t('settings.choose_mail_server')"
+              :options="mailServerOptions"
+              :autoFilter="true"
+              :autoHighlight="true"
+              :invalid-message="$t(error.mail_server)"
+              :helper-text="$t('settings.mail_server_helper')"
+              :disabled="stillLoading"
+              class="mg-bottom maxwidth"
+              ref="mail_server"
+            />
+            <NsComboBox
+              :key="'list-domain-' + optionsKey + '-' + mailServer"
+              v-model="listDomain"
+              :title="$t('settings.list_domain')"
+              :label="$t('settings.choose_list_domain')"
+              :options="listDomainOptions"
+              :autoFilter="true"
+              :autoHighlight="true"
+              :invalid-message="$t(error.list_domain)"
+              :helper-text="$t('settings.list_domain_helper')"
+              :disabled="stillLoading || !mailServer"
+              class="mg-bottom maxwidth"
+              ref="list_domain"
+            />
+            <cv-text-area
+              :label="$t('settings.listmasters')"
+              v-model="listmastersText"
+              :placeholder="$t('settings.listmasters_placeholder')"
+              :helper-text="$t('settings.listmasters_helper')"
+              :invalid-message="$t(error.listmasters, { email: invalidEmail })"
+              :disabled="stillLoading"
+              class="mg-bottom maxwidth"
+              ref="listmasters"
+            />
+            <NsComboBox
+              :key="'domain-' + optionsKey"
+              v-model="userDomain"
+              :title="$t('settings.user_domain')"
+              :label="$t('settings.choose_user_domain')"
+              :options="userDomainOptions"
+              :autoFilter="true"
+              :autoHighlight="true"
+              :invalid-message="$t(error.user_domain)"
+              :helper-text="$t('settings.user_domain_helper')"
+              :disabled="stillLoading"
+              class="mg-bottom maxwidth"
+              ref="user_domain"
+            />
+            <cv-row v-if="configLoaded && !userDomains.length">
+              <cv-column>
+                <NsInlineNotification
+                  kind="info"
+                  :title="$t('settings.no_user_domain')"
+                  :description="$t('settings.no_user_domain_description')"
+                  :actionLabel="$t('settings.go_to_domains')"
+                  @action="goTo('/domains')"
+                  :showCloseButton="false"
+                />
+              </cv-column>
+            </cv-row>
+            <NsComboBox
+              :key="'lang-' + optionsKey"
+              v-model="defaultLang"
+              :title="$t('settings.default_lang')"
+              :label="$t('settings.choose_language')"
+              :options="langOptions"
+              :autoFilter="true"
+              :autoHighlight="true"
+              :invalid-message="$t(error.default_lang)"
+              :disabled="stillLoading"
+              class="mg-bottom maxwidth"
+              ref="default_lang"
+            />
             <cv-row v-if="error.configureModule">
               <cv-column>
                 <NsInlineNotification
                   kind="error"
                   :title="$t('action.configure-module')"
                   :description="error.configureModule"
-                  :showCloseButton="false"
-                />
-              </cv-column>
-            </cv-row>
-            <cv-row v-if="error.getStatus">
-              <cv-column>
-                <NsInlineNotification
-                  kind="error"
-                  :title="$t('action.get-status')"
-                  :description="error.getStatus"
                   :showCloseButton="false"
                 />
               </cv-column>
@@ -147,10 +227,58 @@
               kind="primary"
               :icon="Save20"
               :loading="loading.configureModule"
-              :disabled="loading.getConfiguration || loading.configureModule"
+              :disabled="stillLoading"
               >{{ $t("settings.save") }}</NsButton
             >
           </cv-form>
+        </cv-tile>
+      </cv-column>
+    </cv-row>
+    <cv-row v-if="savedListDomain && inboundDomain">
+      <cv-column>
+        <cv-tile light>
+          <h4 class="mg-bottom-md">{{ $t("settings.addresses_title") }}</h4>
+          <NsInlineNotification
+            kind="info"
+            :title="$t('settings.addresses_info')"
+            :description="
+              $t('settings.addresses_description', {
+                domain: savedListDomain,
+                inbound: inboundDomain,
+              })
+            "
+            :showCloseButton="false"
+          />
+          <h6 class="mg-bottom-sm">{{ $t("settings.robot_addresses") }}</h6>
+          <NsCodeSnippet
+            class="mg-bottom"
+            :copyTooltip="core.$t('common.copy_to_clipboard')"
+            :copyFeedback="core.$t('common.copied_to_clipboard')"
+            :moreText="core.$t('common.show_more')"
+            :lessText="core.$t('common.show_less')"
+            light
+            >{{ addressCommands(robotLocalParts) }}</NsCodeSnippet
+          >
+          <NsTextInput
+            :label="$t('settings.list_name')"
+            placeholder="mylist"
+            v-model.trim="listName"
+            :helper-text="$t('settings.list_name_helper')"
+            class="mg-bottom maxwidth"
+          />
+          <template v-if="validListName">
+            <h6 class="mg-bottom-sm">
+              {{ $t("settings.list_addresses", { list: listName }) }}
+            </h6>
+            <NsCodeSnippet
+              :copyTooltip="core.$t('common.copy_to_clipboard')"
+              :copyFeedback="core.$t('common.copied_to_clipboard')"
+              :moreText="core.$t('common.show_more')"
+              :lessText="core.$t('common.show_less')"
+              light
+              >{{ addressCommands(listLocalParts) }}</NsCodeSnippet
+            >
+          </template>
         </cv-tile>
       </cv-column>
     </cv-row>
@@ -167,6 +295,31 @@ import {
   IconService,
   PageTitleService,
 } from "@nethserver/ns8-ui-lib";
+
+// Languages shipped with Sympa 6.2
+const LANGS = {
+  "en-US": "English",
+  fr: "Français",
+  it: "Italiano",
+  de: "Deutsch",
+  es: "Español",
+  pt: "Português",
+  "pt-BR": "Português (Brasil)",
+  eu: "Euskara",
+};
+
+// Robot addresses, from /etc/sympa/aliases.sympa.postfix of the EPEL package
+const ROBOT_LOCAL_PARTS = [
+  "sympa",
+  "sympa-request",
+  "sympa-owner",
+  "listmaster",
+  "bounce",
+  "abuse-feedback-report",
+];
+
+// Addresses of one list, from Sympa default/list_aliases.tt2
+const LIST_SUFFIXES = ["", "-request", "-editor", "-unsubscribe", "-owner"];
 
 export default {
   name: "Settings",
@@ -188,10 +341,26 @@ export default {
       status: {},
       validationErrorDetails: [],
       urlCheckInterval: null,
+      configLoaded: false,
       host: "",
+      savedHost: "",
+      hasRoute: true,
       isLetsEncryptEnabled: false,
       isLetsEncryptCurrentlyEnabled: false,
-      isHttpToHttpsEnabled: true,
+      listDomain: "",
+      savedListDomain: "",
+      listmastersText: "",
+      // Empty until the configuration loads, or the combo box shows the raw value
+      mailServer: "",
+      userDomain: "",
+      defaultLang: "",
+      inboundDomain: "",
+      mailServers: [],
+      userDomains: [],
+      smarthostEnabled: true,
+      optionsKey: 0,
+      listName: "",
+      invalidEmail: "",
       loading: {
         getConfiguration: false,
         configureModule: false,
@@ -200,10 +369,14 @@ export default {
       error: {
         getConfiguration: "",
         configureModule: "",
+        getStatus: "",
         host: "",
         lets_encrypt: "",
-        http2https: "",
-        getStatus: false,
+        list_domain: "",
+        listmasters: "",
+        mail_server: "",
+        user_domain: "",
+        default_lang: "",
       },
     };
   },
@@ -215,6 +388,65 @@ export default {
         this.loading.configureModule ||
         this.loading.getStatus
       );
+    },
+    mailServerOptions() {
+      return this.mailServers.map((server) => ({
+        name: server.uuid,
+        label: server.ui_name
+          ? `${server.ui_name} (${server.module_id})`
+          : server.module_id,
+        value: server.uuid,
+      }));
+    },
+    userDomainOptions() {
+      return [
+        { name: "-", label: this.$t("settings.no_ldap_login"), value: "-" },
+      ].concat(
+        this.userDomains.map((domain) => ({
+          name: domain,
+          label: domain,
+          value: domain,
+        }))
+      );
+    },
+    listDomainOptions() {
+      const server = this.mailServers.find((s) => s.uuid === this.mailServer);
+      return (server ? server.domains : []).map((domain) => ({
+        name: domain,
+        label: domain,
+        value: domain,
+      }));
+    },
+    langOptions() {
+      return Object.entries(LANGS).map(([value, label]) => ({
+        name: value,
+        label,
+        value,
+      }));
+    },
+    selectedMailModule() {
+      const server = this.mailServers.find((s) => s.uuid === this.mailServer);
+      return server ? server.module_id : "mail1";
+    },
+    validListName() {
+      return /^[a-z0-9][a-z0-9._-]*$/.test(this.listName);
+    },
+    robotLocalParts() {
+      return ROBOT_LOCAL_PARTS;
+    },
+    listLocalParts() {
+      return LIST_SUFFIXES.map((suffix) => this.listName + suffix);
+    },
+  },
+  watch: {
+    mailServer() {
+      // A domain of another mail server cannot be kept
+      if (
+        this.listDomain &&
+        !this.listDomainOptions.some((opt) => opt.value === this.listDomain)
+      ) {
+        this.listDomain = "";
+      }
     },
   },
   created() {
@@ -232,20 +464,35 @@ export default {
     next();
   },
   methods: {
-    goToCertificates() {
-      this.core.$router.push("/settings/tls-certificates");
+    goTo(path) {
+      this.core.$router.push(path);
+    },
+    addressCommands(localParts) {
+      return localParts
+        .map((local) => {
+          const data = {
+            atype: "domain",
+            domain: this.savedListDomain,
+            local,
+            destinations: [
+              { dtype: "external", name: `${local}@${this.inboundDomain}` },
+            ],
+          };
+          return `api-cli run module/${
+            this.selectedMailModule
+          }/add-address --data '${JSON.stringify(data)}'`;
+        })
+        .join("\n");
     },
     async getStatus() {
       this.loading.getStatus = true;
       this.error.getStatus = "";
       const taskAction = "get-status";
       const eventId = this.getUuid();
-      // register to task error
       this.core.$root.$once(
         `${taskAction}-aborted-${eventId}`,
         this.getStatusAborted
       );
-      // register to task completion
       this.core.$root.$once(
         `${taskAction}-completed-${eventId}`,
         this.getStatusCompleted
@@ -265,7 +512,6 @@ export default {
         console.error(`error creating task ${taskAction}`, err);
         this.error.getStatus = this.getErrorMessage(err);
         this.loading.getStatus = false;
-        return;
       }
     },
     getStatusAborted(taskResult, taskContext) {
@@ -282,19 +528,14 @@ export default {
       this.error.getConfiguration = "";
       const taskAction = "get-configuration";
       const eventId = this.getUuid();
-
-      // register to task error
       this.core.$root.$once(
         `${taskAction}-aborted-${eventId}`,
         this.getConfigurationAborted
       );
-
-      // register to task completion
       this.core.$root.$once(
         `${taskAction}-completed-${eventId}`,
         this.getConfigurationCompleted
       );
-
       const res = await to(
         this.createModuleTaskForApp(this.instanceName, {
           action: taskAction,
@@ -306,12 +547,10 @@ export default {
         })
       );
       const err = res[0];
-
       if (err) {
         console.error(`error creating task ${taskAction}`, err);
         this.error.getConfiguration = this.getErrorMessage(err);
         this.loading.getConfiguration = false;
-        return;
       }
     },
     getConfigurationAborted(taskResult, taskContext) {
@@ -321,24 +560,70 @@ export default {
     },
     getConfigurationCompleted(taskContext, taskResult) {
       const config = taskResult.output;
+      this.mailServers = config.mail_servers;
+      this.userDomains = config.user_domains;
+      this.smarthostEnabled = config.smarthost_enabled;
       this.host = config.host;
+      this.savedHost = config.host;
+      this.hasRoute = config.has_route;
       this.isLetsEncryptEnabled = config.lets_encrypt;
       this.isLetsEncryptCurrentlyEnabled = config.lets_encrypt;
-      this.isHttpToHttpsEnabled = config.http2https;
-
+      this.savedListDomain = config.list_domain;
+      this.listmastersText = config.listmasters.join("\n");
+      this.inboundDomain = config.inbound_domain;
+      // A combo box shows the raw value if it is created with one: clear it, recreate, then set
+      this.mailServer = "";
+      this.listDomain = "";
+      this.userDomain = "";
+      this.defaultLang = "";
+      this.optionsKey++;
+      this.$nextTick(() => {
+        this.mailServer =
+          config.mail_server ||
+          (this.mailServers.length === 1 ? this.mailServers[0].uuid : "");
+        // Set after the mail server, or its watcher clears the domain
+        this.$nextTick(() => {
+          this.listDomain = config.list_domain;
+        });
+        this.userDomain = config.host ? config.user_domain || "-" : "";
+        this.defaultLang = config.default_lang || "en-US";
+      });
+      this.configLoaded = true;
       this.loading.getConfiguration = false;
       this.focusElement("host");
+    },
+    listmasters() {
+      return this.listmastersText
+        .split(/[\s,;]+/)
+        .map((addr) => addr.trim().toLowerCase())
+        .filter((addr) => addr);
     },
     validateConfigureModule() {
       this.clearErrors(this);
       this.validationErrorDetails = [];
-
+      const required = [
+        ["host", this.host],
+        ["mail_server", this.mailServer],
+        ["list_domain", this.listDomain],
+        ["listmasters", this.listmasters().length],
+      ];
       let isValidationOk = true;
-      if (!this.host) {
-        this.error.host = "common.required";
-
+      for (const [field, value] of required) {
+        if (!value) {
+          this.error[field] = "common.required";
+          if (isValidationOk) {
+            this.focusElement(field);
+          }
+          isValidationOk = false;
+        }
+      }
+      const emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+      const badEmail = this.listmasters().find((addr) => !emailRe.test(addr));
+      if (badEmail) {
+        this.error.listmasters = "settings.invalid_email";
+        this.invalidEmail = badEmail;
         if (isValidationOk) {
-          this.focusElement("host");
+          this.focusElement("listmasters");
         }
         isValidationOk = false;
       }
@@ -350,13 +635,11 @@ export default {
       for (const validationError of validationErrors) {
         const param = validationError.parameter;
         if (validationError.details) {
-          // show inline error notification with details
           this.validationErrorDetails = validationError.details
             .split("\n")
             .filter((detail) => detail.trim() !== "");
         } else {
-          // set i18n error message
-          this.error[param] = this.$t("settings." + validationError.error);
+          this.error[param] = "settings." + validationError.error;
           if (!focusAlreadySet) {
             this.focusElement(param);
             focusAlreadySet = true;
@@ -365,30 +648,20 @@ export default {
       }
     },
     async configureModule() {
-      this.error.test_imap = false;
-      this.error.test_smtp = false;
-      const isValidationOk = this.validateConfigureModule();
-      if (!isValidationOk) {
+      if (!this.validateConfigureModule()) {
         return;
       }
-
       this.loading.configureModule = true;
       const taskAction = "configure-module";
       const eventId = this.getUuid();
-
-      // register to task error
       this.core.$root.$once(
         `${taskAction}-aborted-${eventId}`,
         this.configureModuleAborted
       );
-
-      // register to task validation
       this.core.$root.$once(
         `${taskAction}-validation-failed-${eventId}`,
         this.configureModuleValidationFailed
       );
-
-      // register to task completion
       this.core.$root.$once(
         `${taskAction}-completed-${eventId}`,
         this.configureModuleCompleted
@@ -399,7 +672,11 @@ export default {
           data: {
             host: this.host,
             lets_encrypt: this.isLetsEncryptEnabled,
-            http2https: this.isHttpToHttpsEnabled,
+            list_domain: this.listDomain,
+            listmasters: this.listmasters(),
+            mail_server: this.mailServer,
+            user_domain: this.userDomain === "-" ? "" : this.userDomain,
+            default_lang: this.defaultLang || "en-US",
           },
           extra: {
             title: this.$t("settings.instance_configuration", {
@@ -411,12 +688,10 @@ export default {
         })
       );
       const err = res[0];
-
       if (err) {
         console.error(`error creating task ${taskAction}`, err);
         this.error.configureModule = this.getErrorMessage(err);
         this.loading.configureModule = false;
-        return;
       }
     },
     configureModuleAborted(taskResult, taskContext) {
@@ -426,8 +701,6 @@ export default {
     },
     configureModuleCompleted() {
       this.loading.configureModule = false;
-
-      // reload configuration
       this.getConfiguration();
     },
   },

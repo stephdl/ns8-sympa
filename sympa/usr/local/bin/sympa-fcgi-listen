@@ -1,0 +1,30 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2026 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+#
+# Usage: sympa-fcgi-listen <addr:port> <command...>
+# Open a listening socket on stdin, then run the command. It replaces the
+# systemd socket unit that multiwatch expects (StandardInput=socket).
+#
+
+use strict;
+use warnings;
+use IO::Socket::INET;
+use POSIX qw(dup2);
+
+my $addr = shift @ARGV or die "missing address\n";
+@ARGV or die "missing command\n";
+
+my $sock = IO::Socket::INET->new(
+    LocalAddr => $addr,
+    Proto     => 'tcp',
+    Listen    => 64,
+    ReuseAddr => 1,
+) or die "cannot listen on $addr: $!\n";
+
+dup2(fileno($sock), 0) or die "dup2: $!\n";
+exec @ARGV or die "exec: $!\n";

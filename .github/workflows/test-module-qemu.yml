@@ -35,10 +35,7 @@ jobs:
       statuses: write
     uses: NethServer/ns8-github-actions/.github/workflows/test-module-qemu.yml@v1
     with:
-      # optional: build-images.sh's reponame is a template placeholder
-      # (kickstart), shared with ns8-kickstart-mariadb. Sed it together with
-      # this value if this repo is cloned into a differently named module.
-      image_name: kickstart
+      image_name: sympa
       # update tested separately later, independent of this drop-in
       # scenarios: '["install","update"]'
       ui_tests_strategy: ${{ github.event.inputs.ui_tests == 'true' && 'always' || 'on_renovate_ui_change' }}

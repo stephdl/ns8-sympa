@@ -1,0 +1,19 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2026 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+import os
+import sys
+import json
+import subprocess
+
+event = json.load(sys.stdin)
+# "domains" exists since core 3.16, "domain" is the obsolete form
+changed = event.get("domains") or [event.get("domain")]
+if os.environ.get("USER_DOMAIN") not in changed:
+    sys.exit(0)
+
+subprocess.run(["systemctl", "--user", "try-restart", "sympa.service"], check=True)

@@ -1,57 +1,106 @@
 {
-    "error": {
-        "403": "Eragiketa baimendu gabea",
-        "cannot_retrieve_installed_modules": "Ezin dira instalatutako moduluak berreskuratu",
-        "401": "Autentifikazio baliogabea",
-        "cannot_retrieve_module_info": "Ezin da moduluaren informazioa berreskuratu",
-        "generic_error": "Zerbait okertu da",
-        "error": "Errorea",
-        "network_timeout": "Sarearen denbora-muga",
-        "404": "Baliabidea ez da aurkitu",
-        "network_error": "Sare-errorea",
-        "validation_error": "Balioztatze-errorea"
-    },
-    "settings": {
-        "test_field": "Proba-eremua",
-        "configure_instance": "{instance} konfiguratu",
-        "save": "Gorde",
-        "title": "Ezarpenak"
-    },
-    "common": {
-        "required": "Beharrezkoa",
-        "work_in_progress": "Lanak martxan",
-        "processing": "Prozesatzen..."
-    },
-    "status": {
-        "created": "Sortuta",
-        "size": "Tamaina",
-        "name": "Izena",
-        "no_images": "Irudirik ez",
-        "app_volumes": "Aplikazioaren bolumena | Aplikazioen bolumenak",
-        "services": "Zerbitzua | Zerbitzuak",
-        "app_images": "Aplikazioaren irudia | Aplikazioen irudiak",
-        "no_services": "Zerbitzurik ez",
-        "app_instance": "Aplikazioaren instantzia",
-        "mount": "Muntatu",
-        "title": "Egoera",
-        "installation_node": "Instalazio-nodoa",
-        "node": "Nodoa",
-        "no_volumes": "Bolumenik ez"
-    },
-    "about": {
-        "title": "Honi buruz"
-    },
-    "action": {
-        "list-backup-repositories": "Babeskopien biltegiak ikusi",
-        "get-module-info": "Moduluaren informazioa berreskuratu",
-        "list-installed-modules": "Instalatutako moduluak ikusi",
-        "list-backups": "Babeskopiak ikusi",
-        "get-status": "Egoera berreskuratu",
-        "configure-module": "Modulua konfiguratu",
-        "get-configuration": "Konfigurazioa berreskuratu",
-        "get-name": "Izena berreskuratu"
-    },
-    "task": {
-        "cannot_create_task": "Ezin da zeregina {action} sortu"
-    }
+  "error": {
+    "403": "Eragiketa baimendu gabea",
+    "cannot_retrieve_installed_modules": "Ezin dira instalatutako moduluak berreskuratu",
+    "401": "Autentifikazio baliogabea",
+    "cannot_retrieve_module_info": "Ezin da moduluaren informazioa berreskuratu",
+    "generic_error": "Zerbait okertu da",
+    "error": "Errorea",
+    "network_timeout": "Sarearen denbora-muga",
+    "404": "Baliabidea ez da aurkitu",
+    "network_error": "Sare-errorea",
+    "validation_error": "Balioztatze-errorea",
+    "cannot_retrieve_configuration": "Cannot retrieve configuration"
+  },
+  "settings": {
+    "configure_instance": "{instance} konfiguratu",
+    "save": "Gorde",
+    "title": "Ezarpenak",
+    "enabled": "Gaituta",
+    "disabled": "Desgaituta",
+    "configuring": "Konfiguratzen",
+    "instance_configuration": "Konfiguratu {instance}",
+    "domain_already_used_in_traefik": "Ostalari-izena beste aplikazio batek erabiltzen du",
+    "host": "Web-interfazearen ostalari-izena (FQDN)",
+    "host_helper": "Web-interfazea https://<ostalari-izena>/sympa helbidean dago",
+    "mail_server": "Posta-zerbitzaria",
+    "choose_mail_server": "Aukeratu posta-zerbitzari bat",
+    "mail_server_helper": "Zerrenden posta Internetetik jasotzen du eta Sympara bidaltzen du",
+    "list_domain": "Zerrenden posta-domeinua",
+    "list_domain_helper": "Zerrendek nirezerrenda@<domeinua> bezalako helbideak erabiltzen dituzte. Aukeratutako posta-zerbitzariaren domeinuak",
+    "listmasters": "Listmaster-ak",
+    "listmasters_placeholder": "admin@example.org",
+    "listmasters_helper": "Sympa administratzaileen helbide elektronikoak, bat lerro bakoitzeko",
+    "invalid_email": "Helbide elektroniko baliogabea: {email}",
+    "user_domain": "Erabiltzaile-domeinua",
+    "choose_user_domain": "Aukeratu erabiltzaile-domeinu bat",
+    "user_domain_helper": "Domeinu honetako erabiltzaileek LDAP kredentzialekin sartzen dira. Besteek Sympa kontua dute",
+    "no_ldap_login": "Bat ere ez, Sympa kontuak soilik",
+    "default_lang": "Hizkuntza lehenetsia",
+    "choose_language": "Aukeratu hizkuntza bat",
+    "smarthost_missing": "Smarthost-a konfiguratu gabe",
+    "smarthost_missing_description": "Sympak klusterraren smarthost-aren bidez soilik bidaltzen du posta. Konfiguratu arte, irteerako posta ilaran geratzen da",
+    "go_to_smarthost": "Joan smarthost ezarpenetara",
+    "mail_missing": "Ez dago posta-zerbitzaririk",
+    "mail_missing_description": "Instalatu Mail aplikazioa: zerrenden posta jasotzen du eta Sympara bidaltzen du",
+    "go_to_software_center": "Joan software zentrora",
+    "no_user_domain": "Ez dago erabiltzaile-domeinurik",
+    "no_user_domain_description": "Sortu erabiltzaile-domeinu bat bere erabiltzaileak LDAP bidez sar daitezen. Sympa kontuek hura gabe funtzionatzen dute",
+    "go_to_domains": "Joan Domeinuak eta erabiltzaileak atalera",
+    "no_route": "Web-interfazea ez dago argitaratuta",
+    "no_route_description": "Instantzia hau klonatu edo leheneratu egin da. Ezarri ostalari-izen bat eta gorde",
+    "mail_server_not_found": "Ez da posta-zerbitzaria aurkitu",
+    "list_domain_is_mail_internal_domain": "Posta-zerbitzariak bere barne-domeinua eta azpidomeinuak baztertzen ditu, aukeratu beste domeinu bat",
+    "user_domain_not_found": "Ez da erabiltzaile-domeinua aurkitu",
+    "addresses_title": "Helbide elektronikoak",
+    "addresses_info": "Adierazi helbideak posta-zerbitzarian",
+    "addresses_description": "Sympak erabiltzen duen {domain} helbide bakoitzak {inbound} domeinuko zati lokal berera birbidali behar du. Sortu itzazu behin Symparako, eta gero zerrenda berri bakoitzerako. Exekutatu komandoak klusterraren liderrean, edo sortu helbide berak Mail aplikazioan. Egiaztatu lehenik ez dagoela izen hauek dituen erabiltzaile edo talderik.",
+    "robot_addresses": "Sympa helbideak, behin bakarrik",
+    "list_name": "Zerrendaren izena",
+    "list_name_helper": "Idatzi zerrenda baten izena bere helbideak lortzeko",
+    "list_addresses": "{list} zerrendaren helbideak",
+    "choose_list_domain": "Aukeratu domeinu bat",
+    "list_domain_not_in_mail_server": "Domeinua ez dago aukeratutako posta-zerbitzarian"
+  },
+  "common": {
+    "required": "Derrigorrezkoa",
+    "work_in_progress": "Lanak martxan",
+    "processing": "Prozesatzen..."
+  },
+  "status": {
+    "created": "Sortuta",
+    "size": "Tamaina",
+    "name": "Izena",
+    "no_images": "Irudirik ez",
+    "app_volumes": "Aplikazioaren bolumena | Aplikazioen bolumenak",
+    "services": "Zerbitzua | Zerbitzuak",
+    "app_images": "Aplikazioaren irudia | Aplikazioen irudiak",
+    "no_services": "Zerbitzurik ez",
+    "app_instance": "Aplikazioaren instantzia",
+    "mount": "Muntatu",
+    "title": "Egoera",
+    "installation_node": "Instalazio-nodoa",
+    "node": "Nodoa",
+    "no_volumes": "Bolumenik ez",
+    "not_configured": "Konfiguratu gabe",
+    "open_webapp": "Ireki Sympa",
+    "configure": "Konfiguratu",
+    "sympa_webapp": "Sympa web-interfazea"
+  },
+  "about": {
+    "title": "Honi buruz"
+  },
+  "action": {
+    "list-backup-repositories": "Babeskopien biltegiak ikusi",
+    "get-module-info": "Moduluaren informazioa berreskuratu",
+    "list-installed-modules": "Instalatutako moduluak ikusi",
+    "list-backups": "Babeskopiak ikusi",
+    "get-status": "Egoera berreskuratu",
+    "configure-module": "Modulua konfiguratu",
+    "get-configuration": "Konfigurazioa berreskuratu",
+    "get-name": "Izena berreskuratu"
+  },
+  "task": {
+    "cannot_create_task": "Ezin da zeregina {action} sortu"
+  }
 }

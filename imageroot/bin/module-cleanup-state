@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #
-# Copyright (C) 2022 Nethesis S.r.l.
+# Copyright (C) 2026 Nethesis S.r.l.
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
-rm -vf kickstart.pg_dump
+rm -vf sympa.pg_dump 1>&2

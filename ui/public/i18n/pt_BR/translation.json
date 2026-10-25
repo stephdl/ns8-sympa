@@ -1,35 +1,106 @@
 {
-    "common": {
-        "required": "Obrigatório",
-        "work_in_progress": "Em progresso",
-        "processing": "Procesando..."
-    },
-    "status": {
-        "services": "Serviço | Serviços",
-        "app_instance": "Instância do aplicativo",
-        "title": "Estado"
-    },
-    "error": {
-        "403": "Operation not authorized",
-        "401": "Invalid authentication",
-        "generic_error": "Something went wrong",
-        "error": "Error",
-        "network_timeout": "Network timeout",
-        "404": "Resource not found",
-        "network_error": "Network error",
-        "validation_error": "Validation error"
-    },
-    "about": {
-        "title": "About"
-    },
-    "action": {
-        "list-backup-repositories": "List backup repositories",
-        "list-backups": "List backups"
-    },
-    "task": {
-        "cannot_create_task": "Cannot create task {action}"
-    },
-    "settings": {
-        "title": "Settings"
-    }
+  "common": {
+    "required": "Obrigatório",
+    "work_in_progress": "Em progresso",
+    "processing": "Procesando..."
+  },
+  "status": {
+    "services": "Serviço | Serviços",
+    "app_instance": "Instância do aplicativo",
+    "title": "Status",
+    "app_images": "App image | App images",
+    "app_volumes": "App volume | App volumes",
+    "installation_node": "Installation node",
+    "node": "Node",
+    "name": "Name",
+    "size": "Size",
+    "created": "Created",
+    "mount": "Mount",
+    "no_services": "No services",
+    "no_images": "No images",
+    "no_volumes": "No volumes",
+    "not_configured": "Não configurado",
+    "open_webapp": "Abrir o Sympa",
+    "configure": "Configurar",
+    "sympa_webapp": "Interface web do Sympa"
+  },
+  "error": {
+    "403": "Operation not authorized",
+    "401": "Invalid authentication",
+    "generic_error": "Something went wrong",
+    "error": "Error",
+    "network_timeout": "Network timeout",
+    "404": "Resource not found",
+    "network_error": "Network error",
+    "validation_error": "Validation error",
+    "cannot_retrieve_module_info": "Cannot retrieve module info",
+    "cannot_retrieve_installed_modules": "Cannot retrieve installed modules",
+    "cannot_retrieve_configuration": "Cannot retrieve configuration"
+  },
+  "about": {
+    "title": "Sobre"
+  },
+  "action": {
+    "list-backup-repositories": "List backup repositories",
+    "list-backups": "List backups",
+    "get-status": "Get status",
+    "get-configuration": "Get configuration",
+    "configure-module": "Configure module",
+    "get-module-info": "Get module info",
+    "get-name": "Get name",
+    "list-installed-modules": "List installed modules"
+  },
+  "task": {
+    "cannot_create_task": "Cannot create task {action}"
+  },
+  "settings": {
+    "title": "Configurações",
+    "configure_instance": "Configure {instance}",
+    "save": "Salvar",
+    "enabled": "Ativado",
+    "disabled": "Desativado",
+    "configuring": "Configurando",
+    "instance_configuration": "Configurar {instance}",
+    "domain_already_used_in_traefik": "Nome de host já usado por outro aplicativo",
+    "host": "Nome do host da interface web (FQDN)",
+    "host_helper": "A interface web está disponível em https://<nome do host>/sympa",
+    "mail_server": "Servidor de e-mail",
+    "choose_mail_server": "Escolha um servidor de e-mail",
+    "mail_server_helper": "Recebe os e-mails das listas da Internet e os encaminha para o Sympa",
+    "list_domain": "Domínio de e-mail das listas",
+    "list_domain_helper": "As listas usam endereços como minhalista@<domínio>. Domínios do servidor de e-mail escolhido",
+    "listmasters": "Listmasters",
+    "listmasters_placeholder": "admin@example.org",
+    "listmasters_helper": "Endereços de e-mail dos administradores do Sympa, um por linha",
+    "invalid_email": "Endereço de e-mail inválido: {email}",
+    "user_domain": "Domínio de usuários",
+    "choose_user_domain": "Escolha um domínio de usuários",
+    "user_domain_helper": "Os usuários deste domínio entram com as credenciais LDAP. Os outros mantêm uma conta Sympa",
+    "no_ldap_login": "Nenhum, só contas Sympa",
+    "default_lang": "Idioma padrão",
+    "choose_language": "Escolha um idioma",
+    "smarthost_missing": "Smarthost não configurado",
+    "smarthost_missing_description": "O Sympa envia e-mails só pelo smarthost do cluster. Até ser configurado, os e-mails de saída ficam na fila",
+    "go_to_smarthost": "Ir para as configurações do smarthost",
+    "mail_missing": "Nenhum servidor de e-mail",
+    "mail_missing_description": "Instale o aplicativo Mail: ele recebe os e-mails das listas e os encaminha para o Sympa",
+    "go_to_software_center": "Ir para a central de software",
+    "no_user_domain": "Nenhum domínio de usuários",
+    "no_user_domain_description": "Crie um domínio de usuários para que entrem com LDAP. As contas Sympa funcionam sem ele",
+    "go_to_domains": "Ir para Domínios e usuários",
+    "no_route": "A interface web não está publicada",
+    "no_route_description": "Esta instância foi clonada ou restaurada. Defina um nome de host e salve",
+    "mail_server_not_found": "Servidor de e-mail não encontrado",
+    "list_domain_is_mail_internal_domain": "O servidor de e-mail rejeita seu domínio interno e subdomínios, escolha outro domínio",
+    "user_domain_not_found": "Domínio de usuários não encontrado",
+    "addresses_title": "Endereços de e-mail",
+    "addresses_info": "Declare os endereços no servidor de e-mail",
+    "addresses_description": "Cada endereço de {domain} usado pelo Sympa precisa encaminhar para a mesma parte local em {inbound}. Crie-os uma vez para o Sympa e depois para cada nova lista. Execute os comandos no líder do cluster, ou crie os mesmos endereços no aplicativo Mail. Verifique antes que nenhum usuário ou grupo tem esses nomes.",
+    "robot_addresses": "Endereços do Sympa, uma única vez",
+    "list_name": "Nome da lista",
+    "list_name_helper": "Digite o nome de uma lista para obter seus endereços",
+    "list_addresses": "Endereços da lista {list}",
+    "choose_list_domain": "Escolha um domínio",
+    "list_domain_not_in_mail_server": "O domínio não existe no servidor de e-mail escolhido"
+  }
 }

@@ -1,0 +1,179 @@
+#!/bin/bash
+
+#
+# Copyright (C) 2026 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+#
+# Render the configuration from environment variables, then run one role:
+#   sympa   - mail processing daemons
+#   postfix - inbound SMTP from the mail module and outbound relay
+#   web     - nginx with the wwsympa FastCGI backend
+#
+
+set -e
+
+role="${1:?missing role: sympa, postfix or web}"
+
+: "${SYMPA_DOMAIN:?}" "${SYMPA_LISTMASTERS:?}" "${SYMPA_WWSYMPA_URL:?}"
+: "${SYMPA_DB_PASSWORD:?}" "${SYMPA_COOKIE:?}"
+
+templates=/usr/local/lib/sympa-templates
+
+# Write a file only through a rename, because the three containers share /etc/sympa
+install_file() {
+    local dest="$1" mode="$2" owner="$3"
+    local tmp="${dest}.tmp.$$"
+    cat > "${tmp}"
+    chmod "${mode}" "${tmp}"
+    chown "${owner}" "${tmp}"
+    mv -f "${tmp}" "${dest}"
+}
+
+render_sympa_conf() {
+    {
+        cat <<EOF
+domain ${SYMPA_DOMAIN}
+listmaster ${SYMPA_LISTMASTERS}
+wwsympa_url ${SYMPA_WWSYMPA_URL}
+lang ${SYMPA_LANG:-en-US}
+db_type PostgreSQL
+db_host 127.0.0.1
+db_port 5432
+db_name sympa
+db_user sympa
+db_passwd ${SYMPA_DB_PASSWORD}
+cookie ${SYMPA_COOKIE}
+sendmail /usr/sbin/sendmail
+alias_manager /bin/true
+log_level ${SYMPA_LOG_LEVEL:-0}
+dmarc_protection.mode ${SYMPA_DMARC_MODE:-dmarc_reject}
+EOF
+    } | install_file /etc/sympa/sympa.conf 0640 sympa:sympa
+}
+
+render_auth_conf() {
+    {
+        if [[ -n "${SYMPA_LDAP_HOST}" ]]; then
+            if [[ "${SYMPA_LDAP_SCHEMA}" == "ad" ]]; then
+                uid_attr=sAMAccountName
+            else
+                uid_attr=uid
+            fi
+            cat <<EOF
+ldap
+	regexp .*
+	host ${SYMPA_LDAP_HOST}:${SYMPA_LDAP_PORT}
+	timeout 10
+	suffix ${SYMPA_LDAP_BASE}
+	bind_dn ${SYMPA_LDAP_BIND_DN}
+	bind_password ${SYMPA_LDAP_BIND_PASSWORD}
+	scope sub
+	use_tls none
+	get_dn_by_uid_filter (&(${uid_attr}=[sender])${SYMPA_LDAP_USER_CLAUSE})
+	get_dn_by_email_filter (&(mail=[sender])${SYMPA_LDAP_USER_CLAUSE})
+	email_attribute mail
+	alternative_email_attribute mail
+
+EOF
+        fi
+        cat <<EOF
+user_table
+	regexp .*
+EOF
+    } | install_file /etc/sympa/auth.conf 0640 sympa:sympa
+}
+
+render_postfix() {
+    local relay="" tls_level="none" wrapper="no" sasl="no"
+
+    if [[ -n "${SMTP_ENABLED}" && -n "${SMTP_HOST}" ]]; then
+        relay="[${SMTP_HOST}]:${SMTP_PORT}"
+        case "${SMTP_ENCRYPTION}" in
+            tls) tls_level=encrypt; wrapper=yes ;;
+            starttls) tls_level=encrypt ;;
+        esac
+        if [[ "${tls_level}" != "none" && -n "${SMTP_TLSVERIFY}" ]]; then
+            tls_level=secure
+        fi
+        if [[ -n "${SMTP_USERNAME}" ]]; then
+            sasl=yes
+            printf '%s %s:%s\n' "${relay}" "${SMTP_USERNAME}" "${SMTP_PASSWORD}" | \
+                install_file /etc/postfix/sasl_passwd 0600 root:root
+        fi
+    fi
+
+    postconf -e \
+        "myhostname = ${SYMPA_HOSTNAME:-$(hostname -f)}" \
+        "mydestination =" \
+        "inet_interfaces = all" \
+        "inet_protocols = ipv4" \
+        "mynetworks = 127.0.0.0/8" \
+        "relay_domains = ${SYMPA_INBOUND_DOMAIN}" \
+        "transport_maps = inline:{${SYMPA_INBOUND_DOMAIN}=sympadeliver:}" \
+        "sympadeliver_destination_recipient_limit = 1" \
+        "recipient_delimiter = +" \
+        "smtpd_relay_restrictions = reject_unauth_destination" \
+        "relayhost = ${relay}" \
+        "smtp_sasl_auth_enable = ${sasl}" \
+        "smtp_sasl_password_maps = texthash:/etc/postfix/sasl_passwd" \
+        "smtp_sasl_security_options = noanonymous" \
+        "smtp_sasl_tls_security_options = noanonymous" \
+        "smtp_tls_security_level = ${tls_level}" \
+        "smtp_tls_wrappermode = ${wrapper}" \
+        "smtp_tls_CAfile = /etc/pki/tls/certs/ca-bundle.crt" \
+        "smtputf8_enable = no" \
+        "message_size_limit = 100000000" \
+        "maillog_file = /dev/stdout"
+
+    if [[ -z "${relay}" ]]; then
+        # Without a smarthost, keep outgoing mail in the queue instead of sending it direct
+        postconf -e "default_transport = retry:4.3.2 smarthost is not configured"
+    else
+        postconf -X default_transport
+    fi
+
+    postconf -M -e "sympadeliver/unix=sympadeliver unix - n n - - pipe flags=hqRu null_sender= user=sympa argv=/usr/local/bin/sympa-deliver \${user}"
+    postconf -M -e "postlog/unix-dgram=postlog unix-dgram n - n - 1 postlogd"
+    touch /etc/postfix/sasl_passwd
+}
+
+render_sympa_conf
+render_auth_conf
+mkdir -p /run/sympa
+chown sympa:sympa /run/sympa
+
+case "${role}" in
+sympa)
+    # Create or upgrade the database schema and the data structure
+    runuser -u sympa -- /usr/sbin/sympa.pl --health_check
+    runuser -u sympa -- /usr/sbin/sympa.pl --upgrade
+    pids=()
+    for daemon in sympa_msg bulk bounced archived task_manager; do
+        "/usr/sbin/${daemon}.pl" --foreground &
+        pids+=($!)
+    done
+    trap 'kill "${pids[@]}" 2>/dev/null' TERM INT
+    # Stop the container when one daemon exits, so systemd restarts all of them
+    wait -n "${pids[@]}"
+    rc=$?
+    kill "${pids[@]}" 2>/dev/null || :
+    exit "${rc}"
+    ;;
+postfix)
+    : "${SYMPA_INBOUND_DOMAIN:?}"
+    render_postfix
+    exec /usr/sbin/postfix start-fg
+    ;;
+web)
+    install -m 0644 "${templates}/nginx.conf" /etc/nginx/nginx.conf
+    perl /usr/local/bin/sympa-fcgi-listen 127.0.0.1:9000 \
+        runuser -u sympa -- /usr/bin/multiwatch -f "${WWS_FCGI_CHILDREN:-3}" -- /usr/libexec/sympa/wwsympa.fcgi &
+    exec /usr/sbin/nginx -g 'daemon off;'
+    ;;
+*)
+    echo "Unknown role ${role}" >&2
+    exit 2
+    ;;
+esac

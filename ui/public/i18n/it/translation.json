@@ -1,57 +1,106 @@
 {
-    "common": {
-        "required": "Obbligatorio",
-        "processing": "Elaborazione in corso...",
-        "work_in_progress": "In lavorazione"
-    },
-    "status": {
-        "node": "Nodo",
-        "services": "Servizio | Servizi",
-        "no_volumes": "Nessun volume",
-        "title": "Stato",
-        "name": "Nome",
-        "size": "Dimensione",
-        "created": "Creato",
-        "no_services": "Nessun servizio",
-        "no_images": "Nessuna immagine",
-        "app_images": "Immagine app|Immagini app",
-        "app_instance": "Istanza app",
-        "app_volumes": "Volume app|Volumi app",
-        "installation_node": "Nodo",
-        "mount": "Percorso di mount"
-    },
-    "settings": {
-        "save": "Salva",
-        "title": "Impostazioni",
-        "configure_instance": "Configura {instance}",
-        "test_field": "Campo di test"
-    },
-    "error": {
-        "error": "Errore",
-        "404": "Risorsa non trovata",
-        "validation_error": "Errore di validazione",
-        "network_error": "Errore di rete",
-        "cannot_retrieve_installed_modules": "Impossibile elencare moduli installati",
-        "cannot_retrieve_module_info": "Impossibile recuperare info modulo",
-        "network_timeout": "Timeout di rete",
-        "generic_error": "Qualcosa è andato storto",
-        "401": "Autenticazione non valida",
-        "403": "Operazione non autorizzata"
-    },
-    "action": {
-        "configure-module": "Configura modulo",
-        "get-configuration": "Visualizza configurazione",
-        "get-status": "Visualizza stato",
-        "get-module-info": "Visualizza info modulo",
-        "get-name": "Visualizza nome",
-        "list-backup-repositories": "Elenca repository di backup",
-        "list-backups": "Elenca backup",
-        "list-installed-modules": "Elenco moduli installati"
-    },
-    "task": {
-        "cannot_create_task": "Impossibile eseguire task {action}"
-    },
-    "about": {
-        "title": "Informazioni"
-    }
+  "common": {
+    "required": "Obbligatorio",
+    "processing": "Elaborazione in corso...",
+    "work_in_progress": "In lavorazione"
+  },
+  "status": {
+    "node": "Nodo",
+    "services": "Servizio | Servizi",
+    "no_volumes": "Nessun volume",
+    "title": "Stato",
+    "name": "Nome",
+    "size": "Dimensione",
+    "created": "Creato",
+    "no_services": "Nessun servizio",
+    "no_images": "Nessuna immagine",
+    "app_images": "Immagine app|Immagini app",
+    "app_instance": "Istanza app",
+    "app_volumes": "Volume app|Volumi app",
+    "installation_node": "Nodo",
+    "mount": "Percorso di mount",
+    "not_configured": "Non configurato",
+    "open_webapp": "Apri Sympa",
+    "configure": "Configura",
+    "sympa_webapp": "Interfaccia web Sympa"
+  },
+  "settings": {
+    "save": "Salva",
+    "title": "Impostazioni",
+    "configure_instance": "Configura {instance}",
+    "enabled": "Abilitato",
+    "disabled": "Disabilitato",
+    "configuring": "Configurazione in corso",
+    "instance_configuration": "Configura {instance}",
+    "domain_already_used_in_traefik": "Nome host già usato da un'altra applicazione",
+    "host": "Nome host dell'interfaccia web (FQDN)",
+    "host_helper": "L'interfaccia web è disponibile su https://<nome host>/sympa",
+    "mail_server": "Server di posta",
+    "choose_mail_server": "Scegli un server di posta",
+    "mail_server_helper": "Riceve la posta delle liste da Internet e la inoltra a Sympa",
+    "list_domain": "Dominio di posta delle liste",
+    "list_domain_helper": "Le liste usano indirizzi come lamialista@<dominio>. Domini del server di posta scelto",
+    "listmasters": "Listmaster",
+    "listmasters_placeholder": "admin@example.org",
+    "listmasters_helper": "Indirizzi email degli amministratori di Sympa, uno per riga",
+    "invalid_email": "Indirizzo email non valido: {email}",
+    "user_domain": "Dominio utente",
+    "choose_user_domain": "Scegli un dominio utente",
+    "user_domain_helper": "Gli utenti di questo dominio accedono con le credenziali LDAP. Gli altri usano un account Sympa",
+    "no_ldap_login": "Nessuno, solo account Sympa",
+    "default_lang": "Lingua predefinita",
+    "choose_language": "Scegli una lingua",
+    "smarthost_missing": "Smarthost non configurato",
+    "smarthost_missing_description": "Sympa invia la posta solo tramite lo smarthost del cluster. Finché non è configurato, la posta in uscita resta in coda",
+    "go_to_smarthost": "Vai alle impostazioni dello smarthost",
+    "mail_missing": "Nessun server di posta",
+    "mail_missing_description": "Installa l'applicazione Mail: riceve la posta delle liste e la inoltra a Sympa",
+    "go_to_software_center": "Vai al Software center",
+    "no_user_domain": "Nessun dominio utente",
+    "no_user_domain_description": "Crea un dominio utente per consentire l'accesso LDAP ai suoi utenti. Gli account Sympa funzionano anche senza",
+    "go_to_domains": "Vai a Domini e utenti",
+    "no_route": "L'interfaccia web non è pubblicata",
+    "no_route_description": "Questa istanza è stata clonata o ripristinata. Imposta un nome host e salva",
+    "mail_server_not_found": "Server di posta non trovato",
+    "list_domain_is_mail_internal_domain": "Il server di posta rifiuta il suo dominio interno e i sottodomini, scegli un altro dominio",
+    "user_domain_not_found": "Dominio utente non trovato",
+    "addresses_title": "Indirizzi email",
+    "addresses_info": "Dichiara gli indirizzi nel server di posta",
+    "addresses_description": "Ogni indirizzo di {domain} usato da Sympa deve inoltrare alla stessa parte locale su {inbound}. Crealo una volta per Sympa, poi per ogni nuova lista. Esegui i comandi sul leader del cluster, oppure crea gli stessi indirizzi nell'applicazione Mail. Verifica prima che nessun utente o gruppo abbia questi nomi.",
+    "robot_addresses": "Indirizzi di Sympa, una volta sola",
+    "list_name": "Nome della lista",
+    "list_name_helper": "Scrivi il nome di una lista per ottenere i suoi indirizzi",
+    "list_addresses": "Indirizzi della lista {list}",
+    "choose_list_domain": "Scegli un dominio",
+    "list_domain_not_in_mail_server": "Il dominio non esiste nel server di posta scelto"
+  },
+  "error": {
+    "error": "Errore",
+    "404": "Risorsa non trovata",
+    "validation_error": "Errore di validazione",
+    "network_error": "Errore di rete",
+    "cannot_retrieve_installed_modules": "Impossibile elencare moduli installati",
+    "cannot_retrieve_module_info": "Impossibile recuperare info modulo",
+    "network_timeout": "Timeout di rete",
+    "generic_error": "Qualcosa è andato storto",
+    "401": "Autenticazione non valida",
+    "403": "Operazione non autorizzata",
+    "cannot_retrieve_configuration": "Cannot retrieve configuration"
+  },
+  "action": {
+    "configure-module": "Configura modulo",
+    "get-configuration": "Visualizza configurazione",
+    "get-status": "Visualizza stato",
+    "get-module-info": "Visualizza info modulo",
+    "get-name": "Visualizza nome",
+    "list-backup-repositories": "Elenca repository di backup",
+    "list-backups": "Elenca backup",
+    "list-installed-modules": "Elenco moduli installati"
+  },
+  "task": {
+    "cannot_create_task": "Impossibile eseguire task {action}"
+  },
+  "about": {
+    "title": "Informazioni"
+  }
 }

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+#
+# Copyright (C) 2026 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+exec 1>&2
+
+# Postfix reads the relay settings at start: sympa-config runs again before the pod starts
+systemctl --user try-restart sympa.service
