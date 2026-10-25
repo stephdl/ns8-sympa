@@ -12,6 +12,13 @@ import sys
 import agent
 
 
+def set_smtp_endpoint(rdb):
+    """Publish our Postfix on the cluster VPN, so the mail module reaches it from any node"""
+    node_id = os.environ['NODE_ID']
+    agent.set_env("SMTP_BIND_ADDRESS", rdb.hget(f'node/{node_id}/vpn', 'ip_address'))
+    agent.set_env("SMTP_PORT", os.environ["TCP_PORTS"].split(",")[1])
+
+
 def _mail_module_id(rdb, mail_uuid):
     providers = agent.list_service_providers(rdb, 'imap', 'tcp', {'module_uuid': mail_uuid})
     return providers[0]['module_id'] if providers else None

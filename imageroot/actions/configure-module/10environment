@@ -9,6 +9,7 @@ import os
 import sys
 import json
 import agent
+import sympa_mail
 
 data = json.load(sys.stdin)
 
@@ -23,11 +24,7 @@ agent.set_env("USER_DOMAIN", user_domain)
 agent.set_env("DEFAULT_LANG", data.get("default_lang", os.environ.get("DEFAULT_LANG", "en-US")))
 agent.bind_user_domains([user_domain] if user_domain else [])
 
-# The mail module reaches our Postfix on the cluster VPN, from any node
-node_id = os.environ['NODE_ID']
-rdb = agent.redis_connect(use_replica=True)
-agent.set_env("SMTP_BIND_ADDRESS", rdb.hget(f'node/{node_id}/vpn', 'ip_address'))
-agent.set_env("SMTP_PORT", os.environ["TCP_PORTS"].split(",")[1])
+sympa_mail.set_smtp_endpoint(agent.redis_connect(use_replica=True))
 
 if not os.environ.get("INBOUND_DOMAIN"):
     agent.set_env("INBOUND_DOMAIN", os.environ["MODULE_ID"] + ".invalid")
