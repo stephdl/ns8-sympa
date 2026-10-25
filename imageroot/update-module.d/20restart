@@ -8,4 +8,4 @@
 set -e
 exec 1>&2
 
-systemctl --user try-restart sympa.service postgresql-app.service sympa-app.service postfix-app.service wwsympa-app.service
+systemctl --user try-restart sympa.service

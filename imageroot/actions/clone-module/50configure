@@ -21,8 +21,7 @@ sympa_mail.set_smtp_endpoint(agent.redis_connect(use_replica=True))
 if not request.get("replace"):
     # A copy must not take over the relay rule of the source: give it its own inbound domain
     agent.set_env("INBOUND_DOMAIN", os.environ["MODULE_ID"] + ".invalid")
-    subprocess.run(["systemctl", "--user", "try-restart", "sympa.service", "postgresql-app.service",
-                    "sympa-app.service", "postfix-app.service", "wwsympa-app.service"], check=True)
+    subprocess.run(["systemctl", "--user", "try-restart", "sympa.service"], check=True)
     print(agent.SD_WARNING + "Cloned instance has no web route and no mail relay, set a new host name in Settings", file=sys.stderr)
     sys.exit(0)
 

@@ -16,5 +16,4 @@ changed = event.get("domains") or [event.get("domain")]
 if os.environ.get("USER_DOMAIN") not in changed:
     sys.exit(0)
 
-subprocess.run(["systemctl", "--user", "try-restart", "sympa.service", "postgresql-app.service",
-                "sympa-app.service", "postfix-app.service", "wwsympa-app.service"], check=True)
+subprocess.run(["systemctl", "--user", "try-restart", "sympa.service"], check=True)

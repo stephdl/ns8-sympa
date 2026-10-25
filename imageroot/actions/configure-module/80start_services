@@ -9,9 +9,9 @@ set -e
 exec 1>&2
 
 systemctl --user enable sympa.service
-# Restart the pod: sympa-config runs again before it starts
+# Restart the pod: sympa-config runs again before it starts, and the
+# containers follow the pod through Requires= and BindsTo=
 systemctl --user restart sympa.service
-systemctl --user start postgresql-app.service sympa-app.service postfix-app.service wwsympa-app.service
 
 # add-relay-rule probes our SMTP port. The port forwarder accepts TCP
 # before Postfix listens, so wait for the SMTP greeting itself.

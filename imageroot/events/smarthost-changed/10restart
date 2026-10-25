@@ -8,4 +8,4 @@
 exec 1>&2
 
 # Postfix reads the relay settings at start: sympa-config runs again before the pod starts
-systemctl --user try-restart sympa.service postgresql-app.service sympa-app.service postfix-app.service wwsympa-app.service
+systemctl --user try-restart sympa.service
