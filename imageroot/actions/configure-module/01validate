@@ -48,6 +48,11 @@ else:
     list_domain = data["list_domain"].lower()
     if internal and (list_domain == internal or list_domain.endswith('.' + internal)):
         fail('list_domain', data["list_domain"], 'list_domain_is_mail_internal_domain')
+    else:
+        result = agent.tasks.run(f"module/{providers[0]['module_id']}", action='list-domains', data={})
+        agent.assert_exp(result['exit_code'] == 0, "Cannot list the domains of the mail server")
+        if list_domain not in [record['domain'].lower() for record in result['output']]:
+            fail('list_domain', data["list_domain"], 'list_domain_not_in_mail_server')
 
 user_domain = data.get("user_domain", "")
 if user_domain and user_domain not in Ldapproxy().get_domains_list():

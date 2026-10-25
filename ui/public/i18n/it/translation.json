@@ -39,7 +39,7 @@
     "choose_mail_server": "Scegli un server di posta",
     "mail_server_helper": "Riceve la posta delle liste da Internet e la inoltra a Sympa",
     "list_domain": "Dominio di posta delle liste",
-    "list_domain_helper": "Le liste usano indirizzi come lamialista@<dominio>. Il dominio deve esistere nel server di posta",
+    "list_domain_helper": "Le liste usano indirizzi come lamialista@<dominio>. Domini del server di posta scelto",
     "listmasters": "Listmaster",
     "listmasters_placeholder": "admin@example.org",
     "listmasters_helper": "Indirizzi email degli amministratori di Sympa, uno per riga",
@@ -70,7 +70,9 @@
     "robot_addresses": "Indirizzi di Sympa, una volta sola",
     "list_name": "Nome della lista",
     "list_name_helper": "Scrivi il nome di una lista per ottenere i suoi indirizzi",
-    "list_addresses": "Indirizzi della lista {list}"
+    "list_addresses": "Indirizzi della lista {list}",
+    "choose_list_domain": "Scegli un dominio",
+    "list_domain_not_in_mail_server": "Il dominio non esiste nel server di posta scelto"
   },
   "error": {
     "error": "Errore",

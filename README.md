@@ -39,7 +39,8 @@ Configure the instance from the UI, or with:
 
 - `host`: host name of the web interface, served at
   `https://<host>/sympa`. HTTP is always redirected to HTTPS.
-- `list_domain`: mail domain of the lists, like `mylist@example.org`. It
+- `list_domain`: mail domain of the lists, like `mylist@example.org`. The UI
+  lists the domains of the selected mail server. It
   can be a domain that already holds mailboxes. It must be a domain of the
   Mail application, and it cannot be the internal LDAP domain of the mail
   server or one of its subdomains: the Mail application rejects them.

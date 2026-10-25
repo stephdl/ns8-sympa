@@ -128,14 +128,18 @@
               class="mg-bottom maxwidth"
               ref="mail_server"
             />
-            <NsTextInput
-              :label="$t('settings.list_domain')"
-              placeholder="example.org"
-              v-model.trim="listDomain"
-              class="mg-bottom"
+            <NsComboBox
+              :key="'list-domain-' + optionsKey + '-' + mailServer"
+              v-model="listDomain"
+              :title="$t('settings.list_domain')"
+              :label="$t('settings.choose_list_domain')"
+              :options="listDomainOptions"
+              :autoFilter="true"
+              :autoHighlight="true"
               :invalid-message="$t(error.list_domain)"
               :helper-text="$t('settings.list_domain_helper')"
-              :disabled="stillLoading"
+              :disabled="stillLoading || !mailServer"
+              class="mg-bottom maxwidth"
               ref="list_domain"
             />
             <cv-text-area
@@ -405,6 +409,14 @@ export default {
         }))
       );
     },
+    listDomainOptions() {
+      const server = this.mailServers.find((s) => s.uuid === this.mailServer);
+      return (server ? server.domains : []).map((domain) => ({
+        name: domain,
+        label: domain,
+        value: domain,
+      }));
+    },
     langOptions() {
       return Object.entries(LANGS).map(([value, label]) => ({
         name: value,
@@ -424,6 +436,17 @@ export default {
     },
     listLocalParts() {
       return LIST_SUFFIXES.map((suffix) => this.listName + suffix);
+    },
+  },
+  watch: {
+    mailServer() {
+      // A domain of another mail server cannot be kept
+      if (
+        this.listDomain &&
+        !this.listDomainOptions.some((opt) => opt.value === this.listDomain)
+      ) {
+        this.listDomain = "";
+      }
     },
   },
   created() {
@@ -545,12 +568,12 @@ export default {
       this.hasRoute = config.has_route;
       this.isLetsEncryptEnabled = config.lets_encrypt;
       this.isLetsEncryptCurrentlyEnabled = config.lets_encrypt;
-      this.listDomain = config.list_domain;
       this.savedListDomain = config.list_domain;
       this.listmastersText = config.listmasters.join("\n");
       this.inboundDomain = config.inbound_domain;
       // A combo box shows the raw value if it is created with one: clear it, recreate, then set
       this.mailServer = "";
+      this.listDomain = "";
       this.userDomain = "";
       this.defaultLang = "";
       this.optionsKey++;
@@ -558,6 +581,10 @@ export default {
         this.mailServer =
           config.mail_server ||
           (this.mailServers.length === 1 ? this.mailServers[0].uuid : "");
+        // Set after the mail server, or its watcher clears the domain
+        this.$nextTick(() => {
+          this.listDomain = config.list_domain;
+        });
         this.userDomain = config.host ? config.user_domain || "-" : "";
         this.defaultLang = config.default_lang || "en-US";
       });

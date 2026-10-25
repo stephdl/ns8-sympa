@@ -27,7 +27,7 @@
     "choose_mail_server": "Aukeratu posta-zerbitzari bat",
     "mail_server_helper": "Zerrenden posta Internetetik jasotzen du eta Sympara bidaltzen du",
     "list_domain": "Zerrenden posta-domeinua",
-    "list_domain_helper": "Zerrendek nirezerrenda@<domeinua> bezalako helbideak erabiltzen dituzte. Domeinuak posta-zerbitzarian egon behar du",
+    "list_domain_helper": "Zerrendek nirezerrenda@<domeinua> bezalako helbideak erabiltzen dituzte. Aukeratutako posta-zerbitzariaren domeinuak",
     "listmasters": "Listmaster-ak",
     "listmasters_placeholder": "admin@example.org",
     "listmasters_helper": "Sympa administratzaileen helbide elektronikoak, bat lerro bakoitzeko",
@@ -58,7 +58,9 @@
     "robot_addresses": "Sympa helbideak, behin bakarrik",
     "list_name": "Zerrendaren izena",
     "list_name_helper": "Idatzi zerrenda baten izena bere helbideak lortzeko",
-    "list_addresses": "{list} zerrendaren helbideak"
+    "list_addresses": "{list} zerrendaren helbideak",
+    "choose_list_domain": "Aukeratu domeinu bat",
+    "list_domain_not_in_mail_server": "Domeinua ez dago aukeratutako posta-zerbitzarian"
   },
   "common": {
     "required": "Derrigorrezkoa",

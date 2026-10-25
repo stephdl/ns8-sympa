@@ -39,7 +39,7 @@
     "choose_mail_server": "Choisir un serveur de messagerie",
     "mail_server_helper": "Il reçoit le courrier des listes depuis Internet et le transmet à Sympa",
     "list_domain": "Domaine de messagerie des listes",
-    "list_domain_helper": "Les listes utilisent des adresses comme maliste@<domaine>. Le domaine doit exister dans le serveur de messagerie",
+    "list_domain_helper": "Les listes utilisent des adresses comme maliste@<domaine>. Domaines du serveur de messagerie choisi",
     "listmasters": "Listmasters",
     "listmasters_placeholder": "admin@example.org",
     "listmasters_helper": "Adresses email des administrateurs Sympa, une par ligne",
@@ -70,7 +70,9 @@
     "robot_addresses": "Adresses de Sympa, une seule fois",
     "list_name": "Nom de la liste",
     "list_name_helper": "Saisissez le nom d'une liste pour obtenir ses adresses",
-    "list_addresses": "Adresses de la liste {list}"
+    "list_addresses": "Adresses de la liste {list}",
+    "choose_list_domain": "Choisir un domaine",
+    "list_domain_not_in_mail_server": "Le domaine n'existe pas dans le serveur de messagerie choisi"
   },
   "about": {
     "title": "À propos"

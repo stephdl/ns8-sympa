@@ -27,7 +27,7 @@
     "choose_mail_server": "Elige un servidor de correo",
     "mail_server_helper": "Recibe el correo de las listas desde Internet y lo reenvía a Sympa",
     "list_domain": "Dominio de correo de las listas",
-    "list_domain_helper": "Las listas usan direcciones como milista@<dominio>. El dominio debe existir en el servidor de correo",
+    "list_domain_helper": "Las listas usan direcciones como milista@<dominio>. Dominios del servidor de correo elegido",
     "listmasters": "Listmasters",
     "listmasters_placeholder": "admin@example.org",
     "listmasters_helper": "Direcciones de correo de los administradores de Sympa, una por línea",
@@ -58,7 +58,9 @@
     "robot_addresses": "Direcciones de Sympa, una sola vez",
     "list_name": "Nombre de la lista",
     "list_name_helper": "Escribe el nombre de una lista para obtener sus direcciones",
-    "list_addresses": "Direcciones de la lista {list}"
+    "list_addresses": "Direcciones de la lista {list}",
+    "choose_list_domain": "Elige un dominio",
+    "list_domain_not_in_mail_server": "El dominio no existe en el servidor de correo elegido"
   },
   "common": {
     "required": "Obligatorio",

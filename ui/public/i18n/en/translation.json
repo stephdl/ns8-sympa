@@ -39,7 +39,7 @@
     "choose_mail_server": "Choose a mail server",
     "mail_server_helper": "It receives the list mail from the Internet and forwards it to Sympa",
     "list_domain": "List mail domain",
-    "list_domain_helper": "Lists use addresses like mylist@<domain>. The domain must exist in the mail server",
+    "list_domain_helper": "Lists use addresses like mylist@<domain>. Domains of the selected mail server",
     "listmasters": "Listmasters",
     "listmasters_placeholder": "admin@example.org",
     "listmasters_helper": "Email addresses of the Sympa administrators, one per line",
@@ -70,7 +70,9 @@
     "robot_addresses": "Sympa addresses, once",
     "list_name": "List name",
     "list_name_helper": "Type the name of a list to get its addresses",
-    "list_addresses": "Addresses of the list {list}"
+    "list_addresses": "Addresses of the list {list}",
+    "choose_list_domain": "Choose a domain",
+    "list_domain_not_in_mail_server": "The domain does not exist in the selected mail server"
   },
   "about": {
     "title": "About"

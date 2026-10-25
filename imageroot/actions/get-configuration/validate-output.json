@@ -20,7 +20,8 @@
                     "module_id": "mail1",
                     "ui_name": "",
                     "node": "1",
-                    "internal_domain": "example.org"
+                    "internal_domain": "example.org",
+                    "domains": ["example.org"]
                 }
             ],
             "user_domains": ["example.org"],

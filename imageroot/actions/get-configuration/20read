@@ -13,14 +13,38 @@ from agent.ldapproxy import Ldapproxy
 
 rdb = agent.redis_connect(use_replica=True)
 
+
+
+def list_mail_domains(module_id, internal):
+    """Domains of the mail module that can receive list mail"""
+    try:
+        result = agent.tasks.run(f"module/{module_id}", action='list-domains', data={})
+    except Exception as ex:
+        print(agent.SD_WARNING + f"Cannot list the domains of {module_id}: {ex}", file=sys.stderr)
+        return []
+    if result['exit_code'] != 0:
+        print(agent.SD_WARNING + f"Cannot list the domains of {module_id}", file=sys.stderr)
+        return []
+    domains = []
+    for record in result['output']:
+        domain = record['domain'].lower()
+        # The mail module rejects its internal domain and every subdomain of it
+        if domain == '*' or (internal and (domain == internal or domain.endswith('.' + internal))):
+            continue
+        domains.append(domain)
+    return sorted(domains)
+
+
 mail_servers = []
 for provider in agent.list_service_providers(rdb, 'imap', 'tcp'):
+    internal = provider.get("user_domain", "").lower()
     mail_servers.append({
         "uuid": provider["module_uuid"],
         "module_id": provider["module_id"],
         "ui_name": provider.get("ui_name") or "",
         "node": provider["node"],
-        "internal_domain": provider.get("user_domain", ""),
+        "internal_domain": internal,
+        "domains": list_mail_domains(provider["module_id"], internal),
     })
 
 route = agent.get_route(os.environ['MODULE_ID']) or {}
