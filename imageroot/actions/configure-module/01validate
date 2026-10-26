@@ -10,6 +10,7 @@ import sys
 import json
 import agent
 import sympa_mail
+import sympa_lists
 from agent.ldapproxy import Ldapproxy
 
 # Validation step, no task progress at all
@@ -57,6 +58,13 @@ else:
         agent.assert_exp(result['exit_code'] == 0, "Cannot list the domains of the mail server")
         if list_domain not in [record['domain'].lower() for record in result['output']]:
             fail('list_domain', data["list_domain"], 'list_domain_not_in_mail_server')
+
+# The lists and their subscribers are stored under the list domain: changing it hides them
+if os.environ.get("LIST_DOMAIN") and sympa_lists.count_lists():
+    if data["list_domain"].lower() != os.environ["LIST_DOMAIN"].lower():
+        fail('list_domain', data["list_domain"], 'list_domain_locked')
+    if data["mail_server"] != os.environ.get("MAIL_SERVER"):
+        fail('mail_server', data["mail_server"], 'mail_server_locked')
 
 user_domain = data.get("user_domain", "")
 if user_domain and user_domain not in Ldapproxy().get_domains_list():

@@ -58,6 +58,11 @@ another application, the mail server and the user domain must exist, and
 the list domain must be a domain of the mail server not used by another
 Sympa instance.
 
+Once the instance has lists, the list domain and the mail server cannot
+change. Sympa stores the lists and their subscribers under the list
+domain: with another domain they would disappear. To serve another
+domain, install another instance.
+
 ## How mail flows
 
 ```

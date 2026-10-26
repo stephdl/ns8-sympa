@@ -51,6 +51,16 @@ def _list_subjects():
     return subjects
 
 
+def count_lists():
+    """Lists on the sympa-data volume, readable while the pod is stopped"""
+    proc = _podman("volume", "inspect", "sympa-data", "--format", "{{.Mountpoint}}")
+    if proc.returncode != 0:
+        return 0
+    path = os.path.join(proc.stdout.strip(), "list_data")
+    return sum(os.path.isfile(os.path.join(path, name, "config")) for name in os.listdir(path)) \
+        if os.path.isdir(path) else 0
+
+
 def get_lists(domain):
     """Lists of the robot, with subject, status and subscribers"""
     lists = []
