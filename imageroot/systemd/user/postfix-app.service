@@ -8,6 +8,7 @@ Environment=PODMAN_SYSTEMD_UNIT=%n
 EnvironmentFile=%S/state/environment
 WorkingDirectory=%S/state
 Restart=always
+RestartSec=5
 TimeoutStopSec=70
 ExecStartPre=/bin/rm -f %t/postfix-app.pid %t/postfix-app.ctr-id
 ExecStart=/usr/bin/podman run --conmon-pidfile %t/postfix-app.pid \
