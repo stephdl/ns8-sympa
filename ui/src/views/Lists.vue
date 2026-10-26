@@ -591,7 +591,7 @@ export default {
         name: "",
         subject: "",
         type: "",
-        owners: this.listmasters.length ? this.listmasters[0] : "",
+        owners: this.listmasters.join("\n"),
         description: "",
       };
       this.typeKey++;
