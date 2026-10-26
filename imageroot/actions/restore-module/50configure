@@ -22,10 +22,8 @@ def warn(message):
 
 
 def start_without_configuration(reason):
-    """Leave the instance unconfigured: the admin finishes in Settings"""
+    """Start the lists without web route and relay rule: the admin finishes in Settings"""
     warn(reason + ", open Settings to complete the configuration")
-    # The list domain may still belong to the original instance and would block its Settings
-    agent.unset_env("LIST_DOMAIN")
     sympa_mail.set_smtp_endpoint(agent.redis_connect(use_replica=True))
     subprocess.run(["systemctl", "--user", "enable", "--now", "sympa.service"], check=True)
     sys.exit(0)

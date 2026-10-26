@@ -226,12 +226,22 @@ The backup contains a dump of the database, the secrets and the
   and its addresses must be declared again from the Lists page.
 - Restore that cannot be configured: when the host name is used by another
   application, when the mail server of the backup does not exist on the
-  cluster, or when it lacks the list domain, the instance is not
-  configured and logs a warning. It does not start until a host name and
-  a list domain are saved in Settings. The restored lists are kept.
+  cluster, when it lacks the list domain, or when another Sympa instance
+  already uses the list domain, the instance starts without web route and
+  without relay rule, and logs a warning. Complete the configuration in
+  Settings.
 - Clone: the copy gets its own inbound domain and port, no web route and
-  no relay rule. Its Sympa addresses must be created from the Lists page. The source keeps working. Set a new host name in
-  Settings to use the copy.
+  no relay rule. The source keeps working.
+
+A copy, made by a clone or by a restore next to the original instance,
+keeps the host name and the list domain of the original. It can be used
+only once the original is gone:
+
+1. In the original instance, open Settings and click "Remove all mail
+   addresses".
+2. Remove the original instance.
+3. In the copy, open Settings and save.
+4. In the copy, open the Lists page and create the missing addresses.
 - Move: the new instance takes over the web route, the inbound domain and
   the relay rule of the source. Let's Encrypt is disabled, because the new
   node may not answer on ports 80 and 443 yet: enable it again in Settings.

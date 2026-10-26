@@ -8,6 +8,7 @@
 import os
 import sys
 import json
+import subprocess
 import agent
 import sympa_mail
 
@@ -20,11 +21,8 @@ sympa_mail.set_smtp_endpoint(agent.redis_connect(use_replica=True))
 if not request.get("replace"):
     # A copy must not take over the relay rule of the source: give it its own inbound domain
     agent.set_env("INBOUND_DOMAIN", os.environ["MODULE_ID"] + ".invalid")
-    # Host and list domain still belong to the source: keeping them would block its Settings
-    agent.unset_env("TRAEFIK_HOST")
-    agent.unset_env("LIST_DOMAIN")
-    agent.unset_env("RELAY_MAIL_SERVER")
-    print(agent.SD_WARNING + "Cloned instance is not configured, set a new host name and list domain in Settings", file=sys.stderr)
+    subprocess.run(["systemctl", "--user", "try-restart", "sympa.service"], check=True)
+    print(agent.SD_WARNING + "Cloned instance has no web route and no mail relay: remove the source instance, then save Settings", file=sys.stderr)
     sys.exit(0)
 
 # A move: the new instance takes over the route and the relay rule of the source.
