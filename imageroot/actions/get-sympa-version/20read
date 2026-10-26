@@ -1,0 +1,22 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2026 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+import os
+import sys
+import json
+import subprocess
+import agent
+
+# The label is set at build time, so this works even when the containers are stopped
+proc = subprocess.run(
+    ["podman", "image", "inspect", "--format", '{{index .Labels "org.nethserver.sympa-version"}}', os.environ["SYMPA_APP_IMAGE"]],
+    capture_output=True, text=True,
+)
+if proc.returncode != 0:
+    print(agent.SD_WARNING + f"Cannot inspect the Sympa image: {proc.stderr.strip()}", file=sys.stderr)
+version = proc.stdout.strip() if proc.returncode == 0 else ""
+json.dump({"version": version}, fp=sys.stdout)

@@ -83,6 +83,7 @@
   "action": {
     "get-status": "Get status",
     "get-configuration": "Get configuration",
+    "get-sympa-version": "Get Sympa version",
     "configure-module": "Configure module",
     "get-module-info": "Get module info",
     "get-name": "Get name",

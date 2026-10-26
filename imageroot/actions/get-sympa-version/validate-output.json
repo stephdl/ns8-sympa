@@ -1,0 +1,20 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Get Sympa version",
+    "$id": "http://nethserver.org/json-schema/task/output/sympa/get-sympa-version",
+    "description": "Sympa package version installed in the application image, empty if unknown",
+    "examples": [
+        {
+            "version": "6.2.80-1.el9"
+        }
+    ],
+    "type": "object",
+    "required": [
+        "version"
+    ],
+    "properties": {
+        "version": {
+            "type": "string"
+        }
+    }
+}

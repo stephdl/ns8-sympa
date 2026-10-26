@@ -70,7 +70,10 @@
                   class="version-skeleton"
                 ></cv-skeleton-text>
                 <span v-else>
-                  {{ version }}
+                  {{ version
+                  }}<template v-if="sympaVersion">
+                    (Sympa {{ sympaVersion }})</template
+                  >
                 </span>
               </span>
             </div>
@@ -183,6 +186,7 @@ export default {
       urlCheckInterval: null,
       app: null,
       version: "",
+      sympaVersion: "",
       error: {
         moduleInfo: "",
         version: "",
@@ -201,6 +205,7 @@ export default {
 
     // needed to retrieve module version
     this.listInstalledModules();
+    this.getSympaVersion();
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
@@ -276,6 +281,32 @@ export default {
       const app = apps.find((el) => el.id == this.instanceName);
       this.version = app.version;
       this.loading.version = false;
+    },
+    async getSympaVersion() {
+      const taskAction = "get-sympa-version";
+      const eventId = this.getUuid();
+
+      // The Sympa version is optional, so a failure only hides it
+      this.core.$root.$once(
+        `${taskAction}-completed-${eventId}`,
+        (taskContext, taskResult) => {
+          this.sympaVersion = taskResult.output.version;
+        }
+      );
+
+      const res = await to(
+        this.createModuleTaskForApp(this.instanceName, {
+          action: taskAction,
+          extra: {
+            title: this.$t("action." + taskAction),
+            isNotificationHidden: true,
+            eventId,
+          },
+        })
+      );
+      if (res[0]) {
+        console.error(`error creating task ${taskAction}`, res[0]);
+      }
     },
   },
 };
