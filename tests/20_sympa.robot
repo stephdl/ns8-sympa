@@ -218,7 +218,7 @@ Check if a bounce to the robot is not sent to the listmaster
     # A listmaster address that bounces would otherwise loop forever
     ${since} =    Execute Command    date "+%F %T"
     ${out}  ${err}  ${rc} =    Execute Command
-    ...    curl -s --mail-from "" --mail-rcpt ${robot_address.replace('@', '-request@', 1)} -T /dev/null smtp://127.0.0.1:25/example.com
+    ...    curl -s --mail-from "<>" --mail-rcpt ${robot_address.replace('@', '-request@', 1)} -T /dev/null smtp://127.0.0.1:25/example.com
     ...    return_rc=True  return_stderr=True
     Should Be Equal As Integers    ${rc}  0    ${err}
     Wait Until Keyword Succeeds    30 times    5 seconds    Bounce is dropped    ${since}
