@@ -57,8 +57,11 @@ def count_lists():
     if proc.returncode != 0:
         return 0
     path = os.path.join(proc.stdout.strip(), "list_data")
-    return sum(os.path.isfile(os.path.join(path, name, "config")) for name in os.listdir(path)) \
-        if os.path.isdir(path) else 0
+    if not os.path.isdir(path):
+        return 0
+    # List folders belong to the container sympa user: the module can see them, not read them
+    with os.scandir(path) as entries:
+        return sum(entry.is_dir() for entry in entries)
 
 
 def get_lists(domain):
