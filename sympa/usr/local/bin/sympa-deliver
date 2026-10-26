@@ -12,6 +12,8 @@
 #
 
 local_part="${1,,}"
+# Empty for a bounce: the null sender
+sender="${2}"
 domain=$(sed -n 's/^domain[[:space:]]\+//p' /etc/sympa/sympa.conf)
 # Robot addresses start with the instance prefix, see SYMPA_ROBOT_PREFIX
 robot=$(sed -n 's/^email[[:space:]]\+//p' /etc/sympa/sympa.conf)
@@ -26,6 +28,11 @@ case "${local_part}" in
     exec /usr/libexec/sympa/queue "${local_part}@${domain}"
     ;;
 "${robot}-request"|"${robot}-owner")
+    # Sympa sends with these as envelope sender: forwarding their bounces to a
+    # listmaster that bounces too would loop forever
+    if [[ -z "${sender}" ]]; then
+        exec /usr/libexec/sympa/bouncequeue "${robot}@${domain}"
+    fi
     exec /usr/libexec/sympa/queue "${robot}-listmaster@${domain}"
     ;;
 *-owner)

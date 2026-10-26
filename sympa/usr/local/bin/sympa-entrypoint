@@ -139,7 +139,7 @@ render_postfix() {
         postconf -X default_transport
     fi
 
-    postconf -M -e "sympadeliver/unix=sympadeliver unix - n n - - pipe flags=hqRu null_sender= user=sympa argv=/usr/local/bin/sympa-deliver \${user}"
+    postconf -M -e "sympadeliver/unix=sympadeliver unix - n n - - pipe flags=hqRu null_sender= user=sympa argv=/usr/local/bin/sympa-deliver \${user} \${sender}"
     postconf -M -e "postlog/unix-dgram=postlog unix-dgram n - n - 1 postlogd"
     touch /etc/postfix/sasl_passwd
 }
