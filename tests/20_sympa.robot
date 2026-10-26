@@ -23,6 +23,14 @@ Web interface answers
     Should Be Equal As Integers    ${rc}  0
     Should Contain    ${out}    Sympa
 
+SMTP service answers
+    # Postfix listens on the node VPN address only, read it from the socket
+    ${out}  ${rc} =    Execute Command
+    ...    runagent -m ${module_id} bash -c 'addr=$(ss -Hltn "sport = :$SMTP_PORT" | head -1 | tr -s " " | cut -d" " -f4); exec 3<>/dev/tcp/\${addr%:*}/$SMTP_PORT && timeout 5 head -c3 <&3'
+    ...    return_rc=True
+    Should Be Equal As Integers    ${rc}  0
+    Should Be Equal    ${out}    220
+
 List has subscribers
     [Arguments]    ${count}
     ${response} =    Run task    module/${module_id}/list-lists    {}
@@ -66,6 +74,7 @@ Check if sympa can be configured
 
 Check if sympa services are running
     Wait Until Keyword Succeeds    30 times    5 seconds    Services are active
+    Wait Until Keyword Succeeds    30 times    5 seconds    SMTP service answers
 
 Check if the web interface answers
     Wait Until Keyword Succeeds    30 times    5 seconds    Web interface answers
@@ -108,6 +117,7 @@ Check if the configuration survives the update
 Check if the services run after the update
     Wait Until Keyword Succeeds    30 times    5 seconds    Services are active
     Wait Until Keyword Succeeds    30 times    5 seconds    Web interface answers
+    Wait Until Keyword Succeeds    30 times    5 seconds    SMTP service answers
 
 Check if the list and its subscriber survive the update
     Wait Until Keyword Succeeds    30 times    5 seconds    List has subscribers    1
