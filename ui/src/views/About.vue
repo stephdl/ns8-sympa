@@ -70,7 +70,10 @@
                   class="version-skeleton"
                 ></cv-skeleton-text>
                 <span v-else>
-                  {{ version }}
+                  {{ version
+                  }}<template v-if="sympaVersion">
+                    (Sympa {{ sympaVersion }})</template
+                  >
                 </span>
               </span>
             </div>
@@ -183,6 +186,7 @@ export default {
       urlCheckInterval: null,
       app: null,
       version: "",
+      sympaVersion: process.env.VUE_APP_SYMPA_VERSION,
       error: {
         moduleInfo: "",
         version: "",

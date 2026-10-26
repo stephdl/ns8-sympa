@@ -11,6 +11,9 @@ set -e
 # Third-party images pulled at runtime, pinned for Renovate
 postgres_image="docker.io/postgres:18.6-alpine"
 
+# Shown on the About page, kept in the Containerfile where Renovate bumps it
+sympa_version=$(sed -n 's/^ARG SYMPA_VERSION=//p' sympa/Containerfile)
+
 # Prepare variables for later use
 images=()
 # The image will be pushed to GitHub container registry
@@ -37,6 +40,7 @@ echo "Build static UI files with node..."
 buildah run \
     --workingdir=/usr/src/ui \
     --env="NODE_OPTIONS=--openssl-legacy-provider" \
+    --env="VUE_APP_SYMPA_VERSION=${sympa_version}" \
     nodebuilder-sympa \
     sh -c "corepack enable && yarn install && yarn build"
 
