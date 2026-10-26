@@ -2,5 +2,43 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "local>NethServer/.github:ns8-automerge"
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Bump Containerfile *_VERSION args annotated with a `# renovate:` comment",
+      "managerFilePatterns": [
+        "/(^|/)Containerfile$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-]+?) packageName=(?<packageName>\\S+) versioning=(?<versioning>\\S+)\\s*\\nARG \\w+_VERSION=(?<currentValue>\\S+)"
+      ]
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Repology has no release timestamps, and a Sympa upgrade migrates live data on start",
+      "matchDatasources": [
+        "repology"
+      ],
+      "matchPackageNames": [
+        "epel_9/sympa"
+      ],
+      "minimumReleaseAge": null,
+      "automerge": false
+    },
+    {
+      "description": "Rocky 10 requires x86-64-v3 CPUs, which older NS8 hosts may lack",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "docker.io/rockylinux/rockylinux"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "enabled": false
+    }
   ]
 }

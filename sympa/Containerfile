@@ -1,6 +1,8 @@
-FROM docker.io/rockylinux/rockylinux:9.8
+FROM docker.io/rockylinux/rockylinux:9.8.20260525.0
 
-ARG SYMPA_VERSION=6.2.80
+# EPEL drops older builds, so this must follow the version EPEL 9 ships
+# renovate: datasource=repology packageName=epel_9/sympa versioning=rpm
+ARG SYMPA_VERSION=6.2.80-1.el9
 
 # CRB provides some Perl modules required by the EPEL sympa package
 RUN dnf -y install epel-release dnf-plugins-core \
