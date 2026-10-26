@@ -8,6 +8,10 @@ not receive mail from the Internet by itself: the NS8 Mail application
 receives the list mail and forwards it to Sympa. Sympa sends mail through
 the cluster smarthost.
 
+One instance serves the lists of one mail domain only, like
+`mylist@example.org`. For lists on another domain, install another
+instance of the module. Two instances cannot share a domain.
+
 ## Mail addresses
 
 Sympa needs addresses in the Mail application. Without them, the Mail
@@ -123,9 +127,9 @@ Configure the instance from the UI, or with:
   lists the domains of the selected mail server. It can be a domain that
   already holds mailboxes. It must be a domain of the Mail application, and
   it cannot be the internal LDAP domain of the mail server or one of its
-  subdomains: the Mail application rejects them. One domain is served by
-  one Sympa instance only: Sympa runs one robot per domain. The UI marks
-  the domains used by another instance.
+  subdomains: the Mail application rejects them. An instance serves one
+  domain, and a domain is served by one instance only: Sympa runs one
+  robot per domain. The UI marks the domains used by another instance.
 - `listmasters`: email addresses of the Sympa administrators.
 - `mail_server`: UUID of the Mail application instance. Find it in
   `mail_servers` of `api-cli run module/sympa1/get-configuration`.
@@ -188,13 +192,14 @@ The backup contains a dump of the database, the secrets and the
   and its addresses must be declared again from the Lists page.
 - Restore that cannot be configured: when the host name is used by another
   application, when the mail server of the backup does not exist on the
-  cluster, or when it lacks the list domain, the instance starts without
+  cluster, when it lacks the list domain, or when another Sympa instance
+  already uses the list domain, the instance starts without
   web route and without relay rule, and logs a warning. Complete the
   configuration in Settings.
 - Clone: the copy gets its own inbound domain and port, no web route and
-  no relay rule. Its Sympa addresses must be created from the Lists page.
-  The source keeps working. Set a new host name in Settings to use the
-  copy.
+  no relay rule. The source keeps working. To use the copy, set a new host
+  name and another list domain in Settings: the source still serves its
+  domain. Then create the Sympa and list addresses from the Lists page.
 - Move: the new instance takes over the web route with its Let's Encrypt
   setting, the inbound domain and the relay rule of the source.
 
