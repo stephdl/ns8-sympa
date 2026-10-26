@@ -6,13 +6,21 @@ Suite Teardown    Restore the cluster smarthost
 
 *** Variables ***
 ${SCENARIO}    install
-# sympa is not in the default NS8 repository, so the update starts from the last published release
-${STABLE_IMAGE_URL}    ghcr.io/stephdl/sympa:1.0.0
 ${sympa_host}    sympa.domain.test
 ${list_name}     robotlist
 ${saved_smarthost}    ${NONE}
 
 *** Keywords ***
+Enable the stephdl forge
+    # The module is published there, not in the default NS8 repositories.
+    ${repos} =    Run task    cluster/list-repositories    {}
+    ${names} =    Evaluate    [r['name'] for r in $repos]
+    IF    'stephdl' in $names    RETURN
+    ${rc} =    Execute Command
+    ...    api-cli run add-repository --data '{"name":"stephdl","url":"https://forge.de-labrusse.fr/ns8/updates/","status":true}'
+    ...    return_rc=True  return_stdout=False
+    Should Be Equal As Integers    ${rc}  0
+
 Services are active
     ${rc} =    Execute Command
     ...    runagent -m ${module_id} systemctl --user is-active sympa.service postgresql-app.service sympa-app.service postfix-app.service wwsympa-app.service
@@ -116,7 +124,14 @@ Configuration is kept
 
 *** Test Cases ***
 Check if sympa is installed correctly
-    ${image} =    Set Variable If    '${SCENARIO}' == 'update'    ${STABLE_IMAGE_URL}    ${IMAGE_URL}
+    # The update scenario starts from the release published in the stephdl forge,
+    # then upgrades it to the image under test through update-module below.
+    IF    '${SCENARIO}' == 'update'
+        Enable the stephdl forge
+        ${image} =    Set Variable    sympa
+    ELSE
+        ${image} =    Set Variable    ${IMAGE_URL}
+    END
     ${output}  ${rc} =    Execute Command    add-module ${image} 1
     ...    return_rc=True
     Should Be Equal As Integers    ${rc}  0

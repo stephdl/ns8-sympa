@@ -264,9 +264,8 @@ checks list delivery to a mailbox, LDAP login on the web interface, the
 `smarthost-changed` and `user-domain-changed` events, reconfiguration
 and invalid input. The test changes the cluster smarthost and restores
 it at the end. Set
-`SCENARIO` to `update` to start from the last release,
-`ghcr.io/stephdl/sympa:1.0.0`, and update it to the image under test. On a
+`SCENARIO` to `update` to install the release published in the stephdl
+repository, `https://forge.de-labrusse.fr/ns8/updates/`, and update it to
+the image under test. The test adds this repository to the cluster. On a
 node that already has a Mail application, set `MAIL_MODULE` to its module
 ID and the suite reuses it.
-
-Update `STABLE_IMAGE_URL` in `tests/20_sympa.robot` after each release.
