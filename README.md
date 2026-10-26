@@ -145,6 +145,11 @@ Sympa instance.
 Then open the Lists page: it creates the Sympa addresses, and the lists
 with their addresses. See [Mail addresses](#mail-addresses).
 
+Once the instance has lists, the list domain and the mail server cannot
+change. Sympa stores the lists and their subscribers under the list
+domain: with another domain they would disappear. To serve another
+domain, install another instance.
+
 ## Lists
 
 The Lists page shows the lists of the instance with their subject, status,
@@ -209,11 +214,20 @@ The backup contains a dump of the database, the secrets and the
   web route and without relay rule, and logs a warning. Complete the
   configuration in Settings.
 - Clone: the copy gets its own inbound domain and port, no web route and
-  no relay rule. The source keeps working. To use the copy, set a new host
-  name and another list domain in Settings: the source still serves its
-  domain. Then create the Sympa and list addresses from the Lists page.
-- Move: the new instance takes over the web route with its Let's Encrypt
-  setting, the inbound domain and the relay rule of the source.
+  no relay rule. The source keeps working.
+- Move: the new instance takes over the web route, the inbound domain and
+  the relay rule of the source. Let's Encrypt is disabled, because the new
+  node may not answer on ports 80 and 443 yet: enable it again in Settings.
+
+A copy, made by a clone or by a restore next to the original instance,
+keeps the host name and the list domain of the original. It can be used
+only once the original is gone:
+
+1. In the original instance, open Settings and click "Remove all mail
+   addresses".
+2. Remove the original instance.
+3. In the copy, open Settings and save.
+4. In the copy, open the Lists page and create the missing addresses.
 
 ## Uninstall
 

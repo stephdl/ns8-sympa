@@ -34,7 +34,8 @@
             "smarthost_enabled": true,
             "domains_in_use": {
                 "example.com": "sympa2"
-            }
+            },
+            "lists_count": 0
         }
     ],
     "type": "object",
@@ -99,6 +100,10 @@
                 "type": "string"
             },
             "description": "List domains served by other Sympa instances, with their module ID"
+        },
+        "lists_count": {
+            "type": "integer",
+            "description": "Number of lists; the list domain and the mail server cannot change while it is not zero"
         }
     }
 }

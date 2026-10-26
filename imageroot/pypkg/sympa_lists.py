@@ -51,6 +51,19 @@ def _list_subjects():
     return subjects
 
 
+def count_lists():
+    """Lists on the sympa-data volume, readable while the pod is stopped"""
+    proc = _podman("volume", "inspect", "sympa-data", "--format", "{{.Mountpoint}}")
+    if proc.returncode != 0:
+        return 0
+    path = os.path.join(proc.stdout.strip(), "list_data")
+    if not os.path.isdir(path):
+        return 0
+    # List folders belong to the container sympa user: the module can see them, not read them
+    with os.scandir(path) as entries:
+        return sum(entry.is_dir() for entry in entries)
+
+
 def get_lists(domain):
     """Lists of the robot, with subject, status and subscribers"""
     lists = []

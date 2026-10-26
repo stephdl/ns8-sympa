@@ -10,6 +10,7 @@ import sys
 import json
 import agent
 import sympa_mail
+import sympa_lists
 from agent.ldapproxy import Ldapproxy
 
 rdb = agent.redis_connect(use_replica=True)
@@ -67,5 +68,6 @@ config = {
     "smarthost_enabled": bool(smarthost["enabled"] and smarthost["host"]),
     # Domains already served by another Sympa instance, with its module ID
     "domains_in_use": sympa_mail.list_domains_in_use(rdb),
+    "lists_count": sympa_lists.count_lists(),
 }
 json.dump(config, fp=sys.stdout)

@@ -124,7 +124,7 @@
               :autoHighlight="true"
               :invalid-message="$t(error.mail_server)"
               :helper-text="$t('settings.mail_server_helper')"
-              :disabled="stillLoading"
+              :disabled="stillLoading || domainLocked"
               class="mg-bottom maxwidth"
               ref="mail_server"
             />
@@ -138,10 +138,24 @@
               :autoHighlight="true"
               :invalid-message="$t(error.list_domain)"
               :helper-text="$t('settings.list_domain_helper')"
-              :disabled="stillLoading || !mailServer"
+              :disabled="stillLoading || !mailServer || domainLocked"
               class="mg-bottom maxwidth"
               ref="list_domain"
             />
+            <cv-row v-if="domainLocked">
+              <cv-column>
+                <NsInlineNotification
+                  kind="info"
+                  :title="$t('settings.domain_locked')"
+                  :description="
+                    $t('settings.domain_locked_description', {
+                      count: listsCount,
+                    })
+                  "
+                  :showCloseButton="false"
+                />
+              </cv-column>
+            </cv-row>
             <cv-row v-if="listDomainUsedBy">
               <cv-column>
                 <NsInlineNotification
@@ -395,6 +409,7 @@ export default {
       userDomains: [],
       smarthostEnabled: true,
       domainsInUse: {},
+      listsCount: 0,
       // Saved mail server and list domain, to move the addresses after a change
       saved: { mailModule: "", listDomain: "", inbound: "" },
       moveError: "",
@@ -466,6 +481,10 @@ export default {
           : domain;
         return { name: domain, label, value: domain };
       });
+    },
+    // Lists and subscribers are stored under the list domain: it cannot change once lists exist
+    domainLocked() {
+      return this.listsCount > 0 && !!this.saved.listDomain;
     },
     listDomainUsedBy() {
       return this.domainsInUse[this.listDomain] || "";
@@ -587,6 +606,7 @@ export default {
       this.userDomains = config.user_domains;
       this.smarthostEnabled = config.smarthost_enabled;
       this.domainsInUse = config.domains_in_use || {};
+      this.listsCount = config.lists_count || 0;
       const savedServer = config.mail_servers.find(
         (s) => s.uuid === config.mail_server
       );
