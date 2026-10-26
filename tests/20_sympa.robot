@@ -54,6 +54,12 @@ Subscribe by mail
     ...    return_rc=True  return_stderr=True
     Should Be Equal As Integers    ${rc}  0    ${err}
 
+Bounce is dropped
+    [Arguments]    ${since}
+    ${out} =    Execute Command
+    ...    journalctl _UID=$(id -u ${module_id}) --since "${since}" --no-pager -o cat | grep -c "sympa-deliver.*dropped"
+    Should Be True    ${out} > 0
+
 Pod start time
     ${out} =    Execute Command
     ...    runagent -m ${module_id} systemctl --user show sympa.service -p ActiveEnterTimestampMonotonic --value
@@ -207,6 +213,15 @@ Check if the list and its subscriber survive the update
 Check if mail still reaches sympa after the update
     Subscribe by mail    second@example.com
     Wait Until Keyword Succeeds    30 times    5 seconds    List has subscribers    2
+
+Check if a bounce to the robot is not sent to the listmaster
+    # A listmaster address that bounces would otherwise loop forever
+    ${since} =    Execute Command    date "+%F %T"
+    ${out}  ${err}  ${rc} =    Execute Command
+    ...    curl -s --mail-from "<>" --mail-rcpt ${robot_address.replace('@', '-request@', 1)} -T /dev/null smtp://127.0.0.1:25/example.com
+    ...    return_rc=True  return_stderr=True
+    Should Be Equal As Integers    ${rc}  0    ${err}
+    Wait Until Keyword Succeeds    30 times    5 seconds    Bounce is dropped    ${since}
 
 Check if an undeclared address is rejected
     ${out}  ${err}  ${rc} =    Execute Command

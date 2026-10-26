@@ -12,6 +12,8 @@
 #
 
 local_part="${1,,}"
+# Empty for a bounce: the null sender
+sender="${2}"
 domain=$(sed -n 's/^domain[[:space:]]\+//p' /etc/sympa/sympa.conf)
 # Robot addresses start with the instance prefix, see SYMPA_ROBOT_PREFIX
 robot=$(sed -n 's/^email[[:space:]]\+//p' /etc/sympa/sympa.conf)
@@ -26,6 +28,13 @@ case "${local_part}" in
     exec /usr/libexec/sympa/queue "${local_part}@${domain}"
     ;;
 "${robot}-request"|"${robot}-owner")
+    # Sympa sends its replies from -request. A bounce forwarded to a listmaster
+    # address that bounces too would loop forever, and the bounce queue would
+    # only quarantine it: drop it. Postfix adds this output to the delivery log line
+    if [[ -z "${sender}" || "${sender,,}" == mailer-daemon@* || "${sender,,}" == postmaster@* ]]; then
+        echo "sympa-deliver: bounce from <${sender}> dropped, check the listmaster addresses"
+        exit 0
+    fi
     exec /usr/libexec/sympa/queue "${robot}-listmaster@${domain}"
     ;;
 *-owner)
