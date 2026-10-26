@@ -226,9 +226,9 @@ The backup contains a dump of the database, the secrets and the
   and its addresses must be declared again from the Lists page.
 - Restore that cannot be configured: when the host name is used by another
   application, when the mail server of the backup does not exist on the
-  cluster, or when it lacks the list domain, the instance starts without
-  web route and without relay rule, and logs a warning. Complete the
-  configuration in Settings.
+  cluster, or when it lacks the list domain, the instance is not
+  configured and logs a warning. It does not start until a host name and
+  a list domain are saved in Settings. The restored lists are kept.
 - Clone: the copy gets its own inbound domain and port, no web route and
   no relay rule. Its Sympa addresses must be created from the Lists page. The source keeps working. Set a new host name in
   Settings to use the copy.
