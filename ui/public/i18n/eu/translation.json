@@ -119,6 +119,7 @@
   "lists": {
     "title": "Zerrendak",
     "create_list": "Sortu zerrenda",
+    "refresh": "Freskatu",
     "create": "Sortu",
     "no_lists": "Ez dago zerrendarik",
     "no_lists_description": "Sortu lehen zerrenda. Bere helbide elektronikoak ere sortzen dira.",

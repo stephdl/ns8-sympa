@@ -103,6 +103,15 @@
           class="mg-bottom"
           >{{ $t("lists.create_list") }}</NsButton
         >
+        <NsButton
+          kind="ghost"
+          :icon="Restart20"
+          :disabled="loading.listLists || !!busy"
+          :loading="loading.listLists"
+          @click="refresh"
+          class="mg-bottom mg-left"
+          >{{ $t("lists.refresh") }}</NsButton
+        >
       </cv-column>
     </cv-row>
     <cv-row v-if="configured">
@@ -721,5 +730,8 @@ export default {
 @import "../styles/carbon-utils";
 .mg-bottom {
   margin-bottom: $spacing-06;
+}
+.mg-left {
+  margin-left: $spacing-03;
 }
 </style>

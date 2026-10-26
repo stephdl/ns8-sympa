@@ -119,6 +119,7 @@
   "lists": {
     "title": "Lists",
     "create_list": "Create list",
+    "refresh": "Refresh",
     "create": "Create",
     "no_lists": "No lists",
     "no_lists_description": "Create the first list. Its mail addresses are created too.",

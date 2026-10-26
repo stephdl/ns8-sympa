@@ -119,6 +119,7 @@
   "lists": {
     "title": "Listas",
     "create_list": "Criar lista",
+    "refresh": "Atualizar",
     "create": "Criar",
     "no_lists": "Nenhuma lista",
     "no_lists_description": "Crie a primeira lista. Seus endereços de e-mail também são criados.",
