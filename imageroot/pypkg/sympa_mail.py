@@ -102,7 +102,7 @@ LIST_SUFFIXES = ["", "-request", "-editor", "-unsubscribe", "-owner"]
 
 
 def robot_prefix():
-    return os.environ["INBOUND_DOMAIN"].removesuffix(".invalid")
+    return os.environ.get("INBOUND_DOMAIN", "").removesuffix(".invalid")
 
 
 def robot_local_parts():
@@ -114,18 +114,28 @@ def list_local_parts(name):
     return [name + suffix for suffix in LIST_SUFFIXES]
 
 
-def inbound_domain_owner(rdb, inbound):
-    """Module ID of another Sympa instance with this inbound domain, or None.
+def _other_instances(rdb):
+    """Environment of the other Sympa instances, as (module_id, env).
 
-    Two instances with the same inbound domain would share one relay rule,
-    and the mail of one would go to the other. The source of a move has our
+    INBOUND_DOMAIN marks a Sympa instance. The source of a move has our
     UUID and is not another instance.
     """
     for module_id in rdb.hkeys('cluster/module_node'):
         if module_id == os.environ['MODULE_ID']:
             continue
-        other, uuid = rdb.hmget(f'module/{module_id}/environment', 'INBOUND_DOMAIN', 'MODULE_UUID')
-        if other and other.lower() == inbound.lower() and uuid != os.environ['MODULE_UUID']:
+        env = rdb.hgetall(f'module/{module_id}/environment')
+        if env.get('INBOUND_DOMAIN') and env.get('MODULE_UUID') != os.environ['MODULE_UUID']:
+            yield module_id, env
+
+
+def inbound_domain_owner(rdb, inbound):
+    """Module ID of another Sympa instance with this inbound domain, or None.
+
+    Two instances with the same inbound domain would share one relay rule,
+    and the mail of one would go to the other.
+    """
+    for module_id, env in _other_instances(rdb):
+        if env['INBOUND_DOMAIN'].lower() == inbound.lower():
             return module_id
     return None
 
@@ -141,15 +151,8 @@ def free_inbound_domain(rdb):
 def list_domains_in_use(rdb):
     """List domains of the other Sympa instances: {domain: module_id}.
 
-    Sympa runs one robot per domain, and the robot addresses (sympa@,
-    listmaster@...) exist once per domain in the mail module.
+    Sympa runs one robot per domain, and two instances on one domain would
+    fight over the same list addresses in the mail module.
     """
-    in_use = {}
-    for module_id in rdb.hkeys('cluster/module_node'):
-        if module_id == os.environ['MODULE_ID']:
-            continue
-        domain, inbound, uuid = rdb.hmget(f'module/{module_id}/environment', 'LIST_DOMAIN', 'INBOUND_DOMAIN', 'MODULE_UUID')
-        # INBOUND_DOMAIN marks a Sympa instance. The source of a move has our UUID.
-        if domain and inbound and uuid != os.environ['MODULE_UUID']:
-            in_use[domain.lower()] = module_id
-    return in_use
+    return {env['LIST_DOMAIN'].lower(): module_id
+            for module_id, env in _other_instances(rdb) if env.get('LIST_DOMAIN')}

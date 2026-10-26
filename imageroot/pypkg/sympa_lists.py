@@ -8,7 +8,6 @@
 #
 
 import os
-import re
 import subprocess
 import tempfile
 from xml.sax.saxutils import escape
@@ -22,8 +21,6 @@ LIST_TYPES = [
     "confidential",
     "public_web_forum",
 ]
-
-NAME_RE = re.compile(r"^[a-z0-9][a-z0-9._-]*$")
 
 
 def _podman(*args, stdin=None):
@@ -42,17 +39,16 @@ def psql(query):
     return [line.split("\t") for line in proc.stdout.splitlines() if line]
 
 
-def _list_config_values(name, keys):
-    """Read some top level parameters of a list config file"""
-    proc = _podman("exec", "sympa-app", "cat", f"/var/lib/sympa/list_data/{name}/config")
-    values = {}
-    if proc.returncode != 0:
-        return values
+def _list_subjects():
+    """Subject of every list config, read with one exec: {name: subject}"""
+    proc = _podman("exec", "sympa-app", "sh", "-c",
+                   "grep -sH '^subject ' /var/lib/sympa/list_data/*/config")
+    subjects = {}
     for line in proc.stdout.splitlines():
-        key, _, value = line.partition(" ")
-        if key in keys and key not in values:
-            values[key] = value.strip()
-    return values
+        path, _, value = line.partition(":subject ")
+        name = path.removesuffix("/config").rsplit("/", 1)[-1]
+        subjects.setdefault(name, value.strip())
+    return subjects
 
 
 def get_lists(domain):
@@ -62,11 +58,11 @@ def get_lists(domain):
     rows = psql("SELECT l.name_list, l.status_list, COUNT(s.user_subscriber) FROM list_table l "
                 "LEFT JOIN subscriber_table s ON s.list_subscriber = l.name_list AND s.robot_subscriber = l.robot_list "
                 f"WHERE l.robot_list = '{domain}' GROUP BY l.name_list, l.status_list ORDER BY l.name_list")
+    subjects = _list_subjects() if rows else {}
     for name, status, total in rows:
-        config = _list_config_values(name, ("subject",))
         lists.append({
             "name": name,
-            "subject": config.get("subject", ""),
+            "subject": subjects.get(name, ""),
             "status": status,
             "subscribers": int(total or 0),
         })
