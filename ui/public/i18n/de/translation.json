@@ -78,6 +78,14 @@
     "processing": "Ausführung..."
   },
   "status": {
+    "search_volumes": "Volumes suchen",
+    "search_images": "Images suchen",
+    "restart_module_warning": "Möchten Sie {name} wirklich neu starten? Der Dienst ist während des Neustarts kurz nicht verfügbar.",
+    "restart_application": "Anwendung neu starten",
+    "go_to_node_details": "Zu den Knotendetails",
+    "failed_services": "Fehlgeschlagene Dienste",
+    "application": "Anwendung",
+    "all_services_running": "Alle Dienste laufen",
     "created": "erstellt",
     "size": "Größe",
     "name": "Name",
@@ -101,6 +109,7 @@
     "title": "Über"
   },
   "action": {
+    "restart-module": "Modul neu starten",
     "list-backup-repositories": "Liste der Datensicherungs-Speicherort",
     "get-module-info": "Informationen zum Modul abrufen",
     "list-installed-modules": "installierte Module auflisten",

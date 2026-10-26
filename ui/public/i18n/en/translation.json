@@ -5,6 +5,14 @@
     "processing": "Processing..."
   },
   "status": {
+    "search_volumes": "Search volumes",
+    "search_images": "Search images",
+    "restart_module_warning": "Are you sure you want to restart {name}? The service will be briefly unavailable during the restart.",
+    "restart_application": "Restart application",
+    "go_to_node_details": "Go to node details",
+    "failed_services": "Failed services",
+    "application": "Application",
+    "all_services_running": "All services are running",
     "title": "Status",
     "app_instance": "App instance",
     "services": "Service | Services",
@@ -91,6 +99,7 @@
     "cannot_create_task": "Cannot create task {action}"
   },
   "action": {
+    "restart-module": "Restart module",
     "get-status": "Get status",
     "get-configuration": "Get configuration",
     "configure-module": "Configure module",

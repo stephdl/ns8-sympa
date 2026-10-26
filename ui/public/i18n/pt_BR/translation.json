@@ -5,6 +5,14 @@
     "processing": "Procesando..."
   },
   "status": {
+    "search_volumes": "Procurar volumes",
+    "search_images": "Procurar imagens",
+    "restart_module_warning": "Tem a certeza de que quer reiniciar {name}? O serviço ficará indisponível durante alguns instantes.",
+    "restart_application": "Reiniciar a aplicação",
+    "go_to_node_details": "Ver os detalhes do nó",
+    "failed_services": "Serviços com falha",
+    "application": "Aplicação",
+    "all_services_running": "Todos os serviços estão em execução",
     "services": "Serviço | Serviços",
     "app_instance": "Instância do aplicativo",
     "title": "Status",
@@ -41,6 +49,7 @@
     "title": "Sobre"
   },
   "action": {
+    "restart-module": "Reiniciar o módulo",
     "list-backup-repositories": "List backup repositories",
     "list-backups": "List backups",
     "get-status": "Get status",
