@@ -24,7 +24,9 @@ templates=/usr/local/lib/sympa-templates
 # Write a file only through a rename, because the three containers share /etc/sympa
 install_file() {
     local dest="$1" mode="$2" owner="$3"
-    local tmp="${dest}.tmp.$$"
+    local tmp
+    # The containers of the pod share /etc/sympa and all run as PID 1, so $$ is not unique
+    tmp=$(mktemp "${dest}.XXXXXX")
     cat > "${tmp}"
     chmod "${mode}" "${tmp}"
     chown "${owner}" "${tmp}"
