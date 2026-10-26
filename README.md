@@ -172,6 +172,18 @@ a user without `mail` cannot log in. Hidden users of the user domain are
 excluded. Other people, for example external subscribers, use a Sympa
 account with a password.
 
+### First login of a listmaster
+
+A listmaster is an address of the `listmasters` setting. Sympa gives the
+admin rights to whoever logs in with that address.
+
+- With a user domain, the listmaster address must be the `mail`
+  attribute of an LDAP user. Log in with the LDAP user name and password.
+- Without a user domain, or for an address outside LDAP, click "First
+  login?" or "Lost password?" on the login page and enter the address.
+  Sympa sends a link by mail to set the password, so the smarthost must
+  work first.
+
 When the user domain does not exist, the module starts with LDAP login
 disabled and logs a warning. When Redis or the user domain cannot be read,
 for example at boot, the pod starts with the previous LDAP and smarthost
@@ -218,6 +230,37 @@ The relay rule is removed from the Mail application.
 
 Inside the pod, every service writes to the journal with the service name
 as identifier, for example `postfix-app` or `sympa-app`.
+
+## Troubleshooting
+
+A message sent to a list does not reach the subscribers. Check each step
+of the path, in this order:
+
+1. The addresses exist. The Lists page shows no red "Missing" tag and no
+   "Sympa addresses are missing" banner. If the Mail application rejects
+   the message, the sender gets a bounce for an unknown user.
+2. The relay rule exists. The Mail application relay rules show a
+   `recipient` rule for `sympa1.invalid`. Saving Settings again creates it.
+   From the command line:
+
+       api-cli run module/mail1/list-relay-rules
+
+3. The message reached the module:
+
+       journalctl _UID=$(id -u sympa1) SYSLOG_IDENTIFIER=postfix-app
+
+4. Outgoing mail is not stuck in the module queue. A full queue usually
+   means the cluster smarthost is missing or refuses the login:
+
+       runagent -m sympa1 podman exec postfix-app postqueue -p
+
+5. Sympa processed the message:
+
+       journalctl _UID=$(id -u sympa1) SYSLOG_IDENTIFIER=sympa-app
+
+A message held for moderation, or a sender who is not a subscriber of a
+private list, is normal Sympa behavior: check the list settings in the
+Sympa web interface.
 
 ## Internals
 
