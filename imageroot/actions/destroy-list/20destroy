@@ -17,9 +17,9 @@ import sympa_lists
 
 request = json.load(sys.stdin)
 name = request['name'].lower()
-domain = os.environ["LIST_DOMAIN"]
+domain = os.environ.get("LIST_DOMAIN", "")
 
-if not sympa_lists.list_exists(name, domain):
+if not domain or not sympa_lists.list_exists(name, domain):
     agent.set_status('validation-failed')
     json.dump([{'field': 'name', 'parameter': 'name', 'value': name, 'error': 'list_not_found'}], fp=sys.stdout)
     sys.exit(2)
