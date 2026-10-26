@@ -26,7 +26,7 @@ Web interface answers
 List has subscribers
     [Arguments]    ${count}
     ${response} =    Run task    module/${module_id}/list-lists    {}
-    ${list} =    Evaluate    [l for l in $response['lists'] if l['name'] == $list_name][0]
+    ${list} =    Evaluate    [l for l in $response['lists'] if l['name'] == '${list_name}'][0]
     Should Be Equal As Integers    ${list}[subscribers]    ${count}
 
 Subscribe by mail
@@ -55,7 +55,7 @@ Check if sympa is installed correctly
 Check if sympa configuration reads back
     ${config} =    Run task    module/${module_id}/get-configuration    {}
     Should Be Equal    ${config}[host]    ${EMPTY}
-    ${mail} =    Evaluate    [m for m in $config['mail_servers'] if m['module_id'] == $mail_id][0]
+    ${mail} =    Evaluate    [m for m in $config['mail_servers'] if m['module_id'] == '${mail_id}'][0]
     Set Global Variable    ${mail_uuid}    ${mail}[uuid]
     Set Global Variable    ${user_domain}    ${mail}[internal_domain]
 
@@ -80,7 +80,7 @@ Declare the mail addresses of sympa and of the list
     ${response} =    Run task    module/${module_id}/list-lists    {}
     ${config} =    Run task    module/${module_id}/get-configuration    {}
     ${inbound} =    Set Variable    ${config}[inbound_domain]
-    ${locals} =    Evaluate    $response['robot_addresses'] + [$list_name + s for s in $response['list_suffixes']]
+    ${locals} =    Evaluate    $response['robot_addresses'] + ['${list_name}' + s for s in $response['list_suffixes']]
     FOR    ${local}    IN    @{locals}
         Run task    module/${mail_id}/add-address
         ...    {"atype":"domain","domain":"${list_domain}","local":"${local}","destinations":[{"dtype":"external","name":"${local}@${inbound}"}]}
