@@ -13,9 +13,8 @@ ${saved_smarthost}    ${NONE}
 *** Keywords ***
 Enable the stephdl forge
     # The module is published there, not in the default NS8 repositories.
-    ${repos} =    Run task    cluster/list-repositories    {}
-    ${names} =    Evaluate    [r['name'] for r in $repos]
-    IF    'stephdl' in $names    RETURN
+    ${repos} =    Execute Command    api-cli run cluster/list-repositories
+    IF    '"name": "stephdl"' in $repos    RETURN
     ${rc} =    Execute Command
     ...    api-cli run add-repository --data '{"name":"stephdl","url":"https://forge.de-labrusse.fr/ns8/updates/","status":true}'
     ...    return_rc=True  return_stdout=False
