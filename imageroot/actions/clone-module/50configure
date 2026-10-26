@@ -21,8 +21,13 @@ sympa_mail.set_smtp_endpoint(agent.redis_connect(use_replica=True))
 if not request.get("replace"):
     # A copy must not take over the relay rule of the source: give it its own inbound domain
     agent.set_env("INBOUND_DOMAIN", os.environ["MODULE_ID"] + ".invalid")
-    subprocess.run(["systemctl", "--user", "try-restart", "sympa.service"], check=True)
-    print(agent.SD_WARNING + "Cloned instance has no web route and no mail relay, set a new host name in Settings", file=sys.stderr)
+    # Host and list domain still belong to the source: keeping them would block its Settings
+    agent.unset_env("TRAEFIK_HOST")
+    agent.unset_env("LIST_DOMAIN")
+    agent.unset_env("RELAY_MAIL_SERVER")
+    # Sympa cannot start without a list domain: configure-module starts it again
+    subprocess.run(["systemctl", "--user", "disable", "--now", "sympa.service"], check=True)
+    print(agent.SD_WARNING + "Cloned instance is not configured, set a new host name and list domain in Settings", file=sys.stderr)
     sys.exit(0)
 
 # A move: the new instance takes over the route and the relay rule of the source.
@@ -31,15 +36,10 @@ if not request.get("replace"):
 source_env = agent.read_envfile('environment.clone-module')
 agent.set_env("INBOUND_DOMAIN", source_env["INBOUND_DOMAIN"])
 
-rdb = agent.redis_connect(use_replica=True)
-source_route = {}
-for module_id, uuid in rdb.hgetall('cluster/module_uuid').items():
-    if uuid == os.environ['MODULE_UUID'] and module_id != os.environ['MODULE_ID']:
-        source_route = agent.get_route(module_id) or {}
-
 configure_retval = agent.tasks.run(agent_id=os.environ['AGENT_ID'], action='configure-module', data={
     "host": os.environ["TRAEFIK_HOST"],
-    "lets_encrypt": source_route.get('lets_encrypt', False),
+    # The new node may not answer on 80 and 443 yet: a failed certificate would fail the move
+    "lets_encrypt": False,
     "list_domain": os.environ["LIST_DOMAIN"],
     "listmasters": [addr for addr in os.environ["LISTMASTERS"].split(",") if addr],
     "mail_server": os.environ["MAIL_SERVER"],
@@ -47,3 +47,4 @@ configure_retval = agent.tasks.run(agent_id=os.environ['AGENT_ID'], action='conf
     "default_lang": os.environ.get("DEFAULT_LANG", "en-US"),
 })
 agent.assert_exp(configure_retval['exit_code'] == 0, "The configure-module subtask failed!")
+print(agent.SD_WARNING + "Let's Encrypt is disabled after a move, enable it again in Settings", file=sys.stderr)

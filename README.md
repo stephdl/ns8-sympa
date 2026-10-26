@@ -232,8 +232,9 @@ The backup contains a dump of the database, the secrets and the
 - Clone: the copy gets its own inbound domain and port, no web route and
   no relay rule. Its Sympa addresses must be created from the Lists page. The source keeps working. Set a new host name in
   Settings to use the copy.
-- Move: the new instance takes over the web route with its Let's Encrypt
-  setting, the inbound domain and the relay rule of the source.
+- Move: the new instance takes over the web route, the inbound domain and
+  the relay rule of the source. Let's Encrypt is disabled, because the new
+  node may not answer on ports 80 and 443 yet: enable it again in Settings.
 
 ## Uninstall
 
