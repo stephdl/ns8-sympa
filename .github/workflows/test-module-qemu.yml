@@ -36,8 +36,7 @@ jobs:
     uses: NethServer/ns8-github-actions/.github/workflows/test-module-qemu.yml@v1
     with:
       image_name: sympa
-      # update tested separately later, independent of this drop-in
-      # scenarios: '["install","update"]'
+      scenarios: '["install","update"]'
       ui_tests_strategy: ${{ github.event.inputs.ui_tests == 'true' && 'always' || 'on_renovate_ui_change' }}
       debug_shell: ${{ github.event.inputs.debug_shell == 'true' }}
       # vm_mem: 12288                 # guest memory, MiB

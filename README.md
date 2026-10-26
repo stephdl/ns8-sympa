@@ -257,3 +257,15 @@ Test the module using the `test-module.sh` script:
     ./test-module.sh <NODE_ADDR> ghcr.io/stephdl/sympa:latest
 
 The tests are made using [Robot Framework](https://robotframework.org/).
+
+The suite installs an OpenLDAP user domain and a Mail application, then
+configures Sympa, creates a list and subscribes to it by mail. It
+checks list delivery to a mailbox, LDAP login on the web interface, the
+`smarthost-changed` and `user-domain-changed` events, reconfiguration
+and invalid input. The test changes the cluster smarthost and restores
+it at the end. Set
+`SCENARIO` to `update` to install the release published in the stephdl
+repository, `https://forge.de-labrusse.fr/ns8/updates/`, and update it to
+the image under test. The test adds this repository to the cluster. On a
+node that already has a Mail application, set `MAIL_MODULE` to its module
+ID and the suite reuses it.
