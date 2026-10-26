@@ -7,7 +7,7 @@ Remove the mail addresses of sympa
     FOR    ${local}    IN    @{sympa_locals}
         Run task    module/${mail_id}/remove-address    {"atype":"domain","domain":"${list_domain}","local":"${local}"}
     END
-    Execute Command    rm -f /tmp/sympa-send-command.sh
+    Execute Command    rm -f /tmp/sympa-send-mail.sh
 
 Check if sympa is removed correctly
     ${rc} =    Execute Command    remove-module --no-preserve ${module_id}
@@ -20,6 +20,9 @@ Check if the relay rule is removed
 
 Remove the list domain
     Run task    module/${mail_id}/remove-domain    {"domain":"${list_domain}"}
+
+Remove the test user
+    Run task    module/${ldap_id}/remove-user    {"user":"${test_user}"}
 
 Remove the mail module and the user domain
     Skip If    not ${mail_installed}    ${mail_id} was already on the node

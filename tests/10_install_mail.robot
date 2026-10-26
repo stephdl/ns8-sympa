@@ -30,3 +30,14 @@ Add the list domain to the mail module
     Run task    module/${mail_id}/add-domain
     ...    {"domain":"${list_domain}","addusers":false,"addgroups":false,"addaliases":false,"catchall":null,"bccaddr":null,"description":"Sympa tests"}
     Set Global Variable    ${list_domain}
+
+Add a test user with a mailbox
+    ${config} =    Run task    module/${mail_id}/get-configuration    {}
+    ${domains} =    Run task    module/${mail_id}/list-domains    {}
+    ${mail_domain} =    Evaluate    [d['domain'] for d in $domains if d['addusers']][0]
+    Set Global Variable    ${ldap_id}    ${config['user_domain']['providers'][0]['id']}
+    Set Global Variable    ${test_user}    sympatester
+    Set Global Variable    ${test_password}    Nethesis,1234
+    Set Global Variable    ${test_mail}    sympatester@${mail_domain}
+    Run task    module/${ldap_id}/add-user
+    ...    {"user":"${test_user}","display_name":"Sympa Tester","password":"${test_password}","mail":"${test_mail}"}
