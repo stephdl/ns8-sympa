@@ -78,6 +78,14 @@
     "processing": "Prozesatzen..."
   },
   "status": {
+    "search_volumes": "Bilatu bolumenak",
+    "search_images": "Bilatu irudiak",
+    "restart_module_warning": "Ziur {name} berrabiarazi nahi duzula? Zerbitzua une batez ez da erabilgarri egongo.",
+    "restart_application": "Berrabiarazi aplikazioa",
+    "go_to_node_details": "Joan nodoaren xehetasunetara",
+    "failed_services": "Huts egin duten zerbitzuak",
+    "application": "Aplikazioa",
+    "all_services_running": "Zerbitzu guztiak martxan daude",
     "created": "Sortuta",
     "size": "Tamaina",
     "name": "Izena",
@@ -101,6 +109,7 @@
     "title": "Honi buruz"
   },
   "action": {
+    "restart-module": "Berrabiarazi modulua",
     "list-backup-repositories": "Babeskopien biltegiak ikusi",
     "get-module-info": "Moduluaren informazioa berreskuratu",
     "list-installed-modules": "Instalatutako moduluak ikusi",

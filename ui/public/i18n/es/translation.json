@@ -78,6 +78,14 @@
     "processing": "Procesando..."
   },
   "status": {
+    "search_volumes": "Buscar volúmenes",
+    "search_images": "Buscar imágenes",
+    "restart_module_warning": "¿Seguro que quiere reiniciar {name}? El servicio no estará disponible durante unos instantes.",
+    "restart_application": "Reiniciar la aplicación",
+    "go_to_node_details": "Ir a los detalles del nodo",
+    "failed_services": "Servicios con fallos",
+    "application": "Aplicación",
+    "all_services_running": "Todos los servicios funcionan",
     "created": "Creado",
     "size": "Tamaño",
     "name": "Nombre",
@@ -101,6 +109,7 @@
     "title": "Acerca de"
   },
   "action": {
+    "restart-module": "Reiniciar el módulo",
     "list-backup-repositories": "Mostrar repositorios de la copia de seguridad",
     "get-module-info": "Obtener información del módulo",
     "list-installed-modules": "Lista de módulos instalados",

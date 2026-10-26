@@ -5,6 +5,14 @@
     "processing": "Processing..."
   },
   "status": {
+    "search_volumes": "Rechercher des volumes",
+    "search_images": "Rechercher des images",
+    "restart_module_warning": "Voulez-vous vraiment redémarrer {name} ? Le service sera brièvement indisponible pendant le redémarrage.",
+    "restart_application": "Redémarrer l'application",
+    "go_to_node_details": "Voir les détails du nœud",
+    "failed_services": "Services en échec",
+    "application": "Application",
+    "all_services_running": "Tous les services fonctionnent",
     "title": "État",
     "app_instance": "App instance",
     "services": "Service | Services",
@@ -91,6 +99,7 @@
     "cannot_create_task": "Cannot create task {action}"
   },
   "action": {
+    "restart-module": "Redémarrer le module",
     "get-status": "Get status",
     "get-configuration": "Get configuration",
     "configure-module": "Configure module",

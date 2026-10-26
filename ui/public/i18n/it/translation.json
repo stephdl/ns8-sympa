@@ -5,6 +5,14 @@
     "work_in_progress": "In lavorazione"
   },
   "status": {
+    "search_volumes": "Cerca volumi",
+    "search_images": "Cerca immagini",
+    "restart_module_warning": "Vuoi davvero riavviare {name}? Il servizio non sarà disponibile per qualche istante durante il riavvio.",
+    "restart_application": "Riavvia l'applicazione",
+    "go_to_node_details": "Vai ai dettagli del nodo",
+    "failed_services": "Servizi in errore",
+    "application": "Applicazione",
+    "all_services_running": "Tutti i servizi sono attivi",
     "node": "Nodo",
     "services": "Servizio | Servizi",
     "no_volumes": "Nessun volume",
@@ -98,6 +106,7 @@
     "cannot_retrieve_configuration": "Cannot retrieve configuration"
   },
   "action": {
+    "restart-module": "Riavvia il modulo",
     "configure-module": "Configura modulo",
     "get-configuration": "Visualizza configurazione",
     "get-status": "Visualizza stato",
