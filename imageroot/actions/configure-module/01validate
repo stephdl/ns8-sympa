@@ -9,6 +9,7 @@ import os
 import sys
 import json
 import agent
+import sympa_mail
 from agent.ldapproxy import Ldapproxy
 
 # Validation step, no task progress at all
@@ -46,8 +47,11 @@ else:
     # The mail module rejects its internal LDAP domain and every subdomain of it
     internal = providers[0].get('user_domain', '').lower()
     list_domain = data["list_domain"].lower()
+    in_use = sympa_mail.list_domains_in_use(rdb)
     if internal and (list_domain == internal or list_domain.endswith('.' + internal)):
         fail('list_domain', data["list_domain"], 'list_domain_is_mail_internal_domain')
+    elif list_domain in in_use:
+        fail('list_domain', data["list_domain"], 'list_domain_used_by_another_instance')
     else:
         result = agent.tasks.run(f"module/{providers[0]['module_id']}", action='list-domains', data={})
         agent.assert_exp(result['exit_code'] == 0, "Cannot list the domains of the mail server")

@@ -1,0 +1,63 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://nethserver.org/json-schema/task/input/sympa/create-list",
+    "title": "create-list input",
+    "description": "Create a Sympa list and its mail addresses",
+    "examples": [
+        {
+            "name": "news",
+            "subject": "Company news",
+            "type": "news-letter",
+            "owners": [
+                "admin@example.org"
+            ],
+            "description": "Monthly news"
+        }
+    ],
+    "type": "object",
+    "required": [
+        "name",
+        "subject",
+        "type",
+        "owners"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "name": {
+            "type": "string",
+            "title": "List name",
+            "minLength": 1,
+            "maxLength": 50,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+        },
+        "subject": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+        },
+        "type": {
+            "type": "string",
+            "enum": [
+                "discussion_list",
+                "news-letter",
+                "html-news-letter",
+                "hotline",
+                "private_working_group",
+                "confidential",
+                "public_web_forum"
+            ]
+        },
+        "owners": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "string",
+                "format": "email"
+            }
+        },
+        "description": {
+            "type": "string",
+            "maxLength": 2000
+        }
+    }
+}

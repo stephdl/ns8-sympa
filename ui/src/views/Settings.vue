@@ -142,6 +142,21 @@
               class="mg-bottom maxwidth"
               ref="list_domain"
             />
+            <cv-row v-if="listDomainUsedBy">
+              <cv-column>
+                <NsInlineNotification
+                  kind="warning"
+                  :title="$t('settings.list_domain_already_used')"
+                  :description="
+                    $t('settings.list_domain_already_used_description', {
+                      domain: listDomain,
+                      instance: listDomainUsedBy,
+                    })
+                  "
+                  :showCloseButton="false"
+                />
+              </cv-column>
+            </cv-row>
             <cv-text-area
               :label="$t('settings.listmasters')"
               v-model="listmastersText"
@@ -191,6 +206,18 @@
               class="mg-bottom maxwidth"
               ref="default_lang"
             />
+            <cv-row v-if="moveError">
+              <cv-column>
+                <NsInlineNotification
+                  kind="warning"
+                  :title="$t('settings.addresses_not_moved')"
+                  :description="moveError"
+                  :actionLabel="$t('settings.go_to_lists')"
+                  @action="goToAppPage(instanceName, 'lists')"
+                  :showCloseButton="false"
+                />
+              </cv-column>
+            </cv-row>
             <cv-row v-if="error.configureModule">
               <cv-column>
                 <NsInlineNotification
@@ -234,54 +261,76 @@
         </cv-tile>
       </cv-column>
     </cv-row>
-    <cv-row v-if="savedListDomain && inboundDomain">
+    <cv-row v-if="saved.mailModule && saved.listDomain">
       <cv-column>
-        <cv-tile light>
-          <h4 class="mg-bottom-md">{{ $t("settings.addresses_title") }}</h4>
-          <NsInlineNotification
-            kind="info"
-            :title="$t('settings.addresses_info')"
-            :description="
-              $t('settings.addresses_description', {
-                domain: savedListDomain,
-                inbound: inboundDomain,
-              })
-            "
-            :showCloseButton="false"
-          />
-          <h6 class="mg-bottom-sm">{{ $t("settings.robot_addresses") }}</h6>
-          <NsCodeSnippet
-            class="mg-bottom"
-            :copyTooltip="core.$t('common.copy_to_clipboard')"
-            :copyFeedback="core.$t('common.copied_to_clipboard')"
-            :moreText="core.$t('common.show_more')"
-            :lessText="core.$t('common.show_less')"
-            light
-            >{{ addressCommands(robotLocalParts) }}</NsCodeSnippet
-          >
-          <NsTextInput
-            :label="$t('settings.list_name')"
-            placeholder="mylist"
-            v-model.trim="listName"
-            :helper-text="$t('settings.list_name_helper')"
-            class="mg-bottom maxwidth"
-          />
-          <template v-if="validListName">
-            <h6 class="mg-bottom-sm">
-              {{ $t("settings.list_addresses", { list: listName }) }}
-            </h6>
-            <NsCodeSnippet
-              :copyTooltip="core.$t('common.copy_to_clipboard')"
-              :copyFeedback="core.$t('common.copied_to_clipboard')"
-              :moreText="core.$t('common.show_more')"
-              :lessText="core.$t('common.show_less')"
-              light
-              >{{ addressCommands(listLocalParts) }}</NsCodeSnippet
-            >
-          </template>
-        </cv-tile>
+        <cv-accordion class="mg-bottom">
+          <cv-accordion-item>
+            <template slot="title">{{
+              $t("settings.before_removing")
+            }}</template>
+            <template slot="content">
+              <p class="mg-bottom">
+                {{
+                  cleanupAddresses.length
+                    ? $t("settings.before_removing_description", {
+                        count: cleanupAddresses.length,
+                        mail: saved.mailModule,
+                      })
+                    : $t("settings.no_address_to_remove", {
+                        mail: saved.mailModule,
+                      })
+                }}
+              </p>
+              <NsInlineNotification
+                v-if="cleanupDone"
+                kind="success"
+                :title="$t('settings.addresses_removed')"
+                :description="
+                  $t('settings.addresses_removed_description', {
+                    count: cleanupDone,
+                    mail: saved.mailModule,
+                  })
+                "
+                @close="cleanupDone = 0"
+              />
+              <NsInlineNotification
+                v-if="cleanupError"
+                kind="error"
+                :title="$t('settings.remove_all_addresses')"
+                :description="cleanupError"
+                :showCloseButton="false"
+              />
+              <NsButton
+                kind="danger"
+                :icon="TrashCan20"
+                :disabled="
+                  stillLoading || !cleanupLoaded || !cleanupAddresses.length
+                "
+                @click="showCleanup"
+                >{{ $t("settings.remove_all_addresses") }}</NsButton
+              >
+            </template>
+          </cv-accordion-item>
+        </cv-accordion>
       </cv-column>
     </cv-row>
+    <NsDangerDeleteModal
+      :isShown="isCleanupShown"
+      :name="instanceName"
+      :title="$t('settings.remove_all_addresses')"
+      :warning="core.$t('common.please_read_carefully')"
+      :description="
+        $t('settings.remove_all_addresses_description', {
+          count: cleanupAddresses.length,
+          mail: saved.mailModule,
+          addresses: cleanupAddresses.join(', '),
+        })
+      "
+      :typeToConfirm="core.$t('common.type_to_confirm', { name: instanceName })"
+      :loading="loading.cleanup"
+      @hide="isCleanupShown = false"
+      @confirmDelete="removeAllAddresses"
+    />
   </cv-grid>
 </template>
 
@@ -295,6 +344,7 @@ import {
   IconService,
   PageTitleService,
 } from "@nethserver/ns8-ui-lib";
+import MailAddresses from "@/mixins/mailAddresses";
 
 // Languages shipped with Sympa 6.2
 const LANGS = {
@@ -308,19 +358,6 @@ const LANGS = {
   eu: "Euskara",
 };
 
-// Robot addresses, from /etc/sympa/aliases.sympa.postfix of the EPEL package
-const ROBOT_LOCAL_PARTS = [
-  "sympa",
-  "sympa-request",
-  "sympa-owner",
-  "listmaster",
-  "bounce",
-  "abuse-feedback-report",
-];
-
-// Addresses of one list, from Sympa default/list_aliases.tt2
-const LIST_SUFFIXES = ["", "-request", "-editor", "-unsubscribe", "-owner"];
-
 export default {
   name: "Settings",
   mixins: [
@@ -329,6 +366,7 @@ export default {
     UtilService,
     QueryParamService,
     PageTitleService,
+    MailAddresses,
   ],
   pageTitle() {
     return this.$t("settings.title") + " - " + this.appName;
@@ -348,23 +386,30 @@ export default {
       isLetsEncryptEnabled: false,
       isLetsEncryptCurrentlyEnabled: false,
       listDomain: "",
-      savedListDomain: "",
       listmastersText: "",
       // Empty until the configuration loads, or the combo box shows the raw value
       mailServer: "",
       userDomain: "",
       defaultLang: "",
-      inboundDomain: "",
       mailServers: [],
       userDomains: [],
       smarthostEnabled: true,
+      domainsInUse: {},
+      // Saved mail server and list domain, to move the addresses after a change
+      saved: { mailModule: "", listDomain: "", inbound: "" },
+      moveError: "",
+      isCleanupShown: false,
+      cleanupAddresses: [],
+      cleanupError: "",
+      cleanupDone: 0,
+      cleanupLoaded: false,
       optionsKey: 0,
-      listName: "",
       invalidEmail: "",
       loading: {
         getConfiguration: false,
         configureModule: false,
         getStatus: false,
+        cleanup: false,
       },
       error: {
         getConfiguration: "",
@@ -411,11 +456,19 @@ export default {
     },
     listDomainOptions() {
       const server = this.mailServers.find((s) => s.uuid === this.mailServer);
-      return (server ? server.domains : []).map((domain) => ({
-        name: domain,
-        label: domain,
-        value: domain,
-      }));
+      // Like ns8-piler: the label tells which domains another instance serves
+      return (server ? server.domains : []).map((domain) => {
+        const label = this.domainsInUse[domain]
+          ? this.$t("settings.domain_used_by", {
+              domain,
+              instance: this.domainsInUse[domain],
+            })
+          : domain;
+        return { name: domain, label, value: domain };
+      });
+    },
+    listDomainUsedBy() {
+      return this.domainsInUse[this.listDomain] || "";
     },
     langOptions() {
       return Object.entries(LANGS).map(([value, label]) => ({
@@ -423,19 +476,6 @@ export default {
         label,
         value,
       }));
-    },
-    selectedMailModule() {
-      const server = this.mailServers.find((s) => s.uuid === this.mailServer);
-      return server ? server.module_id : "mail1";
-    },
-    validListName() {
-      return /^[a-z0-9][a-z0-9._-]*$/.test(this.listName);
-    },
-    robotLocalParts() {
-      return ROBOT_LOCAL_PARTS;
-    },
-    listLocalParts() {
-      return LIST_SUFFIXES.map((suffix) => this.listName + suffix);
     },
   },
   watch: {
@@ -466,23 +506,6 @@ export default {
   methods: {
     goTo(path) {
       this.core.$router.push(path);
-    },
-    addressCommands(localParts) {
-      return localParts
-        .map((local) => {
-          const data = {
-            atype: "domain",
-            domain: this.savedListDomain,
-            local,
-            destinations: [
-              { dtype: "external", name: `${local}@${this.inboundDomain}` },
-            ],
-          };
-          return `api-cli run module/${
-            this.selectedMailModule
-          }/add-address --data '${JSON.stringify(data)}'`;
-        })
-        .join("\n");
     },
     async getStatus() {
       this.loading.getStatus = true;
@@ -563,14 +586,22 @@ export default {
       this.mailServers = config.mail_servers;
       this.userDomains = config.user_domains;
       this.smarthostEnabled = config.smarthost_enabled;
+      this.domainsInUse = config.domains_in_use || {};
+      const savedServer = config.mail_servers.find(
+        (s) => s.uuid === config.mail_server
+      );
+      this.saved = {
+        mailModule: savedServer ? savedServer.module_id : "",
+        listDomain: config.list_domain,
+        inbound: config.inbound_domain,
+      };
+      this.loadCleanupAddresses();
       this.host = config.host;
       this.savedHost = config.host;
       this.hasRoute = config.has_route;
       this.isLetsEncryptEnabled = config.lets_encrypt;
       this.isLetsEncryptCurrentlyEnabled = config.lets_encrypt;
-      this.savedListDomain = config.list_domain;
       this.listmastersText = config.listmasters.join("\n");
-      this.inboundDomain = config.inbound_domain;
       // A combo box shows the raw value if it is created with one: clear it, recreate, then set
       this.mailServer = "";
       this.listDomain = "";
@@ -616,6 +647,14 @@ export default {
           }
           isValidationOk = false;
         }
+      }
+      if (this.listDomainUsedBy) {
+        this.error.list_domain =
+          "settings.list_domain_used_by_another_instance";
+        if (isValidationOk) {
+          this.focusElement("list_domain");
+        }
+        isValidationOk = false;
       }
       const emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
       const badEmail = this.listmasters().find((addr) => !emailRe.test(addr));
@@ -699,9 +738,93 @@ export default {
       this.error.configureModule = this.$t("error.generic_error");
       this.loading.configureModule = false;
     },
-    configureModuleCompleted() {
+    async configureModuleCompleted() {
+      const before = this.saved;
+      const server = this.mailServers.find((s) => s.uuid === this.mailServer);
+      const after = {
+        mailModule: server ? server.module_id : "",
+        listDomain: this.listDomain,
+      };
+      if (
+        before.mailModule &&
+        before.listDomain &&
+        (before.mailModule !== after.mailModule ||
+          before.listDomain !== after.listDomain)
+      ) {
+        await this.moveAddresses(before, after);
+      }
       this.loading.configureModule = false;
       this.getConfiguration();
+    },
+    // The module cannot remove its addresses when the instance is removed
+    async loadCleanupAddresses() {
+      this.cleanupLoaded = false;
+      if (!this.saved.mailModule || !this.saved.listDomain) {
+        this.cleanupAddresses = [];
+        return;
+      }
+      try {
+        const state = await this.readMailState(
+          this.saved.mailModule,
+          this.saved.listDomain
+        );
+        this.cleanupAddresses = this.sympaAddresses(
+          state,
+          this.saved.inbound
+        ).sort();
+        this.cleanupLoaded = true;
+      } catch (err) {
+        this.cleanupAddresses = [];
+        this.cleanupError = err.message;
+      }
+    },
+    async showCleanup() {
+      this.cleanupError = "";
+      this.cleanupDone = 0;
+      // Read again: the Lists page may have changed the addresses
+      await this.loadCleanupAddresses();
+      if (this.cleanupAddresses.length) {
+        this.isCleanupShown = true;
+      }
+    },
+    async removeAllAddresses() {
+      this.loading.cleanup = true;
+      try {
+        await this.withdrawAddresses(
+          this.saved.mailModule,
+          this.saved.listDomain,
+          this.saved.inbound,
+          this.cleanupAddresses
+        );
+        this.cleanupDone = this.cleanupAddresses.length;
+        this.isCleanupShown = false;
+        await this.loadCleanupAddresses();
+      } catch (err) {
+        this.cleanupError = err.message;
+        // Some addresses may be gone: show the ones that are left
+        await this.loadCleanupAddresses();
+      }
+      this.loading.cleanup = false;
+    },
+    // The module cannot move its addresses: copy them, then remove the old ones
+    async moveAddresses(before, after) {
+      this.moveError = "";
+      try {
+        const state = await this.readMailState(
+          before.mailModule,
+          before.listDomain
+        );
+        const locals = this.sympaAddresses(state, before.inbound);
+        await this.declareAddresses(
+          after.mailModule,
+          after.listDomain,
+          before.inbound,
+          locals
+        );
+        await this.dropAddresses(before.mailModule, before.listDomain, locals);
+      } catch (err) {
+        this.moveError = this.addressErrorMessage(err, after.listDomain);
+      }
     },
   },
 };

@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2026 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+#
+# On another cluster, an instance may already use the inbound domain of
+# the backup. Sharing it would share the relay rule too: take a new one.
+#
+
+import os
+import sys
+import agent
+import sympa_mail
+
+rdb = agent.redis_connect(use_replica=True)
+inbound = os.environ.get("INBOUND_DOMAIN", "")
+other = sympa_mail.inbound_domain_owner(rdb, inbound) if inbound else None
+if other:
+    new_inbound = sympa_mail.free_inbound_domain(rdb)
+    agent.set_env("INBOUND_DOMAIN", new_inbound)
+    print(agent.SD_WARNING + f"Inbound domain {inbound} is used by {other}. This instance now uses "
+          f"{new_inbound}: declare its mail addresses again from the Lists page", file=sys.stderr)

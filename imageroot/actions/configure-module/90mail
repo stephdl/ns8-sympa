@@ -6,12 +6,12 @@
 #
 
 import os
+import agent
 import sympa_mail
 
-import agent
-
 # RELAY_MAIL_SERVER is saved only once the rule exists: a failed run keeps
-# pointing to the old mail server, so a retry still removes its rule
+# pointing to the old mail server, so a retry still removes its rule.
+# The addresses are declared by the UI, not here.
 previous = os.environ.get("RELAY_MAIL_SERVER", "")
 current = os.environ["MAIL_SERVER"]
 

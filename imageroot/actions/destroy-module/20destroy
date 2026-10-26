@@ -5,6 +5,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
+#
+# The mail addresses stay in the mail module: the module cannot remove
+# them. The Status page lists them before the instance is removed.
+#
+
 import os
 import sys
 import agent
@@ -12,8 +17,8 @@ import sympa_mail
 
 mail_server = os.environ.get("RELAY_MAIL_SERVER") or os.environ.get("MAIL_SERVER")
 if mail_server:
+    # The instance must go away even if the mail module is unreachable
     try:
         sympa_mail.remove_relay_rule(mail_server)
     except Exception as ex:
-        # The instance must go away even if the mail module is unreachable
         print(agent.SD_WARNING + f"Cannot remove the relay rule: {ex}", file=sys.stderr)

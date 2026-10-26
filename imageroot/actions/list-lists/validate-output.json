@@ -1,0 +1,94 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://nethserver.org/json-schema/task/output/sympa/list-lists",
+    "title": "list-lists output",
+    "description": "Sympa lists and the mail addresses the UI must declare",
+    "examples": [
+        {
+            "configured": true,
+            "list_types": [
+                "discussion_list"
+            ],
+            "robot_addresses": [
+                "sympa1",
+                "sympa1-request",
+                "sympa1-owner",
+                "sympa1-listmaster",
+                "sympa1-bounce",
+                "sympa1-abuse-feedback-report"
+            ],
+            "list_suffixes": [
+                "",
+                "-request",
+                "-editor",
+                "-unsubscribe",
+                "-owner"
+            ],
+            "lists": [
+                {
+                    "name": "news",
+                    "subject": "Company news",
+                    "status": "open",
+                    "subscribers": 12
+                }
+            ]
+        }
+    ],
+    "type": "object",
+    "required": [
+        "configured",
+        "lists",
+        "list_types",
+        "robot_addresses",
+        "list_suffixes"
+    ],
+    "properties": {
+        "configured": {
+            "type": "boolean"
+        },
+        "list_types": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "robot_addresses": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "list_suffixes": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "lists": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "subject",
+                    "status",
+                    "subscribers"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "subject": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "subscribers": {
+                        "type": "integer"
+                    }
+                }
+            }
+        }
+    }
+}

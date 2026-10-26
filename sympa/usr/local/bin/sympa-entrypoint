@@ -17,7 +17,7 @@ set -e
 role="${1:?missing role: sympa, postfix or web}"
 
 : "${SYMPA_DOMAIN:?}" "${SYMPA_LISTMASTERS:?}" "${SYMPA_WWSYMPA_URL:?}"
-: "${SYMPA_DB_PASSWORD:?}" "${SYMPA_COOKIE:?}"
+: "${SYMPA_DB_PASSWORD:?}" "${SYMPA_COOKIE:?}" "${SYMPA_ROBOT_PREFIX:?}"
 
 templates=/usr/local/lib/sympa-templates
 
@@ -36,6 +36,9 @@ render_sympa_conf() {
         cat <<EOF
 domain ${SYMPA_DOMAIN}
 listmaster ${SYMPA_LISTMASTERS}
+email ${SYMPA_ROBOT_PREFIX}
+listmaster_email ${SYMPA_ROBOT_PREFIX}-listmaster
+bounce_email_prefix ${SYMPA_ROBOT_PREFIX}-bounce
 wwsympa_url ${SYMPA_WWSYMPA_URL}
 lang ${SYMPA_LANG:-en-US}
 db_type PostgreSQL

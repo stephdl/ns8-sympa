@@ -43,6 +43,8 @@ def ensure_relay_rule(mail_uuid):
     module_id = _mail_module_id(rdb, mail_uuid)
     agent.assert_exp(module_id is not None, f"Mail server {mail_uuid} not found")
     subject = os.environ["INBOUND_DOMAIN"]
+    other = inbound_domain_owner(rdb, subject)
+    agent.assert_exp(other is None, f"Inbound domain {subject} is used by {other}: its relay rule is not changed")
     host = os.environ["SMTP_BIND_ADDRESS"]
     port = int(os.environ["SMTP_PORT"])
 
@@ -85,3 +87,72 @@ def remove_relay_rule(mail_uuid):
     result = _run(module_id, 'remove-relay-rule', {'rule_subject': subject})
     if result['exit_code'] != 0:
         print(agent.SD_WARNING + f"remove-relay-rule failed on {module_id}", file=sys.stderr)
+
+
+#
+# Mail addresses of Sympa. The mail module does not let us create them: the
+# UI declares them with the token of the logged admin.
+#
+
+# Robot addresses of the EPEL package, before the instance prefix
+LEGACY_ROBOT_LOCAL_PARTS = ["sympa", "sympa-request", "sympa-owner", "listmaster", "bounce", "abuse-feedback-report"]
+ROBOT_SUFFIXES = ["", "-request", "-owner", "-listmaster", "-bounce", "-abuse-feedback-report"]
+# Addresses of one list, from Sympa default/list_aliases.tt2
+LIST_SUFFIXES = ["", "-request", "-editor", "-unsubscribe", "-owner"]
+
+
+def robot_prefix():
+    return os.environ.get("INBOUND_DOMAIN", "").removesuffix(".invalid")
+
+
+def robot_local_parts():
+    """sympa1, sympa1-request, ... set in sympa.conf by the entrypoint"""
+    return [robot_prefix() + suffix for suffix in ROBOT_SUFFIXES]
+
+
+def list_local_parts(name):
+    return [name + suffix for suffix in LIST_SUFFIXES]
+
+
+def _other_instances(rdb):
+    """Environment of the other Sympa instances, as (module_id, env).
+
+    INBOUND_DOMAIN marks a Sympa instance. The source of a move has our
+    UUID and is not another instance.
+    """
+    for module_id in rdb.hkeys('cluster/module_node'):
+        if module_id == os.environ['MODULE_ID']:
+            continue
+        env = rdb.hgetall(f'module/{module_id}/environment')
+        if env.get('INBOUND_DOMAIN') and env.get('MODULE_UUID') != os.environ['MODULE_UUID']:
+            yield module_id, env
+
+
+def inbound_domain_owner(rdb, inbound):
+    """Module ID of another Sympa instance with this inbound domain, or None.
+
+    Two instances with the same inbound domain would share one relay rule,
+    and the mail of one would go to the other.
+    """
+    for module_id, env in _other_instances(rdb):
+        if env['INBOUND_DOMAIN'].lower() == inbound.lower():
+            return module_id
+    return None
+
+
+def free_inbound_domain(rdb):
+    """A new inbound domain from our module ID, not used by another instance"""
+    candidate = os.environ["MODULE_ID"] + ".invalid"
+    if inbound_domain_owner(rdb, candidate):
+        candidate = os.environ["MODULE_ID"] + "-" + os.environ["MODULE_UUID"][:8] + ".invalid"
+    return candidate
+
+
+def list_domains_in_use(rdb):
+    """List domains of the other Sympa instances: {domain: module_id}.
+
+    Sympa runs one robot per domain, and two instances on one domain would
+    fight over the same list addresses in the mail module.
+    """
+    return {env['LIST_DOMAIN'].lower(): module_id
+            for module_id, env in _other_instances(rdb) if env.get('LIST_DOMAIN')}

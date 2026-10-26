@@ -14,6 +14,7 @@
 import os
 import sys
 import agent
+import sympa_mail
 from agent.ldapproxy import Ldapproxy
 
 # Inside the pod, 10.0.2.2 is the node loopback (slirp4netns allow_host_loopback)
@@ -39,6 +40,9 @@ write_env("sympa.env", {
     "SYMPA_WWSYMPA_URL": f"https://{host}/sympa",
     "SYMPA_HOSTNAME": host,
     "SYMPA_INBOUND_DOMAIN": env.get("INBOUND_DOMAIN", ""),
+    # Fixed at creation like the inbound domain: robot addresses never collide
+    # with a user or with another instance, and survive restore and move
+    "SYMPA_ROBOT_PREFIX": sympa_mail.robot_prefix(),
     "SYMPA_LANG": env.get("DEFAULT_LANG", "en-US"),
 })
 

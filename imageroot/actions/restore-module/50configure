@@ -46,6 +46,10 @@ if not providers:
 result = agent.tasks.run(f"module/{providers[0]['module_id']}", action='list-domains', data={})
 if result['exit_code'] != 0 or renv["LIST_DOMAIN"] not in [record['domain'].lower() for record in result['output']]:
     start_without_configuration(f"Domain {renv['LIST_DOMAIN']} does not exist in the mail server")
+# The source instance may still run here: configure-module would refuse its list domain
+other = sympa_mail.list_domains_in_use(rdb).get(renv["LIST_DOMAIN"].lower())
+if other:
+    start_without_configuration(f"Domain {renv['LIST_DOMAIN']} is used by {other}")
 
 configure_retval = agent.tasks.run(agent_id=os.environ['AGENT_ID'], action='configure-module', data={
     "host": renv["TRAEFIK_HOST"],

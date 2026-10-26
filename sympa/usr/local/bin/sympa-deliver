@@ -13,18 +13,20 @@
 
 local_part="${1,,}"
 domain=$(sed -n 's/^domain[[:space:]]\+//p' /etc/sympa/sympa.conf)
+# Robot addresses start with the instance prefix, see SYMPA_ROBOT_PREFIX
+robot=$(sed -n 's/^email[[:space:]]\+//p' /etc/sympa/sympa.conf)
 # EX_TEMPFAIL: Postfix keeps the message and retries
-[[ -n "${local_part}" && -n "${domain}" ]] || exit 75
+[[ -n "${local_part}" && -n "${domain}" && -n "${robot}" ]] || exit 75
 
 case "${local_part}" in
-bounce|abuse-feedback-report)
-    exec /usr/libexec/sympa/bouncequeue "sympa@${domain}"
+"${robot}-bounce"|"${robot}-abuse-feedback-report")
+    exec /usr/libexec/sympa/bouncequeue "${robot}@${domain}"
     ;;
-sympa|listmaster)
+"${robot}"|"${robot}-listmaster")
     exec /usr/libexec/sympa/queue "${local_part}@${domain}"
     ;;
-sympa-request|sympa-owner)
-    exec /usr/libexec/sympa/queue "listmaster@${domain}"
+"${robot}-request"|"${robot}-owner")
+    exec /usr/libexec/sympa/queue "${robot}-listmaster@${domain}"
     ;;
 *-owner)
     exec /usr/libexec/sympa/bouncequeue "${local_part%-owner}@${domain}"

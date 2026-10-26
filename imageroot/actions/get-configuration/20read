@@ -9,6 +9,7 @@ import os
 import sys
 import json
 import agent
+import sympa_mail
 from agent.ldapproxy import Ldapproxy
 
 rdb = agent.redis_connect(use_replica=True)
@@ -64,5 +65,7 @@ config = {
     "mail_servers": mail_servers,
     "user_domains": Ldapproxy().get_domains_list(),
     "smarthost_enabled": bool(smarthost["enabled"] and smarthost["host"]),
+    # Domains already served by another Sympa instance, with its module ID
+    "domains_in_use": sympa_mail.list_domains_in_use(rdb),
 }
 json.dump(config, fp=sys.stdout)
