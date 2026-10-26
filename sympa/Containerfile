@@ -16,9 +16,6 @@ RUN dnf -y install epel-release dnf-plugins-core \
     && dnf clean all \
     && rm -rf /var/cache/dnf
 
-# Read by the get-sympa-version action for the About page
-LABEL org.nethserver.sympa-version="${SYMPA_VERSION}"
-
 COPY usr /usr
 
 ENTRYPOINT ["/usr/local/bin/sympa-entrypoint"]
