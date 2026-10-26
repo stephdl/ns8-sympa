@@ -10,7 +10,9 @@ the cluster smarthost.
 
 One instance serves the lists of one mail domain only, like
 `mylist@example.org`. For lists on another domain, install another
-instance of the module. Two instances cannot share a domain.
+instance of the module. Two instances cannot share a domain. Once the
+first list is created, the list domain and the mail server cannot change
+anymore.
 
 ## Mail addresses
 
@@ -63,7 +65,8 @@ cannot create them.
 - Addresses that forward to the instance but match no list are shown with
   a "Remove unused addresses" button.
 - When the mail server or the list domain changes in Settings, the UI
-  moves the addresses after saving.
+  moves the Sympa addresses after saving. This is possible only before
+  the first list is created.
 
 The UI removes only the addresses that forward to this instance.
 
