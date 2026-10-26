@@ -11,10 +11,6 @@ set -e
 # Third-party images pulled at runtime, pinned for Renovate
 postgres_image="docker.io/postgres:18.6-alpine"
 
-# EPEL drops older builds, so this must follow the version EPEL 9 ships
-# renovate: datasource=repology packageName=epel_9/sympa
-sympa_version=6.2.80
-
 # Prepare variables for later use
 images=()
 # The image will be pushed to GitHub container registry
@@ -25,8 +21,7 @@ reponame="sympa"
 #
 # Sympa application image: Sympa, Postfix and nginx from Rocky Linux + EPEL
 #
-buildah bud --build-arg SYMPA_VERSION="${sympa_version}" \
-    -f sympa/Containerfile -t "${repobase}/${reponame}-app" sympa
+buildah bud -f sympa/Containerfile -t "${repobase}/${reponame}-app" sympa
 images+=("${repobase}/${reponame}-app")
 
 # Create a new empty container image
