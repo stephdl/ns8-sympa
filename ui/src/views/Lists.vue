@@ -104,7 +104,7 @@
           >{{ $t("lists.create_list") }}</NsButton
         >
         <NsButton
-          kind="ghost"
+          kind="tertiary"
           :icon="Restart20"
           :disabled="loading.listLists || !!busy"
           :loading="loading.listLists"
