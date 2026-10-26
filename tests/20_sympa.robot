@@ -239,7 +239,7 @@ Check if sympa restarts when its user domain changes
 
 Check if sympa follows the cluster smarthost
     ${saved} =    Run task    cluster/get-smarthost    {}
-    ${saved} =    Evaluate    {k: $saved[k] for k in ('host', 'port', 'username', 'password', 'enabled', 'encrypt_smtp', 'tls_verify')}
+    ${saved} =    Evaluate    {k: v for k, v in $saved.items() if k in ('host', 'port', 'username', 'password', 'enabled', 'encrypt_smtp', 'tls_verify')}
     # set-smarthost rejects an empty host, even when the smarthost is disabled
     IF    not $saved['host']
         Set To Dictionary    ${saved}    host=localhost
