@@ -257,3 +257,12 @@ Test the module using the `test-module.sh` script:
     ./test-module.sh <NODE_ADDR> ghcr.io/stephdl/sympa:latest
 
 The tests are made using [Robot Framework](https://robotframework.org/).
+
+The suite installs an OpenLDAP user domain and a Mail application, then
+configures Sympa, creates a list and subscribes to it by mail. Set
+`SCENARIO` to `update` to start from the last release,
+`ghcr.io/stephdl/sympa:1.0.0`, and update it to the image under test. On a
+node that already has a Mail application, set `MAIL_MODULE` to its module
+ID and the suite reuses it.
+
+Update `STABLE_IMAGE_URL` in `tests/20_sympa.robot` after each release.
