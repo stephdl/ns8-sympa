@@ -1,6 +1,7 @@
-FROM docker.io/rockylinux/rockylinux:9.8
+FROM docker.io/rockylinux/rockylinux:9.8.20260525.0
 
-ARG SYMPA_VERSION=6.2.80
+# Set by build-images.sh, where Renovate tracks it
+ARG SYMPA_VERSION
 
 # CRB provides some Perl modules required by the EPEL sympa package
 RUN dnf -y install epel-release dnf-plugins-core \
