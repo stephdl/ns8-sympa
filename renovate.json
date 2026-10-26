@@ -26,6 +26,19 @@
       ],
       "minimumReleaseAge": null,
       "automerge": false
+    },
+    {
+      "description": "Rocky 10 requires x86-64-v3 CPUs, which older NS8 hosts may lack",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "docker.io/rockylinux/rockylinux"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "enabled": false
     }
   ]
 }
