@@ -801,6 +801,8 @@ export default {
         await this.loadCleanupAddresses();
       } catch (err) {
         this.cleanupError = err.message;
+        // Some addresses may be gone: show the ones that are left
+        await this.loadCleanupAddresses();
       }
       this.loading.cleanup = false;
     },

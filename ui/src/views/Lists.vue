@@ -420,7 +420,7 @@ export default {
     },
   },
   created() {
-    this.refresh();
+    this.load();
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
@@ -460,7 +460,7 @@ export default {
     isOurs(local) {
       return this.forwardsTo(this.mailState, local, this.inboundDomain);
     },
-    async refresh() {
+    async load() {
       this.loading.listLists = true;
       this.error.listLists = "";
       try {
@@ -476,11 +476,7 @@ export default {
           (s) => s.uuid === config.mail_server
         );
         this.mailModule = server ? server.module_id : "";
-        this.configured = output.configured && !!this.mailModule;
-        this.lists = output.lists;
-        this.listTypes = output.list_types;
-        this.robotAddresses = output.robot_addresses;
-        this.listSuffixes = output.list_suffixes;
+        this.setLists(output);
         this.loaded = true;
       } catch (err) {
         this.error.listLists = err.message;
@@ -489,6 +485,28 @@ export default {
       if (this.configured) {
         await this.loadMailState();
       }
+    },
+    setLists(output) {
+      this.configured = output.configured && !!this.mailModule;
+      this.lists = output.lists;
+      this.listTypes = output.list_types;
+      this.robotAddresses = output.robot_addresses;
+      this.listSuffixes = output.list_suffixes;
+    },
+    // The configuration does not change on this page: read the lists only
+    async refresh() {
+      this.loading.listLists = true;
+      this.error.listLists = "";
+      const [output] = await Promise.all([
+        this.moduleTask(this.instanceName, "list-lists").catch((err) => {
+          this.error.listLists = err.message;
+        }),
+        this.configured ? this.loadMailState() : null,
+      ]);
+      if (output) {
+        this.setLists(output);
+      }
+      this.loading.listLists = false;
     },
     async loadMailState() {
       this.error.mail = "";
@@ -647,19 +665,25 @@ export default {
         );
         this.isCreateShown = false;
       } catch (err) {
-        await this.dropAddresses(this.mailModule, this.listDomain, created);
+        let message = this.addressErrorMessage(err, this.listDomain);
+        try {
+          await this.dropAddresses(this.mailModule, this.listDomain, created);
+        } catch (dropErr) {
+          message += " " + dropErr.message;
+        }
         if (err instanceof AddressConflict) {
           this.error.name = "lists.list_" + err.reason;
           this.errorValue = `${err.local}@${this.listDomain}`;
           this.focusElement("name");
-        } else if (err.validation) {
+        } else if (err.validation && err.action === "create-list") {
           for (const e of err.validation) {
             this.error[e.parameter] = "lists." + e.error;
             this.errorValue = e.value;
             this.focusElement(e.parameter);
           }
         } else {
-          this.error.createList = err.message;
+          // The mail module errors have no field in this form
+          this.error.createList = message;
         }
       }
       this.loading.createList = false;

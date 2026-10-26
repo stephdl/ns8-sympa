@@ -22,17 +22,27 @@ export default {
     moduleTask(moduleId, action, data = {}, title = "") {
       return new Promise((resolve, reject) => {
         const eventId = this.getUuid();
-        this.core.$root.$once(`${action}-completed-${eventId}`, (ctx, result) =>
-          resolve(result.output)
-        );
-        this.core.$root.$once(`${action}-aborted-${eventId}`, () =>
-          reject(new Error(this.$t("error.generic_error")))
-        );
-        this.core.$root.$once(
-          `${action}-validation-failed-${eventId}`,
-          (errors) =>
-            reject(Object.assign(new Error(action), { validation: errors }))
-        );
+        const handlers = {
+          completed: (ctx, result) => resolve(result.output),
+          aborted: () => reject(new Error(this.$t("error.generic_error"))),
+          "validation-failed": (errors) =>
+            reject(
+              Object.assign(new Error(action), { action, validation: errors })
+            ),
+        };
+        // Only one event fires: drop the other listeners with it
+        const off = () => {
+          for (const [name, handler] of Object.entries(handlers)) {
+            this.core.$root.$off(`${action}-${name}-${eventId}`, handler);
+          }
+        };
+        for (const [name, handler] of Object.entries(handlers)) {
+          handlers[name] = (...args) => {
+            off();
+            handler(...args);
+          };
+          this.core.$root.$on(`${action}-${name}-${eventId}`, handlers[name]);
+        }
         this.createModuleTaskForApp(moduleId, {
           action,
           data,
@@ -41,7 +51,10 @@ export default {
             isNotificationHidden: !title,
             eventId,
           },
-        }).catch((err) => reject(new Error(this.getErrorMessage(err))));
+        }).catch((err) => {
+          off();
+          reject(new Error(this.getErrorMessage(err)));
+        });
       });
     },
     // Addresses of a domain as the mail module sees them
@@ -60,6 +73,12 @@ export default {
           state.taken[local] = "address_is_user";
         } else if (addr.atype === "addgroup" && domainInfo.addgroups) {
           state.taken[local] = "address_is_group";
+        } else if (
+          addr.atype === "addalias" &&
+          addr.domain.toLowerCase() === domain
+        ) {
+          // Postfix reads the address table first: a list would steal the mail
+          state.taken[local] = "address_is_alias";
         } else if (
           addr.atype === "domain" &&
           addr.domain.toLowerCase() === domain
@@ -119,13 +138,14 @@ export default {
           created.push(local);
         }
       } catch (err) {
-        await this.dropAddresses(mailModule, domain, created);
+        await this.dropAddresses(mailModule, domain, created).catch(() => {});
         throw err;
       }
       return created;
     },
     // Remove addresses known to forward to this instance, without checking
     async dropAddresses(mailModule, domain, locals) {
+      const failed = [];
       for (const local of locals) {
         try {
           await this.moduleTask(
@@ -136,7 +156,15 @@ export default {
           );
         } catch (err) {
           console.error(`cannot remove ${local}@${domain}`, err);
+          failed.push(`${local}@${domain}`);
         }
+      }
+      if (failed.length) {
+        throw new Error(
+          this.$t("lists.addresses_not_removed", {
+            addresses: failed.join(", "),
+          })
+        );
       }
     },
     // Remove only the given addresses that still forward to this instance
@@ -156,7 +184,11 @@ export default {
       }
       if (err.validation) {
         return err.validation
-          .map((e) => this.$t("lists." + e.error, { value: e.value }))
+          .map((e) =>
+            this.$te("lists.list_" + e.error)
+              ? this.$t("lists.list_" + e.error, { value: e.value })
+              : `${e.error}: ${e.value}`
+          )
           .join(" ");
       }
       return err.message;
