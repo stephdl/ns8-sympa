@@ -32,7 +32,7 @@ case "${local_part}" in
     # address that bounces too would loop forever, and the bounce queue would
     # only quarantine it: drop it and say so in the journal
     if [[ -z "${sender}" || "${sender,,}" == mailer-daemon@* || "${sender,,}" == postmaster@* ]]; then
-        postlog -t sympa-deliver -p warning "bounce to ${local_part}@${domain} from <${sender}> dropped, check the listmaster addresses"
+        /usr/sbin/postlog -t sympa-deliver -p warning "bounce to ${local_part}@${domain} from <${sender}> dropped, check the listmaster addresses"
         exit 0
     fi
     exec /usr/libexec/sympa/queue "${robot}-listmaster@${domain}"
