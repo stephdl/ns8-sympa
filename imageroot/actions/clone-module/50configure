@@ -8,7 +8,6 @@
 import os
 import sys
 import json
-import subprocess
 import agent
 import sympa_mail
 
@@ -25,8 +24,6 @@ if not request.get("replace"):
     agent.unset_env("TRAEFIK_HOST")
     agent.unset_env("LIST_DOMAIN")
     agent.unset_env("RELAY_MAIL_SERVER")
-    # Sympa cannot start without a list domain: configure-module starts it again
-    subprocess.run(["systemctl", "--user", "disable", "--now", "sympa.service"], check=True)
     print(agent.SD_WARNING + "Cloned instance is not configured, set a new host name and list domain in Settings", file=sys.stderr)
     sys.exit(0)
 

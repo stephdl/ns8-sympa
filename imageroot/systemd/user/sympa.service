@@ -9,6 +9,8 @@ EnvironmentFile=%S/state/environment
 WorkingDirectory=%S/state
 Restart=always
 TimeoutStopSec=70
+# A clone has no list domain until Settings, and Sympa cannot start without one
+ExecCondition=/bin/sh -c 'test -n "$$LIST_DOMAIN"'
 ExecStartPre=/bin/rm -f %t/sympa.pid %t/sympa.pod-id
 ExecStartPre=runagent sympa-config
 ExecStartPre=/usr/bin/podman pod create --infra-conmon-pidfile %t/sympa.pid \
