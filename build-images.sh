@@ -20,6 +20,9 @@ images=()
 repobase="${REPOBASE:-ghcr.io/stephdl}"
 # Configure the image name
 reponame="sympa"
+# Node.js 25+ no longer ships Corepack, install it from npm
+# renovate: datasource=npm packageName=corepack
+corepack_version=0.36.0
 
 #
 # Sympa application image: Sympa, Postfix and nginx from Rocky Linux + EPEL
@@ -33,7 +36,8 @@ container=$(buildah from scratch)
 # Reuse existing nodebuilder-sympa container, to speed up builds
 if ! buildah containers --format "{{.ContainerName}}" | grep -q nodebuilder-sympa; then
     echo "Pulling NodeJS runtime..."
-    buildah from --name nodebuilder-sympa -v "${PWD}:/usr/src:Z" docker.io/library/node:lts
+    buildah from --name nodebuilder-sympa -v "${PWD}:/usr/src:Z" docker.io/library/node:26.13.0-slim
+    buildah run nodebuilder-sympa sh -c "npm install -g corepack@${corepack_version} && corepack enable"
 fi
 
 echo "Build static UI files with node..."
@@ -42,7 +46,7 @@ buildah run \
     --env="NODE_OPTIONS=--openssl-legacy-provider" \
     --env="VUE_APP_SYMPA_VERSION=${sympa_version}" \
     nodebuilder-sympa \
-    sh -c "corepack enable && yarn install && yarn build"
+    sh -c "yarn install && yarn build"
 
 # Add imageroot directory to the container image
 buildah add "${container}" imageroot /imageroot
