@@ -26,11 +26,12 @@ on:
 jobs:
   run:
     name: "Run tests"
-    # A commit status per leg and the screenshots comment, and a called
-    # workflow cannot hold more than its caller. Granted here rather than by
-    # raising the repository default, so the write token stops at this job.
+    # A commit status per leg, the screenshots pushed to the ci-screenshots
+    # branch and their comment, and a called workflow cannot hold more than
+    # its caller. Granted here rather than by raising the repository default,
+    # so the write token stops at this job.
     permissions:
-      contents: read
+      contents: write
       pull-requests: write
       statuses: write
     uses: NethServer/ns8-github-actions/.github/workflows/test-module-qemu.yml@v1
