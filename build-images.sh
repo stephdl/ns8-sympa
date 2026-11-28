@@ -9,7 +9,7 @@
 set -e
 
 # Third-party images pulled at runtime, pinned for Renovate
-postgres_image="docker.io/postgres:18.6-alpine"
+postgres_image="docker.io/postgres:19.0-alpine"
 
 # Shown on the About page, kept in the Containerfile where Renovate bumps it
 sympa_version=$(sed -n 's/^ARG SYMPA_VERSION=//p' sympa/Containerfile)
